@@ -72,10 +72,10 @@
             <!-- Container Melengkung -->
             <div class="relative w-full h-[calc(100vh-2rem)] md:h-[calc(100vh-3rem)] rounded-[2.5rem] md:rounded-[3.5rem] overflow-hidden shadow-2xl bg-[#114045]" id="hero-slider">
                 <!-- Background Image Loop -->
-                <img src="{{ asset('slides-1.jpg') }}" class="hero-slide absolute inset-0 w-full h-full object-cover transform transition-all duration-1000 ease-in-out opacity-100" alt="Mess FR Academy 1">
-                <img src="{{ asset('slides-2.jpg') }}" class="hero-slide absolute inset-0 w-full h-full object-cover transform transition-all duration-1000 ease-in-out opacity-0" alt="Mess FR Academy 2">
-                <img src="{{ asset('slides-3.jpg') }}" class="hero-slide absolute inset-0 w-full h-full object-cover transform transition-all duration-1000 ease-in-out opacity-0" alt="Mess FR Academy 3">
-                <img src="{{ asset('slides-4.jpg') }}" class="hero-slide absolute inset-0 w-full h-full object-cover transform transition-all duration-1000 ease-in-out opacity-0" alt="Mess FR Academy 4">
+                <img src="{{ asset('images/slides-1.jpg') }}" class="hero-slide absolute inset-0 w-full h-full object-cover transform transition-all duration-1000 ease-in-out opacity-100" alt="Mess FR Academy 1">
+                <img src="{{ asset('images/slides-2.jpg') }}" class="hero-slide absolute inset-0 w-full h-full object-cover transform transition-all duration-1000 ease-in-out opacity-0" alt="Mess FR Academy 2">
+                <img src="{{ asset('images/slides-3.jpg') }}" class="hero-slide absolute inset-0 w-full h-full object-cover transform transition-all duration-1000 ease-in-out opacity-0" alt="Mess FR Academy 3">
+                <img src="{{ asset('images/slides-4.jpg') }}" class="hero-slide absolute inset-0 w-full h-full object-cover transform transition-all duration-1000 ease-in-out opacity-0" alt="Mess FR Academy 4">
                 
                 <!-- Overlay Hitam -->
                 <div class="absolute inset-0 bg-black/40 pointer-events-none"></div>
@@ -93,15 +93,7 @@
 
                 <!-- 3. Floating Check-in / Login Box INSIDE HERO -->
                 <div class="absolute bottom-8 md:bottom-10 left-1/2 -translate-x-1/2 z-40 w-11/12 max-w-3xl">
-                    <div class="bg-white/10 backdrop-blur-md rounded-full shadow-2xl p-2 border border-white/20 flex flex-col md:flex-row items-center gap-2">
-                        <div class="flex-1 w-full flex items-center px-6 bg-white rounded-full py-3 h-full">
-                            <svg class="w-6 h-6 text-[#59A338] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                            <input type="text" placeholder="Masukkan Nomor HP (Tamu)..." class="w-full bg-transparent border-none focus:ring-0 text-gray-800 placeholder-gray-500 font-semibold text-base">
-                        </div>
-                        <a href="{{ route('guest.login') }}" class="w-full md:w-auto px-8 py-3 md:py-3.5 rounded-full text-white font-bold bg-[#59A338] hover:bg-[#4d8c2f] transition-colors shadow-lg flex-shrink-0 flex items-center justify-center gap-2 text-base">
-                            Jelajahi Portal
-                        </a>
-                    </div>
+                    <livewire:guest.auth.login />
                 </div>
             </div>
         </section>

@@ -15,4 +15,9 @@ class RencanaMenuHarian extends Model
     {
         return $this->belongsTo(Menu::class);
     }
+
+    public function feedbackMasakans()
+    {
+        return $this->hasMany(FeedbackMasakan::class, 'rencana_menu_harian_id');
+    }
 }

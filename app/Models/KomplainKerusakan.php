@@ -10,5 +10,14 @@ class KomplainKerusakan extends Model
     use SoftDeletes;
 
     protected $guarded = [];
-    //
+
+    public function reservasi()
+    {
+        return $this->belongsTo(Reservasi::class);
+    }
+
+    public function teknisi()
+    {
+        return $this->belongsTo(User::class, 'teknisi_id');
+    }
 }

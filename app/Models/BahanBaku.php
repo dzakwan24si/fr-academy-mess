@@ -10,5 +10,8 @@ class BahanBaku extends Model
     use SoftDeletes;
 
     protected $guarded = [];
-    //
+
+    protected $casts = [
+        'harga_satuan' => 'decimal:2',
+    ];
 }

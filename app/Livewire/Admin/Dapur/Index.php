@@ -24,7 +24,7 @@ class Index extends Component
     {
         $bahanBakus = BahanBaku::latest()->get();
         $menus = Menu::withCount('bahanBakus')->latest()->get();
-        $rencanaHarians = RencanaMenuHarian::with('menu')->latest()->get();
+        $rencanaHarians = RencanaMenuHarian::with(['menu', 'feedbackMasakans'])->latest()->get();
 
         return view('livewire.admin.dapur.index', compact('bahanBakus', 'menus', 'rencanaHarians'));
     }
@@ -36,10 +36,13 @@ class Index extends Component
     public $nama_bahan;
     public $stok_saat_ini;
     public $satuan;
+    public $kategori_bahan = 'Kering';
+    public $harga_satuan = 0;
+    public $keterangan_volume;
 
     public function bukaModal()
     {
-        $this->reset(['nama_bahan', 'stok_saat_ini', 'satuan']);
+        $this->reset(['nama_bahan', 'stok_saat_ini', 'satuan', 'kategori_bahan', 'harga_satuan', 'keterangan_volume']);
         $this->isModalOpen = true;
     }
 
@@ -54,12 +57,18 @@ class Index extends Component
             'nama_bahan' => 'required|string|max:255',
             'stok_saat_ini' => 'required|numeric|min:0',
             'satuan' => 'required|string|max:50',
+            'kategori_bahan' => 'required|in:Kering,Basah',
+            'harga_satuan' => 'required|numeric|min:0',
+            'keterangan_volume' => 'nullable|string|max:50'
         ]);
 
         BahanBaku::create([
             'nama_bahan' => $this->nama_bahan,
             'stok' => $this->stok_saat_ini,
             'satuan' => $this->satuan,
+            'kategori_bahan' => $this->kategori_bahan,
+            'harga_satuan' => $this->harga_satuan,
+            'keterangan_volume' => $this->keterangan_volume,
         ]);
 
         $this->tutupModal();
@@ -237,7 +246,7 @@ class Index extends Component
             'tanggal' => $this->rencana_tanggal,
             'waktu' => $this->rencana_waktu,
             'menu_id' => $this->rencana_menu_id,
-            'status' => 'Belum Mulai',
+            'status' => 'menunggu',
             'target_porsi' => $this->rencana_target_porsi,
         ]);
 
@@ -256,7 +265,7 @@ class Index extends Component
         }
 
         // Cek status masak (kolom aktual: 'status')
-        if ($rencanaMenu->status !== 'Belum Mulai') {
+        if ($rencanaMenu->status !== 'menunggu') {
             session()->flash('error', 'Status rencana harian ini tidak valid untuk mulai memasak (sudah sedang masak atau selesai).');
             return;
         }
@@ -297,7 +306,7 @@ class Index extends Component
                 }
 
                 // 5. Update Status
-                $rencanaMenu->update(['status' => 'Sedang Masak']);
+                $rencanaMenu->update(['status' => 'sedang_masak']);
             });
 
             // Notifikasi Sukses
@@ -307,5 +316,59 @@ class Index extends Component
             // Notifikasi Error dari Exception
             session()->flash('error', $e->getMessage());
         }
+    }
+
+    public function selesaiMasak($id)
+    {
+        $rencanaMenu = RencanaMenuHarian::find($id);
+
+        if (!$rencanaMenu || $rencanaMenu->status !== 'sedang_masak') {
+            session()->flash('error', 'Status rencana harian ini tidak valid untuk diselesaikan.');
+            return;
+        }
+
+        $rencanaMenu->update(['status' => 'selesai']);
+        session()->flash('success', 'Masakan telah selesai dan siap dihidangkan!');
+    }
+
+    // --- State & Methods untuk Cetak Daftar Belanja ---
+    public $isModalCetakOpen = false;
+    public $cetak_start_date;
+    public $cetak_end_date;
+    public $cetak_nama_pelatihan;
+    public $cetak_jumlah_peserta;
+
+    public function bukaModalCetak()
+    {
+        $this->reset(['cetak_start_date', 'cetak_end_date', 'cetak_nama_pelatihan', 'cetak_jumlah_peserta']);
+        $this->cetak_start_date = date('Y-m-d');
+        $this->cetak_end_date = date('Y-m-d', strtotime('+7 days'));
+        $this->isModalCetakOpen = true;
+    }
+
+    public function tutupModalCetak()
+    {
+        $this->isModalCetakOpen = false;
+    }
+
+    public function prosesCetakBelanja()
+    {
+        $this->validate([
+            'cetak_start_date' => 'required|date',
+            'cetak_end_date' => 'required|date|after_or_equal:cetak_start_date',
+            'cetak_nama_pelatihan' => 'required|string|max:255',
+            'cetak_jumlah_peserta' => 'required|integer|min:1',
+        ]);
+
+        $this->tutupModalCetak();
+
+        // Redirect to print route with query parameters
+        return redirect()->route('admin.dapur.print', [
+            'start' => $this->cetak_start_date,
+            'end' => $this->cetak_end_date,
+            'pelatihan' => $this->cetak_nama_pelatihan,
+            'peserta' => $this->cetak_jumlah_peserta,
+            'tanggal_teks' => \Carbon\Carbon::parse($this->cetak_start_date)->translatedFormat('j F') . ' - ' . \Carbon\Carbon::parse($this->cetak_end_date)->translatedFormat('j F Y'),
+        ]);
     }
 }

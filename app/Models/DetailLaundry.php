@@ -10,5 +10,9 @@ class DetailLaundry extends Model
     use SoftDeletes;
 
     protected $guarded = [];
-    //
+
+    public function requestLaundry()
+    {
+        return $this->belongsTo(RequestLaundry::class);
+    }
 }

@@ -59,7 +59,9 @@
                             <tr>
                                 <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100 w-16">No</th>
                                 <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100">Nama Bahan</th>
+                                <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100">Kategori</th>
                                 <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100">Stok Saat Ini</th>
+                                <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100">Harga Satuan</th>
                                 <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100">Satuan</th>
                                 <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100 text-center">Aksi</th>
                             </tr>
@@ -69,8 +71,14 @@
                             <tr class="hover:bg-gray-50/50 transition-colors">
                                 <td class="px-6 py-4 text-gray-500 font-medium">{{ $index + 1 }}</td>
                                 <td class="px-6 py-4 font-medium text-gray-800">{{ $bahan->nama_bahan }}</td>
+                                <td class="px-6 py-4 font-medium">
+                                    <span class="inline-flex items-center justify-center px-2 py-1 rounded text-xs font-semibold {{ $bahan->kategori_bahan == 'Basah' ? 'bg-blue-50 text-blue-600 border border-blue-200' : 'bg-orange-50 text-orange-600 border border-orange-200' }}">
+                                        {{ $bahan->kategori_bahan }}
+                                    </span>
+                                </td>
                                 <td class="px-6 py-4 font-bold {{ $bahan->stok < 10 ? 'text-red-500' : 'text-green-600' }}">{{ $bahan->stok }}</td>
-                                <td class="px-6 py-4 text-gray-500">{{ $bahan->satuan }}</td>
+                                <td class="px-6 py-4 text-gray-500">Rp {{ number_format($bahan->harga_satuan, 0, ',', '.') }}</td>
+                                <td class="px-6 py-4 text-gray-500">{{ $bahan->satuan }} {{ $bahan->keterangan_volume ? '('.$bahan->keterangan_volume.')' : '' }}</td>
                                 <td class="px-6 py-4">
                                     <div class="flex justify-center items-center gap-2">
                                         <button class="p-1.5 rounded-full text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors" title="Edit">
@@ -170,6 +178,11 @@
                         <!-- Date Filter Placeholder -->
                         <input type="date" class="px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 bg-gray-50 focus:bg-white transition-colors" value="{{ date('Y-m-d') }}">
                         
+                        <button wire:click="bukaModalCetak" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold shadow-sm flex items-center gap-2 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                            Cetak Daftar Belanja
+                        </button>
+
                         <button wire:click="bukaModalRencana" class="px-4 py-2 bg-[#2E7D32] hover:bg-green-700 text-white rounded-lg text-sm font-semibold shadow-sm flex items-center gap-2 transition-colors">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                             Buat Rencana
@@ -203,11 +216,11 @@
                                     Rp 1.500.000
                                 </td>
                                 <td class="px-6 py-4">
-                                    @if($rencana->status == 'Selesai')
+                                    @if($rencana->status == 'selesai')
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700 border border-green-100">
                                             <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Selesai
                                         </span>
-                                    @elseif($rencana->status == 'Sedang Masak')
+                                    @elseif($rencana->status == 'sedang_masak')
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-50 text-yellow-700 border border-yellow-100">
                                             <span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span> Sedang Masak
                                         </span>
@@ -219,10 +232,30 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex justify-center items-center gap-2">
-                                        @if($rencana->status != 'Selesai')
+                                        @if($rencana->status == 'sedang_masak')
+                                        <button wire:click="selesaiMasak({{ $rencana->id }})" class="px-3 py-1.5 rounded-lg text-emerald-700 bg-emerald-50 hover:bg-emerald-100 font-semibold text-xs border border-emerald-200 transition-colors">
+                                            Selesai Masak
+                                        </button>
+                                        @elseif($rencana->status == 'menunggu')
                                         <button wire:click="mulaiMasak({{ $rencana->id }})" class="px-3 py-1.5 rounded-lg text-blue-700 bg-blue-50 hover:bg-blue-100 font-semibold text-xs border border-blue-200 transition-colors">
                                             Mulai Masak
                                         </button>
+                                        @elseif($rencana->status == 'selesai')
+                                            @php
+                                                $avgRating = $rencana->feedbackMasakans->avg('rating');
+                                                $countRating = $rencana->feedbackMasakans->count();
+                                            @endphp
+                                            @if($countRating > 0)
+                                                <div class="flex flex-col items-center">
+                                                    <div class="flex items-center text-orange-400">
+                                                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                                        <span class="font-bold text-gray-700">{{ number_format($avgRating, 1) }}</span>
+                                                    </div>
+                                                    <span class="text-[10px] text-gray-500">({{ $countRating }} ulasan)</span>
+                                                </div>
+                                            @else
+                                                <span class="text-xs text-gray-400 italic">Belum ada ulasan</span>
+                                            @endif
                                         @endif
                                     </div>
                                 </td>
@@ -263,7 +296,7 @@
                     @error('nama_bahan') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                 </div>
                 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Stok Awal <span class="text-red-500">*</span></label>
                         <input wire:model="stok_saat_ini" type="number" step="0.01" min="0" placeholder="0" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#59A338] focus:ring-1 focus:ring-[#59A338] transition-colors">
@@ -280,8 +313,33 @@
                             <option value="butir">Butir</option>
                             <option value="pcs">Pcs / Buah</option>
                             <option value="ikat">Ikat</option>
+                            <option value="sisir">Sisir</option>
+                            <option value="sak">Sak</option>
+                            <option value="pak">Pak / Bks</option>
+                            <option value="botol">Botol (btl)</option>
                         </select>
                         @error('satuan') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Kategori <span class="text-red-500">*</span></label>
+                        <select wire:model="kategori_bahan" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#59A338] focus:ring-1 focus:ring-[#59A338] transition-colors bg-white">
+                            <option value="Kering">Bahan Kering</option>
+                            <option value="Basah">Bahan Basah</option>
+                        </select>
+                        @error('kategori_bahan') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Harga Satuan (Rp) <span class="text-red-500">*</span></label>
+                        <input wire:model="harga_satuan" type="number" min="0" placeholder="Contoh: 15000" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#59A338] focus:ring-1 focus:ring-[#59A338] transition-colors">
+                        @error('harga_satuan') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Keterangan/Vol (Opsional)</label>
+                        <input wire:model="keterangan_volume" type="text" placeholder="Contoh: 120 ptg" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#59A338] focus:ring-1 focus:ring-[#59A338] transition-colors">
+                        @error('keterangan_volume') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                     </div>
                 </div>
             </div>
@@ -549,6 +607,60 @@
             <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end shrink-0">
                 <button wire:click="tutupModalResep" class="px-5 py-2 text-sm font-semibold text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">
                     Selesai / Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- MODAL CETAK BELANJA -->
+    @if($isModalCetakOpen)
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden border border-gray-100">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-blue-50/50">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800">Cetak Daftar Belanja</h3>
+                    <p class="text-xs text-gray-500 mt-0.5">Atur detail pelatihan dan rentang waktu rencana masak</p>
+                </div>
+                <button wire:click="tutupModalCetak" class="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div class="p-6 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Dari Tanggal <span class="text-red-500">*</span></label>
+                        <input wire:model="cetak_start_date" type="date" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+                        @error('cetak_start_date') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Sampai Tanggal <span class="text-red-500">*</span></label>
+                        <input wire:model="cetak_end_date" type="date" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+                        @error('cetak_end_date') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Nama Pelatihan <span class="text-red-500">*</span></label>
+                    <input wire:model="cetak_nama_pelatihan" type="text" placeholder="Contoh: FAT I, MAT I, TAT I 2027" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+                    @error('cetak_nama_pelatihan') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Jumlah Peserta <span class="text-red-500">*</span></label>
+                    <input wire:model="cetak_jumlah_peserta" type="number" min="1" placeholder="Contoh: 55" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+                    @error('cetak_jumlah_peserta') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                </div>
+            </div>
+
+            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+                <button wire:click="tutupModalCetak" class="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">
+                    Batal
+                </button>
+                <button wire:click="prosesCetakBelanja" class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm flex items-center gap-2 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                    Proses & Cetak
                 </button>
             </div>
         </div>
