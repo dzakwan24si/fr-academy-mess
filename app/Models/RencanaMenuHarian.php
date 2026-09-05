@@ -10,5 +10,9 @@ class RencanaMenuHarian extends Model
     use SoftDeletes;
 
     protected $guarded = [];
-    //
+
+    public function menu()
+    {
+        return $this->belongsTo(Menu::class);
+    }
 }

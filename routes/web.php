@@ -16,9 +16,12 @@ Route::get('/tamu/login', function () {
 })->name('guest.login');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/admin/dashboard', function () {
-        return Blade::render('<livewire:admin.dashboard />');
-    })->name('admin.dashboard');
+    Route::get('/admin/dashboard', \App\Livewire\Admin\Dashboard::class)->name('admin.dashboard');
+    Route::get('/admin/reservasi', \App\Livewire\Admin\Reservasi\Index::class)->name('admin.reservasi');
+    Route::get('/admin/laundry', \App\Livewire\Admin\Laundry\Index::class)->name('admin.laundry');
+    Route::get('/admin/dapur', \App\Livewire\Admin\Dapur\Index::class)->name('admin.dapur');
+    Route::get('/admin/komplain', \App\Livewire\Admin\Komplain\Index::class)->name('admin.komplain');
+    Route::get('/admin/akun', \App\Livewire\Admin\Akun\Index::class)->name('admin.akun');
 });
 
 Route::middleware('auth:tamu')->group(function () {

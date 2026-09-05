@@ -10,5 +10,14 @@ class Reservasi extends Model
     use SoftDeletes;
 
     protected $guarded = [];
-    //
+
+    public function tamu()
+    {
+        return $this->belongsTo(Tamu::class);
+    }
+
+    public function kamar()
+    {
+        return $this->belongsTo(Kamar::class);
+    }
 }

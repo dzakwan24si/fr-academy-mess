@@ -1,0 +1,311 @@
+<?php
+
+namespace App\Livewire\Admin\Dapur;
+
+use Livewire\Component;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
+use App\Models\BahanBaku;
+use App\Models\Menu;
+use App\Models\RencanaMenuHarian;
+
+#[Layout('components.layouts.admin')]
+#[Title('DAPUR & MENU')]
+class Index extends Component
+{
+    public $activeTab = 'stok'; // stok, master, rencana
+
+    public function setTab($tab)
+    {
+        $this->activeTab = $tab;
+    }
+
+    public function render()
+    {
+        $bahanBakus = BahanBaku::latest()->get();
+        $menus = Menu::withCount('bahanBakus')->latest()->get();
+        $rencanaHarians = RencanaMenuHarian::with('menu')->latest()->get();
+
+        return view('livewire.admin.dapur.index', compact('bahanBakus', 'menus', 'rencanaHarians'));
+    }
+
+    public function formOpname() {}
+
+    // --- State & Methods untuk Modal Bahan Baku ---
+    public $isModalOpen = false;
+    public $nama_bahan;
+    public $stok_saat_ini;
+    public $satuan;
+
+    public function bukaModal()
+    {
+        $this->reset(['nama_bahan', 'stok_saat_ini', 'satuan']);
+        $this->isModalOpen = true;
+    }
+
+    public function tutupModal()
+    {
+        $this->isModalOpen = false;
+    }
+
+    public function simpanBahan()
+    {
+        $this->validate([
+            'nama_bahan' => 'required|string|max:255',
+            'stok_saat_ini' => 'required|numeric|min:0',
+            'satuan' => 'required|string|max:50',
+        ]);
+
+        BahanBaku::create([
+            'nama_bahan' => $this->nama_bahan,
+            'stok' => $this->stok_saat_ini,
+            'satuan' => $this->satuan,
+        ]);
+
+        $this->tutupModal();
+        session()->flash('success', 'Bahan baku baru berhasil ditambahkan.');
+    }
+    
+    // --- State & Methods untuk Modal Menu ---
+    public $isModalMenuOpen = false;
+    public $editMenuId = null;
+    public $nama_menu;
+    public $deskripsi;
+    public $kategori = 'Sarapan';
+    public $waktu_penyajian = 'Universal';
+    public $estimasi_harga_porsi = 0;
+    public $is_active = true;
+
+    public function bukaModalMenu()
+    {
+        $this->reset(['editMenuId', 'nama_menu', 'deskripsi', 'kategori', 'waktu_penyajian', 'estimasi_harga_porsi', 'is_active']);
+        $this->kategori = 'Sarapan';
+        $this->waktu_penyajian = 'Universal';
+        $this->estimasi_harga_porsi = 0;
+        $this->is_active = true;
+        $this->isModalMenuOpen = true;
+    }
+
+    public function editMenu($id)
+    {
+        $menu = Menu::findOrFail($id);
+        $this->editMenuId = $menu->id;
+        $this->nama_menu = $menu->nama_menu;
+        $this->deskripsi = $menu->deskripsi;
+        $this->kategori = $menu->kategori;
+        $this->waktu_penyajian = $menu->waktu_penyajian;
+        $this->estimasi_harga_porsi = $menu->estimasi_harga_porsi;
+        $this->is_active = $menu->is_active;
+        $this->isModalMenuOpen = true;
+    }
+
+    public function tutupModalMenu()
+    {
+        $this->isModalMenuOpen = false;
+    }
+
+    public function simpanMenu()
+    {
+        $this->validate([
+            'nama_menu' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string|max:1000',
+            'kategori' => 'required|string',
+            'waktu_penyajian' => 'required|string',
+            'estimasi_harga_porsi' => 'required|numeric|min:0',
+            'is_active' => 'required|boolean',
+        ]);
+
+        $data = [
+            'nama_menu' => $this->nama_menu,
+            'deskripsi' => $this->deskripsi,
+            'kategori' => $this->kategori,
+            'waktu_penyajian' => $this->waktu_penyajian,
+            'estimasi_harga_porsi' => $this->estimasi_harga_porsi,
+            'is_active' => $this->is_active,
+        ];
+
+        if ($this->editMenuId) {
+            Menu::findOrFail($this->editMenuId)->update($data);
+            session()->flash('success', 'Menu berhasil diperbarui.');
+        } else {
+            Menu::create($data);
+            session()->flash('success', 'Menu baru berhasil ditambahkan.');
+        }
+
+        $this->tutupModalMenu();
+    }
+
+    public function hapusMenu($id)
+    {
+        $menu = Menu::findOrFail($id);
+        $menu->delete();
+        
+        session()->flash('success', 'Menu berhasil dihapus.');
+    }
+
+    // --- State & Methods untuk Modal Resep ---
+    public $isModalResepOpen = false;
+    public $activeMenuId = null;
+    public $activeMenuName = '';
+    public $selectedBahanId = '';
+    public $jumlahPerPorsi = '';
+    public $resepBahanList = [];
+
+    public function bukaModalResep($menuId)
+    {
+        $this->reset(['selectedBahanId', 'jumlahPerPorsi', 'resepBahanList']);
+        
+        $menu = Menu::with('bahanBakus')->findOrFail($menuId);
+        $this->activeMenuId = $menu->id;
+        $this->activeMenuName = $menu->nama_menu;
+        $this->resepBahanList = $menu->bahanBakus; // Load existing
+        
+        $this->isModalResepOpen = true;
+    }
+
+    public function tutupModalResep()
+    {
+        $this->reset(['activeMenuId', 'activeMenuName', 'selectedBahanId', 'jumlahPerPorsi', 'resepBahanList']);
+        $this->isModalResepOpen = false;
+    }
+
+    public function tambahBahanKeResep()
+    {
+        $this->validate([
+            'selectedBahanId' => 'required|exists:bahan_bakus,id',
+            'jumlahPerPorsi' => 'required|numeric|min:0.01',
+        ]);
+
+        $menu = Menu::findOrFail($this->activeMenuId);
+
+        // Validasi duplicate
+        if ($menu->bahanBakus()->where('bahan_baku_id', $this->selectedBahanId)->exists()) {
+            session()->flash('error_resep', 'Bahan baku ini sudah ada di dalam resep.');
+            return;
+        }
+
+        // Attach ke pivot
+        $menu->bahanBakus()->attach($this->selectedBahanId, [
+            'jumlah_dibutuhkan' => $this->jumlahPerPorsi
+        ]);
+
+        // Refresh state
+        $this->resepBahanList = $menu->bahanBakus()->get();
+        $this->reset(['selectedBahanId', 'jumlahPerPorsi']);
+        session()->flash('success_resep', 'Bahan baku berhasil ditambahkan ke resep.');
+    }
+
+    public function hapusBahanDariResep($bahanId)
+    {
+        $menu = Menu::findOrFail($this->activeMenuId);
+        $menu->bahanBakus()->detach($bahanId);
+        
+        // Refresh state
+        $this->resepBahanList = $menu->bahanBakus()->get();
+    }
+
+    // --- State & Methods untuk Modal Rencana Harian ---
+    public $isModalRencanaOpen = false;
+    public $rencana_tanggal;
+    public $rencana_waktu = 'Pagi'; // Default
+    public $rencana_menu_id;
+    public $rencana_target_porsi; 
+
+    public function bukaModalRencana()
+    {
+        $this->reset(['rencana_tanggal', 'rencana_waktu', 'rencana_menu_id', 'rencana_target_porsi']);
+        $this->rencana_tanggal = date('Y-m-d');
+        $this->rencana_waktu = 'Pagi';
+        $this->isModalRencanaOpen = true;
+    }
+
+    public function tutupModalRencana()
+    {
+        $this->isModalRencanaOpen = false;
+    }
+
+    public function simpanRencana()
+    {
+        $this->validate([
+            'rencana_tanggal' => 'required|date',
+            'rencana_waktu' => 'required|string',
+            'rencana_menu_id' => 'required|exists:menus,id',
+            'rencana_target_porsi' => 'required|numeric|min:1',
+        ]);
+
+        RencanaMenuHarian::create([
+            'tanggal' => $this->rencana_tanggal,
+            'waktu' => $this->rencana_waktu,
+            'menu_id' => $this->rencana_menu_id,
+            'status' => 'Belum Mulai',
+            'target_porsi' => $this->rencana_target_porsi,
+        ]);
+
+        $this->tutupModalRencana();
+        session()->flash('success', 'Rencana masak harian berhasil dibuat.');
+    }
+
+    public function mulaiMasak($id)
+    {
+        // 1. Validasi Awal
+        $rencanaMenu = RencanaMenuHarian::with('menu.bahanBakus')->find($id);
+
+        if (!$rencanaMenu) {
+            session()->flash('error', 'Data Rencana Menu tidak ditemukan.');
+            return;
+        }
+
+        // Cek status masak (kolom aktual: 'status')
+        if ($rencanaMenu->status !== 'Belum Mulai') {
+            session()->flash('error', 'Status rencana harian ini tidak valid untuk mulai memasak (sudah sedang masak atau selesai).');
+            return;
+        }
+
+        // 2. Gunakan DB::transaction
+        try {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($rencanaMenu) {
+                // 3. Logika Kalkulasi & Pemotongan
+                $menu = $rencanaMenu->menu;
+                
+                // Gunakan target_porsi dari DB jika ada, jika belum gunakan default fallback (contoh: 100)
+                // (Catatan: kolom target_porsi belum ada di schema rencana_menu_harians)
+                $targetPorsi = $rencanaMenu->target_porsi ?? 100;
+
+                if ($menu && $menu->bahanBakus) {
+                    foreach ($menu->bahanBakus as $bahanBaku) {
+                        // Kolom di pivot table adalah jumlah_dibutuhkan
+                        $jumlahPerPorsi = $bahanBaku->pivot->jumlah_dibutuhkan;
+                        $jumlahDipotong = $jumlahPerPorsi * $targetPorsi;
+
+                        // Validasi stok (kolom aktual: 'stok')
+                        if ($bahanBaku->stok < $jumlahDipotong) {
+                            // Lempar exception agar transaksi DB dibatalkan secara otomatis
+                            throw new \Exception("Stok {$bahanBaku->nama_bahan} tidak mencukupi. (Butuh: {$jumlahDipotong}, Tersedia: {$bahanBaku->stok})");
+                        }
+
+                        // Lakukan pengurangan
+                        $bahanBaku->decrement('stok', $jumlahDipotong);
+
+                        // 4. Pencatatan Log
+                        \App\Models\PemotonganStok::create([
+                            'rencana_menu_harian_id' => $rencanaMenu->id,
+                            'bahan_baku_id' => $bahanBaku->id,
+                            'jumlah_dipotong' => $jumlahDipotong,
+                            'tanggal' => now()
+                        ]);
+                    }
+                }
+
+                // 5. Update Status
+                $rencanaMenu->update(['status' => 'Sedang Masak']);
+            });
+
+            // Notifikasi Sukses
+            session()->flash('success', 'Proses memasak dimulai. Stok bahan baku telah dipotong otomatis.');
+
+        } catch (\Exception $e) {
+            // Notifikasi Error dari Exception
+            session()->flash('error', $e->getMessage());
+        }
+    }
+}
