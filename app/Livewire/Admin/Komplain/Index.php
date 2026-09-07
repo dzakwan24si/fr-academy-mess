@@ -9,7 +9,7 @@ use Livewire\WithPagination;
 use App\Models\KomplainKerusakan;
 use App\Models\User;
 
-#[Layout('components.layouts.admin')]
+#[Layout('layouts.admin')]
 #[Title('Komplain & Kerusakan')]
 class Index extends Component
 {

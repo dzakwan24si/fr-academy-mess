@@ -10,7 +10,7 @@ use App\Models\FeedbackMasakan;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
-#[Layout('components.layouts.app')]
+#[Layout('layouts.app')]
 #[Title('Menu Makanan Hari Ini')]
 class Index extends Component
 {

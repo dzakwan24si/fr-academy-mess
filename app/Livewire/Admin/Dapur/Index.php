@@ -9,7 +9,7 @@ use App\Models\BahanBaku;
 use App\Models\Menu;
 use App\Models\RencanaMenuHarian;
 
-#[Layout('components.layouts.admin')]
+#[Layout('layouts.admin')]
 #[Title('DAPUR & MENU')]
 class Index extends Component
 {

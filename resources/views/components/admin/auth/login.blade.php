@@ -26,7 +26,8 @@ new class extends Component
 };
 ?>
 
-<x-layouts.app>
+@extends('layouts.app')
+@section('content')
     <div class="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
         <div class="sm:mx-auto sm:w-full sm:max-w-md">
             <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
@@ -77,4 +78,4 @@ new class extends Component
             </div>
         </div>
     </div>
-</x-layouts.app>
+@endsection

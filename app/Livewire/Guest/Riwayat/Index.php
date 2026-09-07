@@ -9,7 +9,7 @@ use Livewire\WithPagination;
 use App\Models\Reservasi;
 use Illuminate\Support\Facades\Auth;
 
-#[Layout('components.layouts.app')]
+#[Layout('layouts.app')]
 #[Title('Riwayat Reservasi')]
 class Index extends Component
 {

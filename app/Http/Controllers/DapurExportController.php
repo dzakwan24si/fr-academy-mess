@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -63,7 +63,7 @@ class DapurExportController extends Controller
         $bahanKering = collect($kebutuhanBahan)->where('kategori', 'Kering')->values();
         $bahanBasah = collect($kebutuhanBahan)->where('kategori', 'Basah')->values();
 
-        return view('admin.dapur.print-belanja', compact(
+        return view('exports.print-belanja', compact(
             'bahanKering', 
             'bahanBasah', 
             'namaPelatihan', 

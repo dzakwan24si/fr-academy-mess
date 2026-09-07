@@ -1,6 +1,8 @@
 @props(['title' => 'Dashboard'])
 
-<x-layouts.app>
+@extends('layouts.app')
+
+@section('content')
     <div class="min-h-screen bg-[#F4F7F6] font-sans p-4 md:p-6 flex flex-col gap-4">
         <!-- Top Header (Floating) -->
         <header class="bg-white rounded-2xl shadow-sm h-16 flex items-center justify-between px-6 shrink-0 relative z-20">
@@ -75,4 +77,4 @@
             }));
         });
     </script>
-</x-layouts.app>
+@endsection

@@ -73,7 +73,7 @@ class Index extends Component
         $this->resetPage();
     }
 
-    #[Layout('components.layouts.app')]
+    #[Layout('layouts.app')]
     public function render()
     {
         $query = Kamar::where('status', 'kosong_bersih');

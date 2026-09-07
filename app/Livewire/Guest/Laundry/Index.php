@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
-#[Layout('components.layouts.app')]
+#[Layout('layouts.app')]
 #[Title('Request Laundry')]
 class Index extends Component
 {

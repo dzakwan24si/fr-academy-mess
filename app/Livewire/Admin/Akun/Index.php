@@ -6,7 +6,7 @@ use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 
-#[Layout('components.layouts.admin')]
+#[Layout('layouts.admin')]
 #[Title('MANAJEMEN AKUN')]
 class Index extends Component
 {

@@ -3,7 +3,7 @@
         <form wire:submit.prevent="cekNomor" class="bg-white/10 backdrop-blur-md rounded-full shadow-2xl p-2 border border-white/20 flex flex-col md:flex-row items-center gap-2">
             <div class="flex-1 w-full flex items-center px-6 bg-white rounded-full py-3 h-full">
                 <svg class="w-6 h-6 text-[#59A338] mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                <input wire:model="no_hp" type="text" placeholder="Masukkan Nomor HP (Tamu)..." class="w-full bg-transparent border-none focus:ring-0 text-gray-800 placeholder-gray-500 font-semibold text-base" required>
+                <input wire:model="no_hp" type="number" placeholder="Masukkan Nomor HP (Tamu)..." class="w-full bg-transparent border-none outline-none focus:outline-none focus:border-transparent focus:ring-0 text-gray-800 placeholder-gray-500 font-semibold text-base" style="outline: none !important; box-shadow: none !important; border-color: transparent !important; background: transparent !important;" required>
             </div>
             <button type="submit" class="w-full md:w-auto px-8 py-3 md:py-3.5 rounded-full text-white font-bold bg-[#59A338] hover:bg-[#4d8c2f] transition-colors shadow-lg flex-shrink-0 flex items-center justify-center gap-2 text-base">
                 <span wire:loading.remove wire:target="cekNomor">Jelajahi Portal</span>

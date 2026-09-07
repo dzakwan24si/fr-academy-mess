@@ -6,7 +6,7 @@ use Livewire\Component;
 use Livewire\Attributes\Layout;
 use App\Models\Reservasi;
 
-#[Layout('components.layouts.admin')]
+#[Layout('layouts.admin')]
 class Dashboard extends Component
 {
     public function render()

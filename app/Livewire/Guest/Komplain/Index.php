@@ -10,7 +10,7 @@ use App\Models\KomplainKerusakan;
 use App\Models\Reservasi;
 use Illuminate\Support\Facades\Auth;
 
-#[Layout('components.layouts.app')]
+#[Layout('layouts.app')]
 #[Title('Lapor Kerusakan')]
 class Index extends Component
 {

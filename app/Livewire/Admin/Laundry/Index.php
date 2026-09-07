@@ -8,7 +8,7 @@ use Livewire\Attributes\Title;
 use Livewire\WithPagination;
 use App\Models\RequestLaundry;
 
-#[Layout('components.layouts.admin')]
+#[Layout('layouts.admin')]
 #[Title('Manajemen Laundry')]
 class Index extends Component
 {

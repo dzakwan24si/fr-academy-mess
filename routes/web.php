@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Blade;
 
 Route::get('/', function () {
-    return view('components.welcome');
+    return view('welcome');
 })->name('home');
 
 Route::get('/login', function () {
@@ -35,7 +35,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/reservasi', \App\Livewire\Admin\Reservasi\Index::class)->name('admin.reservasi');
     Route::get('/admin/laundry', \App\Livewire\Admin\Laundry\Index::class)->name('admin.laundry');
     Route::get('/admin/dapur', \App\Livewire\Admin\Dapur\Index::class)->name('admin.dapur');
-    Route::get('/admin/dapur/print', [\App\Http\Controllers\Admin\DapurExportController::class, 'printBelanja'])->name('admin.dapur.print');
+    Route::get('/admin/dapur/print', [\App\Http\Controllers\DapurExportController::class, 'printBelanja'])->name('admin.dapur.print');
     Route::get('/admin/akun', \App\Livewire\Admin\Akun\Index::class)->name('admin.akun');
     Route::get('/admin/kamar', \App\Livewire\Admin\Kamar\Index::class)->name('admin.kamar');
     Route::get('/admin/komplain', \App\Livewire\Admin\Komplain\Index::class)->name('admin.komplain');

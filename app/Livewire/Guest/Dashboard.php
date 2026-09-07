@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class Dashboard extends Component
 {
-    #[Layout('components.layouts.app')]
+    #[Layout('layouts.app')]
     public function render()
     {
         $tamu = Auth::guard('tamu')->user();
