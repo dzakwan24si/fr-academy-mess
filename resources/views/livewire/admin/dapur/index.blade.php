@@ -43,8 +43,9 @@
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-bold text-gray-800">Daftar Stok Saat Ini</h2>
                     <div class="flex gap-3">
-                        <button wire:click="formOpname" class="px-4 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-semibold shadow-sm transition-colors">
-                            Form Opname/Penerimaan
+                        <button wire:click="bukaModalBelanja" class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-semibold shadow-sm flex items-center gap-2 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            Input Belanja
                         </button>
                         <button wire:click="bukaModal" class="px-4 py-2 bg-[#59A338] hover:bg-[#4d8c2f] text-white rounded-lg text-sm font-semibold shadow-sm flex items-center gap-2 transition-colors">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
@@ -76,7 +77,7 @@
                                         {{ $bahan->kategori_bahan }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 font-bold {{ $bahan->stok < 10 ? 'text-red-500' : 'text-green-600' }}">{{ $bahan->stok }}</td>
+                                <td class="px-6 py-4 font-bold {{ $bahan->stok < 10 ? 'text-red-500' : 'text-green-600' }}">{{ (float) $bahan->stok }}</td>
                                 <td class="px-6 py-4 text-gray-500">Rp {{ number_format($bahan->harga_satuan, 0, ',', '.') }}</td>
                                 <td class="px-6 py-4 text-gray-500">{{ $bahan->satuan }} {{ $bahan->keterangan_volume ? '('.$bahan->keterangan_volume.')' : '' }}</td>
                                 <td class="px-6 py-4">
@@ -182,6 +183,11 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                             Cetak Daftar Belanja
                         </button>
+                        
+                        <button wire:click="bukaModalJadwal" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-semibold shadow-sm flex items-center gap-2 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            Cetak Jadwal Menu
+                        </button>
 
                         <button wire:click="bukaModalRencana" class="px-4 py-2 bg-[#2E7D32] hover:bg-green-700 text-white rounded-lg text-sm font-semibold shadow-sm flex items-center gap-2 transition-colors">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
@@ -196,6 +202,7 @@
                             <tr>
                                 <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100">Tanggal</th>
                                 <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100">Nama Menu</th>
+                                <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100">Waktu</th>
                                 <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100">Target Porsi</th>
                                 <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100">Estimasi Anggaran</th>
                                 <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100">Status Masak</th>
@@ -205,15 +212,27 @@
                         <tbody class="divide-y divide-gray-50">
                             @forelse($rencanaHarians as $rencana)
                             <tr class="hover:bg-gray-50/50 transition-colors">
-                                <td class="px-6 py-4 text-gray-600 font-medium">{{ \Carbon\Carbon::parse($rencana->tanggal)->format('d M Y') }}</td>
+                                <td class="px-6 py-4 text-gray-600 font-medium">
+                                    {{ \Carbon\Carbon::parse($rencana->tanggal)->format('d M Y') }}
+                                    <button wire:click="bukaModalJus('{{ $rencana->tanggal }}')" class="ml-2 px-2 py-0.5 text-[10px] font-bold bg-orange-100 text-orange-700 hover:bg-orange-200 rounded border border-orange-200 transition-colors">SET JUS</button>
+                                </td>
                                 <td class="px-6 py-4 font-bold text-gray-800">{{ $rencana->menu->nama_menu ?? 'Menu Terhapus' }}</td>
+                                <td class="px-6 py-4 text-gray-600 font-medium">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">
+                                        {{ ucfirst($rencana->waktu) }}
+                                    </span>
+                                </td>
                                 <td class="px-6 py-4 text-gray-600">
-                                    {{-- Mockup porsi since not in DB yet --}}
-                                    100 Porsi
+                                    {{ $rencana->target_porsi }} Porsi
                                 </td>
                                 <td class="px-6 py-4 text-gray-500 font-medium">
-                                    {{-- Mockup anggaran --}}
-                                    Rp 1.500.000
+                                    @php
+                                        $hargaPorsi = $rencana->menu->estimasi_harga_porsi > 0 
+                                            ? $rencana->menu->estimasi_harga_porsi 
+                                            : ($rencana->menu->bahanBakus ? $rencana->menu->bahanBakus->sum(function($b) { return $b->pivot->jumlah_dibutuhkan * $b->harga_satuan; }) : 0);
+                                        $totalAnggaran = $hargaPorsi * $rencana->target_porsi;
+                                    @endphp
+                                    Rp {{ number_format($totalAnggaran, 0, ',', '.') }}
                                 </td>
                                 <td class="px-6 py-4">
                                     @if($rencana->status == 'selesai')
@@ -312,9 +331,6 @@
                             <option value="ml">Mililiter (ml)</option>
                             <option value="butir">Butir</option>
                             <option value="pcs">Pcs / Buah</option>
-                            <option value="ikat">Ikat</option>
-                            <option value="sisir">Sisir</option>
-                            <option value="sak">Sak</option>
                             <option value="pak">Pak / Bks</option>
                             <option value="botol">Botol (btl)</option>
                         </select>
@@ -398,6 +414,8 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1.5">Kategori Menu <span class="text-red-500">*</span></label>
                             <select wire:model="kategori" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#59A338] focus:ring-1 focus:ring-[#59A338] transition-colors bg-white">
+                                <option value="">-- Pilih Kategori --</option>
+                                <option value="Umum">Umum</option>
                                 <option value="Sarapan">Sarapan</option>
                                 <option value="Coffee Break">Coffee Break</option>
                                 <option value="Makan Siang">Makan Siang</option>
@@ -408,6 +426,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1.5">Waktu Penyajian <span class="text-red-500">*</span></label>
                             <select wire:model="waktu_penyajian" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#59A338] focus:ring-1 focus:ring-[#59A338] transition-colors bg-white">
+                                <option value="">-- Pilih Waktu --</option>
                                 <option value="Pagi">Pagi</option>
                                 <option value="Siang">Siang</option>
                                 <option value="Malam">Malam</option>
@@ -661,6 +680,169 @@
                 <button wire:click="prosesCetakBelanja" class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm flex items-center gap-2 transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                     Proses & Cetak
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Modal Input Kedatangan Belanja -->
+    @if($isModalBelanjaOpen)
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" wire:click="tutupModalBelanja"></div>
+            
+            <div class="relative bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-xl z-10">
+                <div class="flex justify-between items-center p-6 pb-4 border-b border-gray-100 shrink-0">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900">Input Kedatangan Belanja</h3>
+                        <p class="text-sm text-gray-500 mt-1">Isi kuantitas dan total harga beli berdasarkan nota belanja pasar.</p>
+                    </div>
+                    <button wire:click="tutupModalBelanja" class="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+
+                <div class="p-6 overflow-y-auto">
+                    @if(count($belanjaItems) > 0)
+                        <div class="overflow-x-auto rounded-xl border border-gray-200">
+                            <table class="min-w-full text-left text-sm whitespace-nowrap">
+                                <thead class="bg-gray-50 border-b border-gray-200">
+                                    <tr>
+                                        <th class="px-4 py-3 font-semibold text-gray-600">Bahan Baku</th>
+                                        <th class="px-4 py-3 font-semibold text-gray-600 text-center">Kekurangan (Estimasi)</th>
+                                        <th class="px-4 py-3 font-semibold text-gray-600">Kuantitas Dibeli</th>
+                                        <th class="px-4 py-3 font-semibold text-gray-600">Total Harga Beli (Rp)</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    @foreach($belanjaItems as $index => $item)
+                                    <tr class="hover:bg-gray-50 transition-colors">
+                                        <td class="px-4 py-3 font-medium text-gray-800">
+                                            {{ $item['nama_bahan'] }}
+                                        </td>
+                                        <td class="px-4 py-3 text-center text-red-600 font-bold bg-red-50/50">
+                                            {{ $item['kekurangan'] }} {{ $item['satuan'] }}
+                                        </td>
+                                        <td class="px-4 py-3 w-40">
+                                            <div class="flex items-center gap-2">
+                                                <input type="number" step="0.01" min="0" wire:model="belanjaItems.{{ $index }}.kuantitas_dibeli" class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-orange-500 focus:border-orange-500 text-right font-medium">
+                                                <span class="text-xs text-gray-500 w-8">{{ $item['satuan'] }}</span>
+                                            </div>
+                                            @error('belanjaItems.'.$index.'.kuantitas_dibeli') <span class="text-red-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror
+                                        </td>
+                                        <td class="px-4 py-3 w-48">
+                                            <input type="number" step="1" min="0" wire:model="belanjaItems.{{ $index }}.total_harga_beli" class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-orange-500 focus:border-orange-500 text-right font-medium" placeholder="Cth: 50000">
+                                            @error('belanjaItems.'.$index.'.total_harga_beli') <span class="text-red-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="text-center py-12">
+                            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-50 mb-4">
+                                <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                            <h4 class="text-lg font-bold text-gray-900 mb-1">Stok Aman!</h4>
+                            <p class="text-gray-500">Tidak ada bahan baku yang minus untuk rencana masak saat ini.</p>
+                        </div>
+                    @endif
+                </div>
+
+                <div class="p-6 pt-4 border-t border-gray-100 flex justify-end gap-3 shrink-0 bg-gray-50 rounded-b-2xl">
+                    <button type="button" wire:click="tutupModalBelanja" class="px-5 py-2.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors shadow-sm">
+                        Batal
+                    </button>
+                    @if(count($belanjaItems) > 0)
+                    <button type="button" wire:click="simpanBelanja" class="px-6 py-2.5 text-sm font-semibold text-white bg-orange-600 hover:bg-orange-700 rounded-xl shadow-sm flex items-center gap-2 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Simpan & Update Stok
+                    </button>
+                    @endif
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- MODAL CETAK JADWAL MENU -->
+    @if($isModalJadwalOpen)
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden border border-gray-100">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800">Cetak Jadwal Menu</h3>
+                    <p class="text-xs text-gray-500 mt-0.5">Cetak FORM/TA/04.a (Daftar Menu Learning & Development)</p>
+                </div>
+                <button wire:click="tutupModalJadwal" class="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div class="p-6 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Mulai Tanggal <span class="text-red-500">*</span></label>
+                        <input wire:model="jadwal_start_date" type="date" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#59A338] focus:ring-1 focus:ring-[#59A338]">
+                        @error('jadwal_start_date') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Sampai Tanggal <span class="text-red-500">*</span></label>
+                        <input wire:model="jadwal_end_date" type="date" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#59A338] focus:ring-1 focus:ring-[#59A338]">
+                        @error('jadwal_end_date') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Nama Pelatihan <span class="text-red-500">*</span></label>
+                    <input wire:model="jadwal_nama_pelatihan" type="text" placeholder="Contoh: FAT I, MAT I, TAT I 2027" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#59A338] focus:ring-1 focus:ring-[#59A338]">
+                    @error('jadwal_nama_pelatihan') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Jumlah Peserta (Total) <span class="text-red-500">*</span></label>
+                    <input wire:model="jadwal_jumlah_peserta" type="number" min="1" placeholder="Contoh: 55" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#59A338] focus:ring-1 focus:ring-[#59A338]">
+                    <p class="text-[10px] text-gray-500 mt-1">Misal: 55 Orang (di PDF otomatis tertulis "55+3")</p>
+                    @error('jadwal_jumlah_peserta') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                </div>
+            </div>
+
+            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 rounded-b-2xl">
+                <button wire:click="tutupModalJadwal" class="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50">
+                    Batal
+                </button>
+                <button wire:click="prosesCetakJadwal" class="px-4 py-2 text-sm font-semibold text-white bg-purple-600 hover:bg-purple-700 rounded-lg flex items-center gap-2">
+                    Cetak PDF
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- MODAL SET JUS TRAINER -->
+    @if($isModalJusOpen)
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden border border-gray-100">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800">Set Jus Trainer</h3>
+                    <p class="text-xs text-gray-500 mt-0.5">{{ \Carbon\Carbon::parse($jus_tanggal)->format('d F Y') }}</p>
+                </div>
+                <button wire:click="tutupModalJus" class="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div class="p-6">
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Nama Jus</label>
+                <input wire:model="jus_trainer_name" type="text" placeholder="Cth: Alpukat, Mangga, Naga" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#59A338] focus:ring-1 focus:ring-[#59A338]">
+                @error('jus_trainer_name') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+            </div>
+
+            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 rounded-b-2xl">
+                <button wire:click="tutupModalJus" class="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50">
+                    Batal
+                </button>
+                <button wire:click="simpanJus" class="px-4 py-2 text-sm font-semibold text-white bg-orange-600 hover:bg-orange-700 rounded-lg">
+                    Simpan Jus
                 </button>
             </div>
         </div>

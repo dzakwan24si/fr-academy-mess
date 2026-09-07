@@ -44,7 +44,9 @@ class DapurExportController extends Controller
                             'kategori' => $bahan->kategori_bahan,
                             'keterangan_volume' => $bahan->keterangan_volume,
                             'harga_satuan' => $bahan->harga_satuan,
+                            'stok' => $bahan->stok,
                             'total_qty' => 0,
+                            'qty_beli' => 0,
                             'total_harga' => 0,
                         ];
                     }
@@ -54,9 +56,17 @@ class DapurExportController extends Controller
             }
         }
 
-        // Kalkulasi Total Harga untuk setiap item
+        // Kalkulasi Total Harga dan Qty Beli (setelah dikurangi stok Gudang)
         foreach ($kebutuhanBahan as $key => $item) {
-            $kebutuhanBahan[$key]['total_harga'] = $item['total_qty'] * $item['harga_satuan'];
+            $kekurangan = $item['total_qty'] - $item['stok'];
+            
+            if ($kekurangan > 0) {
+                $kebutuhanBahan[$key]['qty_beli'] = $kekurangan;
+                $kebutuhanBahan[$key]['total_harga'] = $kekurangan * $item['harga_satuan'];
+            } else {
+                // Hapus bahan dari daftar belanja jika stok gudang sudah mencukupi
+                unset($kebutuhanBahan[$key]);
+            }
         }
 
         // Pisahkan Kering dan Basah
@@ -69,6 +79,74 @@ class DapurExportController extends Controller
             'namaPelatihan', 
             'jumlahPeserta', 
             'tanggalPelatihan'
+        ));
+    }
+    public function printJadwal(Request $request)
+    {
+        $startDate = $request->query('start');
+        $endDate = $request->query('end');
+        $namaPelatihan = $request->query('pelatihan', '');
+        $jumlahPeserta = $request->query('peserta', '');
+
+        if (!$startDate || !$endDate) {
+            abort(400, 'Parameter rentang tanggal tidak valid.');
+        }
+
+        $rencanaHarians = RencanaMenuHarian::with('menu')
+            ->whereBetween('tanggal', [$startDate, $endDate])
+            ->orderBy('tanggal', 'asc')
+            ->get();
+
+        $infoHarian = \App\Models\InformasiHarianDapur::whereBetween('tanggal', [$startDate, $endDate])
+            ->get()
+            ->keyBy('tanggal');
+
+        // Group by Tanggal, then by Waktu
+        $jadwal = [];
+        $currentDate = Carbon::parse($startDate);
+        $end = Carbon::parse($endDate);
+
+        while ($currentDate->lte($end)) {
+            $dateString = $currentDate->format('Y-m-d');
+            $jadwal[$dateString] = [
+                'hari' => $currentDate->locale('id')->isoFormat('dddd'),
+                'tanggal_format' => $currentDate->locale('id')->isoFormat('D MMMM YYYY'),
+                'jus_trainer' => isset($infoHarian[$dateString]) ? $infoHarian[$dateString]->jus_trainer : '',
+                'menus' => [
+                    'pagi' => [],
+                    'siang' => [],
+                    'malam' => []
+                ],
+                'porsi' => [
+                    'pagi' => 0,
+                    'siang' => 0,
+                    'malam' => 0
+                ]
+            ];
+            $currentDate->addDay();
+        }
+
+        foreach ($rencanaHarians as $rencana) {
+            $waktu = strtolower($rencana->waktu);
+            if (isset($jadwal[$rencana->tanggal]['menus'][$waktu])) {
+                $jadwal[$rencana->tanggal]['menus'][$waktu][] = $rencana->menu->nama_menu;
+                // Ambil porsi terbesar untuk waktu tersebut jika ada banyak menu
+                if ($rencana->target_porsi > $jadwal[$rencana->tanggal]['porsi'][$waktu]) {
+                    $jadwal[$rencana->tanggal]['porsi'][$waktu] = $rencana->target_porsi;
+                }
+            }
+        }
+
+        // Format tanggal header
+        $startFormat = Carbon::parse($startDate)->locale('id')->isoFormat('D MMMM YYYY');
+        $endFormat = Carbon::parse($endDate)->locale('id')->isoFormat('D MMMM YYYY');
+        $periode = $startFormat . ' - ' . $endFormat;
+
+        return view('exports.print-jadwal-menu', compact(
+            'jadwal',
+            'namaPelatihan',
+            'jumlahPeserta',
+            'periode'
         ));
     }
 }

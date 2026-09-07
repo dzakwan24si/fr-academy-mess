@@ -330,8 +330,7 @@ class Index extends Component
                         \App\Models\PemotonganStok::create([
                             'rencana_menu_harian_id' => $rencanaMenu->id,
                             'bahan_baku_id' => $bahanBaku->id,
-                            'jumlah_dipotong' => $jumlahDipotong,
-                            'tanggal' => now()
+                            'jumlah_dipotong' => $jumlahDipotong
                         ]);
                     }
                 }
@@ -401,5 +400,167 @@ class Index extends Component
             'peserta' => $this->cetak_jumlah_peserta,
             'tanggal_teks' => \Carbon\Carbon::parse($this->cetak_start_date)->translatedFormat('j F') . ' - ' . \Carbon\Carbon::parse($this->cetak_end_date)->translatedFormat('j F Y'),
         ]);
+    }
+
+    // --- State & Methods untuk Modal Kedatangan Belanja ---
+    public $isModalBelanjaOpen = false;
+    public $belanjaItems = []; 
+
+    public function bukaModalBelanja()
+    {
+        $this->belanjaItems = [];
+        
+        $bahanKebutuhan = [];
+        $rencanaMenunggu = RencanaMenuHarian::with('menu.bahanBakus')->where('status', 'menunggu')->get();
+        
+        foreach ($rencanaMenunggu as $rencana) {
+            $targetPorsi = $rencana->target_porsi ?? 100;
+            if ($rencana->menu && $rencana->menu->bahanBakus) {
+                foreach ($rencana->menu->bahanBakus as $bahanBaku) {
+                    $butuh = $bahanBaku->pivot->jumlah_dibutuhkan * $targetPorsi;
+                    if (!isset($bahanKebutuhan[$bahanBaku->id])) {
+                        $bahanKebutuhan[$bahanBaku->id] = 0;
+                    }
+                    $bahanKebutuhan[$bahanBaku->id] += $butuh;
+                }
+            }
+        }
+
+        $allBahan = \App\Models\BahanBaku::whereIn('id', array_keys($bahanKebutuhan))->get();
+        
+        foreach ($allBahan as $bahan) {
+            $kebutuhan = $bahanKebutuhan[$bahan->id];
+            if ($bahan->stok < $kebutuhan) {
+                $kekurangan = $kebutuhan - $bahan->stok;
+                $this->belanjaItems[] = [
+                    'bahan_baku_id' => $bahan->id,
+                    'nama_bahan' => $bahan->nama_bahan,
+                    'satuan' => $bahan->satuan,
+                    'kekurangan' => $kekurangan,
+                    'kuantitas_dibeli' => $kekurangan,
+                    'total_harga_beli' => 0
+                ];
+            }
+        }
+
+        $this->isModalBelanjaOpen = true;
+    }
+
+    public function tutupModalBelanja()
+    {
+        $this->isModalBelanjaOpen = false;
+    }
+
+    public function simpanBelanja()
+    {
+        $this->validate([
+            'belanjaItems.*.kuantitas_dibeli' => 'required|numeric|min:0',
+            'belanjaItems.*.total_harga_beli' => 'required|numeric|min:0',
+        ]);
+
+        \Illuminate\Support\Facades\DB::transaction(function () {
+            foreach ($this->belanjaItems as $item) {
+                if ($item['kuantitas_dibeli'] > 0) {
+                    $bahan = \App\Models\BahanBaku::find($item['bahan_baku_id']);
+                    
+                    // Update stok
+                    $bahan->stok += $item['kuantitas_dibeli'];
+                    
+                    // Update harga satuan sesuai harga pasar terbaru
+                    $hargaSatuanAktual = 0;
+                    if ($item['total_harga_beli'] > 0) {
+                        $hargaSatuanAktual = $item['total_harga_beli'] / $item['kuantitas_dibeli'];
+                        $bahan->harga_satuan = $hargaSatuanAktual;
+                    }
+                    
+                    $bahan->save();
+
+                    // Insert Log Belanja
+                    \App\Models\RiwayatBelanjaDapur::create([
+                        'bahan_baku_id' => $bahan->id,
+                        'kuantitas_dibeli' => $item['kuantitas_dibeli'],
+                        'total_harga_beli' => $item['total_harga_beli'],
+                        'harga_satuan_aktual' => $hargaSatuanAktual,
+                        'tanggal_belanja' => now(),
+                    ]);
+                }
+            }
+        });
+
+        $this->tutupModalBelanja();
+        session()->flash('success', 'Kedatangan barang berhasil diinput dan stok telah ditambahkan. Silakan klik Mulai Masak.');
+    }
+
+    // --- State & Methods untuk Cetak Jadwal Menu ---
+    public $isModalJadwalOpen = false;
+    public $jadwal_start_date;
+    public $jadwal_end_date;
+    public $jadwal_nama_pelatihan;
+    public $jadwal_jumlah_peserta;
+
+    public function bukaModalJadwal()
+    {
+        $this->reset(['jadwal_start_date', 'jadwal_end_date', 'jadwal_nama_pelatihan', 'jadwal_jumlah_peserta']);
+        $this->jadwal_start_date = date('Y-m-d');
+        $this->jadwal_end_date = date('Y-m-d', strtotime('+6 days'));
+        $this->isModalJadwalOpen = true;
+    }
+
+    public function tutupModalJadwal()
+    {
+        $this->isModalJadwalOpen = false;
+    }
+
+    public function prosesCetakJadwal()
+    {
+        $this->validate([
+            'jadwal_start_date' => 'required|date',
+            'jadwal_end_date' => 'required|date|after_or_equal:jadwal_start_date',
+            'jadwal_nama_pelatihan' => 'required|string|max:255',
+            'jadwal_jumlah_peserta' => 'required|integer|min:1',
+        ]);
+
+        $this->tutupModalJadwal();
+
+        return redirect()->route('admin.dapur.print-jadwal', [
+            'start' => $this->jadwal_start_date,
+            'end' => $this->jadwal_end_date,
+            'pelatihan' => $this->jadwal_nama_pelatihan,
+            'peserta' => $this->jadwal_jumlah_peserta,
+        ]);
+    }
+
+    // --- State & Methods untuk Set Jus Trainer ---
+    public $isModalJusOpen = false;
+    public $jus_tanggal;
+    public $jus_trainer_name;
+
+    public function bukaModalJus($tanggal)
+    {
+        $this->jus_tanggal = $tanggal;
+        $info = \App\Models\InformasiHarianDapur::where('tanggal', $tanggal)->first();
+        $this->jus_trainer_name = $info ? $info->jus_trainer : '';
+        $this->isModalJusOpen = true;
+    }
+
+    public function tutupModalJus()
+    {
+        $this->isModalJusOpen = false;
+    }
+
+    public function simpanJus()
+    {
+        $this->validate([
+            'jus_tanggal' => 'required|date',
+            'jus_trainer_name' => 'nullable|string|max:255',
+        ]);
+
+        \App\Models\InformasiHarianDapur::updateOrCreate(
+            ['tanggal' => $this->jus_tanggal],
+            ['jus_trainer' => $this->jus_trainer_name]
+        );
+
+        $this->tutupModalJus();
+        session()->flash('success', 'Jus trainer berhasil disimpan.');
     }
 }

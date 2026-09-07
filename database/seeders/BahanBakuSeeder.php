@@ -14,8 +14,8 @@ class BahanBakuSeeder extends Seeder
     {
         // === BAHAN KERING ===
         $bahanKering = [
-            ['nama_bahan' => 'Beras belida @20kg', 'satuan' => 'sak', 'harga_satuan' => 320000],
-            ['nama_bahan' => 'Beras topi koki @20kg', 'satuan' => 'sak', 'harga_satuan' => 320000],
+            ['nama_bahan' => 'Beras belida @20kg', 'satuan' => 'kg', 'harga_satuan' => 16000, 'keterangan_volume' => '1 sak = 20kg'],
+            ['nama_bahan' => 'Beras topi koki @20kg', 'satuan' => 'kg', 'harga_satuan' => 16000, 'keterangan_volume' => '1 sak = 20kg'],
             ['nama_bahan' => 'Bihun jagung', 'satuan' => 'pak', 'harga_satuan' => 43000],
             ['nama_bahan' => 'Daia', 'satuan' => 'bks', 'harga_satuan' => 20000],
             ['nama_bahan' => 'Garam halus', 'satuan' => 'pak', 'harga_satuan' => 100000],
@@ -31,7 +31,7 @@ class BahanBakuSeeder extends Seeder
             ['nama_bahan' => 'Merica halus', 'satuan' => 'ppn', 'harga_satuan' => 12000],
             ['nama_bahan' => 'Mie lidi', 'satuan' => 'bks', 'harga_satuan' => 9000],
             ['nama_bahan' => 'Mie telor', 'satuan' => 'dus', 'harga_satuan' => 80000],
-            ['nama_bahan' => 'Minyak goreng', 'satuan' => 'dus', 'harga_satuan' => 270000],
+            ['nama_bahan' => 'Minyak goreng', 'satuan' => 'liter', 'harga_satuan' => 22500, 'keterangan_volume' => '1 dus = 12 liter'],
             ['nama_bahan' => 'Plastik PE @10kg', 'satuan' => 'kg', 'harga_satuan' => 50000],
             ['nama_bahan' => 'Plastik press gulung', 'satuan' => 'glg', 'harga_satuan' => 23000],
             ['nama_bahan' => 'Royco ayam/sapi', 'satuan' => 'bks', 'harga_satuan' => 10000],
@@ -100,7 +100,7 @@ class BahanBakuSeeder extends Seeder
             ['nama_bahan' => 'Minyak soto', 'satuan' => 'bks', 'harga_satuan' => 4000],
             ['nama_bahan' => 'Nangka muda', 'satuan' => 'kg', 'harga_satuan' => 15000],
             ['nama_bahan' => 'Petai', 'satuan' => 'kg', 'harga_satuan' => 85000],
-            ['nama_bahan' => 'Pisang barangan', 'satuan' => 'sisir', 'harga_satuan' => 22000],
+            ['nama_bahan' => 'Pisang barangan', 'satuan' => 'buah', 'harga_satuan' => 2000, 'keterangan_volume' => '1 sisir = 11 buah'],
             ['nama_bahan' => 'Sawi putih', 'satuan' => 'kg', 'harga_satuan' => 25000],
             ['nama_bahan' => 'Sayur asam', 'satuan' => 'bks', 'harga_satuan' => 3000],
             ['nama_bahan' => 'Semangka', 'satuan' => 'kg', 'harga_satuan' => 15000],
@@ -110,7 +110,7 @@ class BahanBakuSeeder extends Seeder
             ['nama_bahan' => 'Tahu goreng', 'satuan' => 'bks', 'harga_satuan' => 7000],
             ['nama_bahan' => 'Tahu putih', 'satuan' => 'bks', 'harga_satuan' => 7000],
             ['nama_bahan' => 'Tauco', 'satuan' => 'kg', 'harga_satuan' => 22000],
-            ['nama_bahan' => 'Telur ayam', 'satuan' => 'ppn', 'harga_satuan' => 56000],
+            ['nama_bahan' => 'Telur ayam', 'satuan' => 'butir', 'harga_satuan' => 1867, 'keterangan_volume' => '1 papan = 30 butir'],
             ['nama_bahan' => 'Tempe', 'satuan' => 'bks', 'harga_satuan' => 7000],
             ['nama_bahan' => 'Timun', 'satuan' => 'kg', 'harga_satuan' => 18000],
             ['nama_bahan' => 'Toge pendek', 'satuan' => 'kg', 'harga_satuan' => 14000],

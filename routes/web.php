@@ -33,6 +33,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/dashboard', \App\Livewire\Admin\Dashboard::class)->name('admin.dashboard');
     Route::get('/admin/dapur', \App\Livewire\Admin\Dapur\Index::class)->name('admin.dapur');
     Route::get('/admin/dapur/print', [\App\Http\Controllers\DapurExportController::class, 'printBelanja'])->name('admin.dapur.print');
+    Route::get('/admin/dapur/print-jadwal', [\App\Http\Controllers\DapurExportController::class, 'printJadwal'])->name('admin.dapur.print-jadwal');
     Route::get('/admin/reservasi', \App\Livewire\Admin\Reservasi\Index::class)->name('admin.reservasi');
     Route::get('/admin/laundry', \App\Livewire\Admin\Laundry\Index::class)->name('admin.laundry');
     Route::get('/admin/akun', \App\Livewire\Admin\Akun\Index::class)->name('admin.akun');

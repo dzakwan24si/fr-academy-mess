@@ -16,8 +16,8 @@ class MenuDanResepSeeder extends Seeder
                 'nama_menu' => 'Nasi Goreng',
                 'deskripsi' => 'Nasi goreng kampung dengan kecap dan bumbu rempah',
                 'resep' => [
-                    'Beras topi koki @20kg' => 0.005, // 0.1 kg (asumsi 1 sak 20kg = 0.005 sak)
-                    'Minyak goreng' => 0.005,
+                    'Beras topi koki @20kg' => 0.1, // 100 gram
+                    'Minyak goreng' => 0.05,
                     'Kecap manis ABC refill' => 0.01,
                     'Garam halus' => 0.01,
                     'Bawang merah' => 0.01,
@@ -33,7 +33,7 @@ class MenuDanResepSeeder extends Seeder
                     'Cabe merah' => 0.05,
                     'Bawang merah' => 0.02,
                     'Bawang putih' => 0.01,
-                    'Minyak goreng' => 0.01,
+                    'Minyak goreng' => 0.1,
                     'Tomat' => 0.02,
                 ]
             ],
@@ -41,9 +41,9 @@ class MenuDanResepSeeder extends Seeder
                 'nama_menu' => 'Telor Dadar',
                 'deskripsi' => 'Telor dadar tebal khas padang',
                 'resep' => [
-                    'Telur ayam' => 0.033, // 1 butir (dari 1 papan isi 30)
+                    'Telur ayam' => 1, // 1 butir
                     'Bawang merah' => 0.01,
-                    'Minyak goreng' => 0.005,
+                    'Minyak goreng' => 0.05,
                     'Cabe merah' => 0.005,
                 ]
             ],
@@ -64,7 +64,7 @@ class MenuDanResepSeeder extends Seeder
                     'Cabe merah giling' => 0.05,
                     'Bawang merah' => 0.02,
                     'Tomat' => 0.02,
-                    'Minyak goreng' => 0.01,
+                    'Minyak goreng' => 0.1,
                 ]
             ],
             [
@@ -93,7 +93,7 @@ class MenuDanResepSeeder extends Seeder
                     'Lontong plastik' => 0.1,
                     'Santan gulai lontong' => 0.05,
                     'Jipang' => 0.05,
-                    'Telur ayam' => 0.033,
+                    'Telur ayam' => 1,
                     'Bawang merah' => 0.01,
                 ]
             ],
@@ -116,7 +116,7 @@ class MenuDanResepSeeder extends Seeder
                     'Bawang putih' => 0.01,
                     'Cabe merah' => 0.01,
                     'Terasi' => 0.01,
-                    'Minyak goreng' => 0.005,
+                    'Minyak goreng' => 0.05,
                 ]
             ],
             [
@@ -146,7 +146,7 @@ class MenuDanResepSeeder extends Seeder
                 'resep' => [
                     'Mie telor' => 0.05,
                     'Sawi putih' => 0.05,
-                    'Telur ayam' => 0.033,
+                    'Telur ayam' => 1,
                     'Kecap manis ABC refill' => 0.01,
                     'Bawang putih' => 0.01,
                 ]
@@ -167,7 +167,7 @@ class MenuDanResepSeeder extends Seeder
                 'nama_menu' => 'Pisang Barangan',
                 'deskripsi' => 'Buah Pisang Barangan segar',
                 'resep' => [
-                    'Pisang barangan' => 0.05,
+                    'Pisang barangan' => 1,
                 ]
             ],
         ];

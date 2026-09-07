@@ -186,7 +186,7 @@
                         <td class="text-center">{{ $index + 1 }}</td>
                         <td>{{ $item['nama_bahan'] }}</td>
                         <td class="text-center">{{ $item['satuan'] }}</td>
-                        <td class="text-center">{{ rtrim(rtrim(number_format($item['total_qty'], 2, ',', '.'), '0'), ',') }}</td>
+                        <td class="text-center">{{ rtrim(rtrim(number_format($item['qty_beli'], 2, ',', '.'), '0'), ',') }}</td>
                         <td class="text-center">{{ $item['keterangan_volume'] ?? '' }}</td>
                         <td>
                             <div style="display: flex; justify-content: space-between;">
