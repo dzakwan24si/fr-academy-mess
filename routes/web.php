@@ -31,13 +31,15 @@ Route::post('/logout', function (\Illuminate\Http\Request $request) {
 
 Route::middleware('auth')->group(function () {
     Route::get('/admin/dashboard', \App\Livewire\Admin\Dashboard::class)->name('admin.dashboard');
-    Route::get('/admin/kamar', \App\Livewire\Admin\Kamar\Index::class)->name('admin.kamar');
-    Route::get('/admin/reservasi', \App\Livewire\Admin\Reservasi\Index::class)->name('admin.reservasi');
-    Route::get('/admin/laundry', \App\Livewire\Admin\Laundry\Index::class)->name('admin.laundry');
     Route::get('/admin/dapur', \App\Livewire\Admin\Dapur\Index::class)->name('admin.dapur');
     Route::get('/admin/dapur/print', [\App\Http\Controllers\DapurExportController::class, 'printBelanja'])->name('admin.dapur.print');
+    Route::get('/admin/reservasi', \App\Livewire\Admin\Reservasi\Index::class)->name('admin.reservasi');
+    Route::get('/admin/laundry', \App\Livewire\Admin\Laundry\Index::class)->name('admin.laundry');
     Route::get('/admin/akun', \App\Livewire\Admin\Akun\Index::class)->name('admin.akun');
     Route::get('/admin/kamar', \App\Livewire\Admin\Kamar\Index::class)->name('admin.kamar');
+    Route::get('/admin/kamar/{kamar}/aset', \App\Livewire\Admin\Kamar\Aset::class)->name('admin.kamar.aset');
+    Route::get('/admin/aset', \App\Livewire\Admin\Aset\Index::class)->name('admin.aset');
+    Route::get('/admin/aset/laporan', \App\Livewire\Admin\Aset\Laporan::class)->name('admin.aset.laporan');
     Route::get('/admin/komplain', \App\Livewire\Admin\Komplain\Index::class)->name('admin.komplain');
 });
 

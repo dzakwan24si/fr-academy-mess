@@ -18,6 +18,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RolesAndPermissionsSeeder::class,
             MasterDataSeeder::class,
+            AsetExcelSeeder::class,
+            BahanBakuSeeder::class,
+            MenuDanResepSeeder::class,
         ]);
     }
 }

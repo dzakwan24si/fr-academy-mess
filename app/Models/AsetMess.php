@@ -10,4 +10,11 @@ class AsetMess extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    public function kamars()
+    {
+        return $this->belongsToMany(Kamar::class, 'aset_kamar', 'aset_mess_id', 'kamar_id')
+                    ->withPivot('id', 'jumlah', 'kondisi', 'keterangan', 'tanggal_maintenance')
+                    ->withTimestamps();
+    }
 }

@@ -31,6 +31,7 @@
                 <thead>
                     <tr class="bg-gray-50/50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                         <th class="px-6 py-4">Kamar</th>
+                        <th class="px-6 py-4">Lokasi</th>
                         <th class="px-6 py-4">Tipe & Kapasitas</th>
                         <th class="px-6 py-4">Status</th>
                         <th class="px-6 py-4 text-right">Aksi</th>
@@ -40,7 +41,10 @@
                     @forelse($kamars as $kamar)
                         <tr class="hover:bg-gray-50/50 transition-colors">
                             <td class="px-6 py-4">
-                                <div class="font-bold text-gray-800 text-lg">No. {{ $kamar->nomor_kamar }}</div>
+                                <div class="font-bold text-gray-800 text-lg">{{ $kamar->nomor_kamar }}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm text-gray-600 font-medium">{{ $kamar->lokasi ?: '-' }}</div>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="font-bold text-gray-800">{{ $kamar->tipe_kamar }}</div>
@@ -61,8 +65,12 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <div class="flex justify-end gap-2">
-                                    <button wire:click="bukaModal({{ $kamar->id }})" class="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors" title="Edit Kamar">
+                                <div class="flex items-center justify-end gap-2">
+                                    <a href="{{ route('admin.kamar.aset', $kamar->id) }}" class="px-3 py-1.5 bg-[#E8F5E9] text-[#59A338] hover:bg-[#59A338] hover:text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-1" title="Lihat Aset Kamar">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                                        Aset
+                                    </a>
+                                    <button wire:click="bukaModal({{ $kamar->id }})" class="p-2 text-gray-400 hover:text-[#59A338] hover:bg-green-50 rounded-lg transition-colors" title="Edit Kamar">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                                     </button>
                                     <button wire:confirm="Apakah Anda yakin ingin menghapus kamar ini? Data yang terkait mungkin akan hilang." wire:click="hapus({{ $kamar->id }})" class="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors" title="Hapus Kamar">
@@ -106,8 +114,14 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Nomor Kamar <span class="text-red-500">*</span></label>
-                            <input wire:model="nomor_kamar" type="text" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm" placeholder="Contoh: 101, VIP-01" required>
+                            <input wire:model="nomor_kamar" type="text" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm" placeholder="Contoh: Kamar 101, VIP-01" required>
                             @error('nomor_kamar') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Lokasi Kamar</label>
+                            <input wire:model="lokasi" type="text" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm" placeholder="Contoh: Lorong 1, Gedung Utama">
+                            @error('lokasi') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                         </div>
 
                         <div>

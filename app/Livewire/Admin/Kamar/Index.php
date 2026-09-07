@@ -20,10 +20,11 @@ class Index extends Component
     // Form Modal
     public $isModalOpen = false;
     public $isEdit = false;
-    public $selectedId = null;
+    public $kamar_id = null;
 
     // Fields
     public $nomor_kamar;
+    public $lokasi;
     public $tipe_kamar = 'Reguler Twin Bed';
     public $kapasitas = 2;
     public $status = 'kosong_bersih';
@@ -44,18 +45,18 @@ class Index extends Component
     {
         $this->resetValidation();
         if ($id) {
-            $this->isEdit = true;
-            $this->selectedId = $id;
-            
             $kamar = Kamar::findOrFail($id);
+            $this->kamar_id = $kamar->id;
             $this->nomor_kamar = $kamar->nomor_kamar;
+            $this->lokasi = $kamar->lokasi;
             $this->tipe_kamar = $kamar->tipe_kamar;
             $this->kapasitas = $kamar->kapasitas;
             $this->status = $kamar->status;
+            $this->isEdit = true;
         } else {
             $this->isEdit = false;
-            $this->selectedId = null;
-            $this->reset(['nomor_kamar', 'tipe_kamar', 'kapasitas', 'status']);
+            $this->kamar_id = null;
+            $this->reset(['nomor_kamar', 'lokasi', 'tipe_kamar', 'kapasitas', 'status']);
             $this->tipe_kamar = 'Reguler Twin Bed';
             $this->kapasitas = 2;
             $this->status = 'kosong_bersih';
@@ -71,28 +72,23 @@ class Index extends Component
     public function simpan()
     {
         $this->validate([
-            'nomor_kamar' => 'required|string|max:50|unique:kamars,nomor_kamar,' . $this->selectedId,
+            'nomor_kamar' => 'required|string|max:50|unique:kamars,nomor_kamar,' . $this->kamar_id,
+            'lokasi' => 'nullable|string|max:255',
             'tipe_kamar' => 'required|string|max:255',
             'kapasitas' => 'required|integer|min:1',
             'status' => 'required|in:kosong_bersih,kosong_kotor,terisi,maintenance',
         ]);
 
-        if ($this->isEdit) {
-            $kamar = Kamar::findOrFail($this->selectedId);
-            $kamar->update([
+        Kamar::updateOrCreate(
+            ['id' => $this->kamar_id],
+            [
                 'nomor_kamar' => $this->nomor_kamar,
+                'lokasi' => $this->lokasi,
                 'tipe_kamar' => $this->tipe_kamar,
                 'kapasitas' => $this->kapasitas,
                 'status' => $this->status,
-            ]);
-        } else {
-            Kamar::create([
-                'nomor_kamar' => $this->nomor_kamar,
-                'tipe_kamar' => $this->tipe_kamar,
-                'kapasitas' => $this->kapasitas,
-                'status' => $this->status,
-            ]);
-        }
+            ]
+        );
 
         $this->tutupModal();
     }
@@ -104,7 +100,7 @@ class Index extends Component
 
     public function render()
     {
-        $query = Kamar::orderBy('created_at', 'desc');
+        $query = Kamar::orderBy('nomor_kamar', 'asc');
 
         if (!empty($this->search)) {
             $query->where('nomor_kamar', 'like', '%' . $this->search . '%')

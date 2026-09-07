@@ -33,6 +33,7 @@ class Index extends Component
 
     // --- State & Methods untuk Modal Bahan Baku ---
     public $isModalOpen = false;
+    public $editBahanId = null;
     public $nama_bahan;
     public $stok_saat_ini;
     public $satuan;
@@ -42,7 +43,23 @@ class Index extends Component
 
     public function bukaModal()
     {
-        $this->reset(['nama_bahan', 'stok_saat_ini', 'satuan', 'kategori_bahan', 'harga_satuan', 'keterangan_volume']);
+        $this->reset(['editBahanId', 'nama_bahan', 'stok_saat_ini', 'satuan', 'kategori_bahan', 'harga_satuan', 'keterangan_volume']);
+        $this->kategori_bahan = 'Kering';
+        $this->harga_satuan = 0;
+        $this->isModalOpen = true;
+    }
+
+    public function editBahan($id)
+    {
+        $bahan = BahanBaku::findOrFail($id);
+        $this->editBahanId = $bahan->id;
+        $this->nama_bahan = $bahan->nama_bahan;
+        $this->stok_saat_ini = $bahan->stok;
+        $this->satuan = $bahan->satuan;
+        $this->kategori_bahan = $bahan->kategori_bahan;
+        $this->harga_satuan = $bahan->harga_satuan;
+        $this->keterangan_volume = $bahan->keterangan_volume;
+        
         $this->isModalOpen = true;
     }
 
@@ -62,17 +79,31 @@ class Index extends Component
             'keterangan_volume' => 'nullable|string|max:50'
         ]);
 
-        BahanBaku::create([
+        $data = [
             'nama_bahan' => $this->nama_bahan,
             'stok' => $this->stok_saat_ini,
             'satuan' => $this->satuan,
             'kategori_bahan' => $this->kategori_bahan,
             'harga_satuan' => $this->harga_satuan,
             'keterangan_volume' => $this->keterangan_volume,
-        ]);
+        ];
+
+        if ($this->editBahanId) {
+            BahanBaku::findOrFail($this->editBahanId)->update($data);
+            session()->flash('success', 'Bahan baku berhasil diperbarui.');
+        } else {
+            BahanBaku::create($data);
+            session()->flash('success', 'Bahan baku baru berhasil ditambahkan.');
+        }
 
         $this->tutupModal();
-        session()->flash('success', 'Bahan baku baru berhasil ditambahkan.');
+    }
+
+    public function hapusBahan($id)
+    {
+        $bahan = BahanBaku::findOrFail($id);
+        $bahan->delete();
+        session()->flash('success', 'Bahan baku berhasil dihapus.');
     }
     
     // --- State & Methods untuk Modal Menu ---

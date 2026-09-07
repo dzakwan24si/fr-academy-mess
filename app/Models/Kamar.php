@@ -9,6 +9,18 @@ class Kamar extends Model
 {
     use SoftDeletes;
 
-    protected $guarded = [];
-    //
+    protected $fillable = [
+        'nomor_kamar',
+        'lokasi',
+        'tipe_kamar',
+        'kapasitas',
+        'status',
+    ];
+
+    public function asets()
+    {
+        return $this->belongsToMany(AsetMess::class, 'aset_kamar', 'kamar_id', 'aset_mess_id')
+                    ->withPivot('id', 'jumlah', 'kondisi', 'keterangan', 'tanggal_maintenance')
+                    ->withTimestamps();
+    }
 }
