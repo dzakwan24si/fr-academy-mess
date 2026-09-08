@@ -10,5 +10,9 @@ class SurveiKepuasanKamar extends Model
     use SoftDeletes;
 
     protected $guarded = [];
-    //
+
+    public function reservasi()
+    {
+        return $this->belongsTo(Reservasi::class);
+    }
 }

@@ -11,9 +11,7 @@ Route::get('/login', function () {
     return Blade::render('<livewire:admin.auth.login />');
 })->name('login');
 
-// Route::get('/tamu/login', function () {
-//     return Blade::render('<livewire:guest-portal.auth.login />');
-// })->name('guest.login');
+Route::get('/tamu/login', \App\Livewire\Guest\Auth\Login::class)->name('guest.login');
 
 Route::post('/logout', function (\Illuminate\Http\Request $request) {
     if (\Illuminate\Support\Facades\Auth::guard('tamu')->check()) {
@@ -30,18 +28,52 @@ Route::post('/logout', function (\Illuminate\Http\Request $request) {
 })->name('logout');
 
 Route::middleware('auth')->group(function () {
+    // Dashboard (Akses umum untuk admin)
     Route::get('/admin/dashboard', \App\Livewire\Admin\Dashboard::class)->name('admin.dashboard');
-    Route::get('/admin/dapur', \App\Livewire\Admin\Dapur\Index::class)->name('admin.dapur');
-    Route::get('/admin/dapur/print', [\App\Http\Controllers\DapurExportController::class, 'printBelanja'])->name('admin.dapur.print');
-    Route::get('/admin/dapur/print-jadwal', [\App\Http\Controllers\DapurExportController::class, 'printJadwal'])->name('admin.dapur.print-jadwal');
-    Route::get('/admin/reservasi', \App\Livewire\Admin\Reservasi\Index::class)->name('admin.reservasi');
-    Route::get('/admin/laundry', \App\Livewire\Admin\Laundry\Index::class)->name('admin.laundry');
-    Route::get('/admin/akun', \App\Livewire\Admin\Akun\Index::class)->name('admin.akun');
-    Route::get('/admin/kamar', \App\Livewire\Admin\Kamar\Index::class)->name('admin.kamar');
-    Route::get('/admin/kamar/{kamar}/aset', \App\Livewire\Admin\Kamar\Aset::class)->name('admin.kamar.aset');
-    Route::get('/admin/aset', \App\Livewire\Admin\Aset\Index::class)->name('admin.aset');
-    Route::get('/admin/aset/laporan', \App\Livewire\Admin\Aset\Laporan::class)->name('admin.aset.laporan');
-    Route::get('/admin/komplain', \App\Livewire\Admin\Komplain\Index::class)->name('admin.komplain');
+
+    // Dapur
+    Route::middleware('permission:akses_dapur')->group(function () {
+        Route::get('/admin/dapur', \App\Livewire\Admin\Dapur\Index::class)->name('admin.dapur');
+        Route::get('/admin/dapur/print', [\App\Http\Controllers\DapurExportController::class, 'printBelanja'])->name('admin.dapur.print');
+        Route::get('/admin/dapur/print-jadwal', [\App\Http\Controllers\DapurExportController::class, 'printJadwal'])->name('admin.dapur.print-jadwal');
+    });
+
+    // Reservasi
+    Route::middleware('permission:akses_reservasi')->group(function () {
+        Route::get('/admin/reservasi', \App\Livewire\Admin\Reservasi\Index::class)->name('admin.reservasi');
+    });
+
+    // Laundry
+    Route::middleware('permission:akses_laundry')->group(function () {
+        Route::get('/admin/laundry', \App\Livewire\Admin\Laundry\Index::class)->name('admin.laundry');
+    });
+
+    // --- Laporan & Pengaturan ---
+    Route::middleware(['can:akses_survei'])->group(function () {
+        Route::get('/admin/survei', \App\Livewire\Admin\Survei\Index::class)->name('admin.survei.index');
+    });
+
+    // Manajemen Akun
+    Route::middleware('permission:manajemen_akun')->group(function () {
+        Route::get('/admin/akun', \App\Livewire\Admin\Akun\Index::class)->name('admin.akun');
+    });
+
+    // Kamar
+    Route::middleware('permission:akses_kamar')->group(function () {
+        Route::get('/admin/kamar', \App\Livewire\Admin\Kamar\Index::class)->name('admin.kamar');
+        Route::get('/admin/kamar/{kamar}/aset', \App\Livewire\Admin\Kamar\Aset::class)->name('admin.kamar.aset');
+    });
+
+    // Aset
+    Route::middleware('permission:akses_aset')->group(function () {
+        Route::get('/admin/aset', \App\Livewire\Admin\Aset\Index::class)->name('admin.aset');
+        Route::get('/admin/aset/laporan', \App\Livewire\Admin\Aset\Laporan::class)->name('admin.aset.laporan');
+    });
+
+    // Komplain
+    Route::middleware('permission:akses_komplain')->group(function () {
+        Route::get('/admin/komplain', \App\Livewire\Admin\Komplain\Index::class)->name('admin.komplain');
+    });
 });
 
 Route::middleware('auth:tamu')->group(function () {

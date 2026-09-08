@@ -22,6 +22,17 @@ class Index extends Component
     public $alasanTolak = '';
     public $selectedReservasiId = null;
 
+    // Form Walk-in Reservation
+    public $isModalBuatOpen = false;
+    public $form_nama = '';
+    public $form_no_hp = '';
+    public $form_perusahaan = '';
+    public $form_jabatan = '';
+    public $form_tgl_checkin = '';
+    public $form_tgl_checkout = '';
+    public $form_kamar_id = '';
+    public $form_keperluan = '';
+
     protected $queryString = ['search', 'filterStatus'];
 
     public function updatingSearch()
@@ -69,10 +80,68 @@ class Index extends Component
         $this->tutupModalTolak();
     }
 
+    public function bukaModalBuat()
+    {
+        $this->reset([
+            'form_nama', 'form_no_hp', 'form_perusahaan', 'form_jabatan',
+            'form_tgl_checkin', 'form_tgl_checkout', 'form_kamar_id', 'form_keperluan'
+        ]);
+        $this->form_tgl_checkin = \Carbon\Carbon::today()->format('Y-m-d');
+        $this->isModalBuatOpen = true;
+    }
+
+    public function tutupModalBuat()
+    {
+        $this->isModalBuatOpen = false;
+    }
+
+    public function simpanWalkIn()
+    {
+        $this->validate([
+            'form_nama' => 'required|string|max:255',
+            'form_no_hp' => 'required|string|max:20',
+            'form_perusahaan' => 'nullable|string|max:255',
+            'form_jabatan' => 'nullable|string|max:255',
+            'form_tgl_checkin' => 'required|date',
+            'form_tgl_checkout' => 'required|date|after_or_equal:form_tgl_checkin',
+            'form_keperluan' => 'required|string',
+            'form_kamar_id' => 'nullable|exists:kamars,id'
+        ]);
+
+        // Cari Tamu berdasarkan No HP, atau buat baru
+        $tamu = \App\Models\Tamu::firstOrCreate(
+            ['no_hp' => $this->form_no_hp],
+            [
+                'nama' => $this->form_nama,
+                'perusahaan' => $this->form_perusahaan,
+                'jabatan' => $this->form_jabatan
+            ]
+        );
+
+        // Buat Reservasi dengan status 'approved'
+        Reservasi::create([
+            'tamu_id' => $tamu->id,
+            'kamar_id' => $this->form_kamar_id ?: null,
+            'tanggal_checkin' => $this->form_tgl_checkin,
+            'tanggal_checkout' => $this->form_tgl_checkout,
+            'keperluan_menginap' => $this->form_keperluan,
+            'status' => 'approved'
+        ]);
+
+        $this->tutupModalBuat();
+    }
+
     public function prosesCheckIn($id)
     {
         $reservasi = Reservasi::findOrFail($id);
-        $reservasi->update(['status' => 'checked_in']);
+        
+        \Illuminate\Support\Facades\DB::transaction(function () use ($reservasi) {
+            $reservasi->update(['status' => 'checked_in']);
+            
+            if ($reservasi->kamar) {
+                $reservasi->kamar->update(['status' => 'terisi']);
+            }
+        });
     }
 
     public function prosesCheckOut($id)
@@ -83,7 +152,7 @@ class Index extends Component
             $reservasi->update(['status' => 'completed']);
             
             if ($reservasi->kamar) {
-                $reservasi->kamar->update(['status' => 'kotor']);
+                $reservasi->kamar->update(['status' => 'kosong_kotor']);
             }
         });
     }
@@ -104,7 +173,8 @@ class Index extends Component
         }
 
         return view('livewire.admin.reservasi.index', [
-            'reservasis' => $query->paginate(10)
+            'reservasis' => $query->paginate(10),
+            'availableRooms' => Kamar::where('status', 'kosong_bersih')->get()
         ]);
     }
 }

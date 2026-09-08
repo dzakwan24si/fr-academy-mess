@@ -5,12 +5,12 @@
             <h1 class="text-2xl font-bold text-gray-800">Manajemen Reservasi</h1>
             <p class="text-gray-500 text-sm">Kelola pengajuan booking dan proses check-in/out tamu.</p>
         </div>
-        <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-            <div class="relative w-full sm:w-64">
+        <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+            <div class="relative w-full md:w-64">
                 <input wire:model.live.debounce.300ms="search" type="text" placeholder="Cari nama tamu..." class="w-full bg-white border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow">
                 <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </div>
-            <select wire:model.live="filterStatus" class="w-full sm:w-48 bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow">
+            <select wire:model.live="filterStatus" class="w-full md:w-48 bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow">
                 <option value="">Semua Status</option>
                 <option value="pending">Pending</option>
                 <option value="approved">Approved</option>
@@ -18,6 +18,10 @@
                 <option value="completed">Completed</option>
                 <option value="rejected">Rejected</option>
             </select>
+            <button wire:click="bukaModalBuat" class="w-full md:w-auto px-5 py-2.5 bg-[#2E7D32] hover:bg-green-700 text-white rounded-xl text-sm font-semibold shadow-sm flex items-center justify-center gap-2 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                Buat Reservasi
+            </button>
         </div>
     </div>
 
@@ -143,6 +147,118 @@
                         <button type="submit" class="px-5 py-2.5 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700 transition-colors shadow-sm">
                             <span wire:loading.remove wire:target="tolakBooking">Konfirmasi Tolak</span>
                             <span wire:loading wire:target="tolakBooking">Memproses...</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
+
+    <!-- Modal Walk-in Reservation -->
+    @if($isModalBuatOpen)
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" wire:click="tutupModalBuat"></div>
+            
+            <div class="relative bg-white rounded-2xl w-full max-w-4xl shadow-xl z-10 flex flex-col max-h-[90vh]">
+                <!-- Modal Header -->
+                <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 rounded-t-2xl">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900">Walk-in Reservation</h3>
+                        <p class="text-xs text-gray-500 mt-1">Pemesanan kamar manual oleh Admin.</p>
+                    </div>
+                    <button wire:click="tutupModalBuat" class="text-gray-400 hover:text-gray-600 p-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                
+                <!-- Modal Body -->
+                <form wire:submit.prevent="simpanWalkIn" class="flex flex-col flex-1 overflow-hidden">
+                    <div class="p-6 overflow-y-auto">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            
+                            <!-- Kolom Kiri: Data Tamu -->
+                            <div class="flex flex-col gap-5">
+                                <div class="flex items-center gap-2 border-b border-gray-100 pb-2">
+                                    <div class="w-6 h-6 rounded bg-blue-100 text-blue-600 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg></div>
+                                    <h4 class="font-semibold text-gray-800">Informasi Tamu</h4>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
+                                    <input type="text" wire:model="form_nama" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm" placeholder="Nama sesuai identitas" required>
+                                    @error('form_nama') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nomor Handphone <span class="text-red-500">*</span></label>
+                                    <input type="text" wire:model="form_no_hp" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm" placeholder="Contoh: 081234567890" required>
+                                    <p class="text-[11px] text-gray-400 mt-1">Sistem akan menautkan ke tamu lama jika no HP cocok.</p>
+                                    @error('form_no_hp') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Perusahaan asal (Opsional)</label>
+                                    <input type="text" wire:model="form_perusahaan" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm" placeholder="Nama PT / Instansi">
+                                    @error('form_perusahaan') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Jabatan (Opsional)</label>
+                                    <input type="text" wire:model="form_jabatan" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm" placeholder="Jabatan Tamu">
+                                    @error('form_jabatan') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- Kolom Kanan: Data Reservasi -->
+                            <div class="flex flex-col gap-5">
+                                <div class="flex items-center gap-2 border-b border-gray-100 pb-2">
+                                    <div class="w-6 h-6 rounded bg-green-100 text-green-600 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>
+                                    <h4 class="font-semibold text-gray-800">Detail Pemesanan</h4>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-1">Check-in <span class="text-red-500">*</span></label>
+                                        <input type="date" wire:model="form_tgl_checkin" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm" required>
+                                        @error('form_tgl_checkin') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-1">Check-out <span class="text-red-500">*</span></label>
+                                        <input type="date" wire:model="form_tgl_checkout" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm" required>
+                                        @error('form_tgl_checkout') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Pilih Kamar (Opsional)</label>
+                                    <select wire:model="form_kamar_id" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm">
+                                        <option value="">-- Alokasikan Nanti --</option>
+                                        @foreach($availableRooms as $kamar)
+                                            <option value="{{ $kamar->id }}">{{ $kamar->nomor_kamar }} ({{ $kamar->tipe_kamar }})</option>
+                                        @endforeach
+                                    </select>
+                                    <p class="text-[11px] text-gray-400 mt-1">Hanya menampilkan kamar yang berstatus kosong & bersih.</p>
+                                    @error('form_kamar_id') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                                </div>
+
+                                <div class="flex-1">
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Keperluan Menginap <span class="text-red-500">*</span></label>
+                                    <textarea wire:model="form_keperluan" rows="3" class="w-full h-24 border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm resize-none" placeholder="Contoh: Kunjungan VIP, Pelatihan Khusus..." required></textarea>
+                                    @error('form_keperluan') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    
+                    <!-- Modal Footer -->
+                    <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 rounded-b-2xl">
+                        <button type="button" wire:click="tutupModalBuat" class="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-white transition-colors">
+                            Batal
+                        </button>
+                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#2E7D32] text-white font-semibold hover:bg-green-700 transition-colors shadow-sm flex items-center gap-2">
+                            <span wire:loading.remove wire:target="simpanWalkIn">Simpan Reservasi</span>
+                            <span wire:loading wire:target="simpanWalkIn">Memproses...</span>
                         </button>
                     </div>
                 </form>

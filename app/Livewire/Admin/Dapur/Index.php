@@ -361,6 +361,26 @@ class Index extends Component
         session()->flash('success', 'Masakan telah selesai dan siap dihidangkan!');
     }
 
+    // --- State & Methods untuk Modal Ulasan ---
+    public $isModalUlasanOpen = false;
+    public $ulasanList = [];
+    public $ulasanMenuName = '';
+
+    public function bukaModalUlasan($id)
+    {
+        $rencanaMenu = RencanaMenuHarian::with(['menu', 'feedbackMasakans.tamu'])->find($id);
+        if ($rencanaMenu) {
+            $this->ulasanMenuName = $rencanaMenu->menu->nama_menu ?? 'Menu Tidak Diketahui';
+            $this->ulasanList = $rencanaMenu->feedbackMasakans;
+            $this->isModalUlasanOpen = true;
+        }
+    }
+
+    public function tutupModalUlasan()
+    {
+        $this->isModalUlasanOpen = false;
+    }
+
     // --- State & Methods untuk Cetak Daftar Belanja ---
     public $isModalCetakOpen = false;
     public $cetak_start_date;
