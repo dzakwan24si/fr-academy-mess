@@ -554,38 +554,4 @@ class Index extends Component
             'peserta' => $this->jadwal_jumlah_peserta,
         ]);
     }
-
-    // --- State & Methods untuk Set Jus Trainer ---
-    public $isModalJusOpen = false;
-    public $jus_tanggal;
-    public $jus_trainer_name;
-
-    public function bukaModalJus($tanggal)
-    {
-        $this->jus_tanggal = $tanggal;
-        $info = \App\Models\InformasiHarianDapur::where('tanggal', $tanggal)->first();
-        $this->jus_trainer_name = $info ? $info->jus_trainer : '';
-        $this->isModalJusOpen = true;
-    }
-
-    public function tutupModalJus()
-    {
-        $this->isModalJusOpen = false;
-    }
-
-    public function simpanJus()
-    {
-        $this->validate([
-            'jus_tanggal' => 'required|date',
-            'jus_trainer_name' => 'nullable|string|max:255',
-        ]);
-
-        \App\Models\InformasiHarianDapur::updateOrCreate(
-            ['tanggal' => $this->jus_tanggal],
-            ['jus_trainer' => $this->jus_trainer_name]
-        );
-
-        $this->tutupModalJus();
-        session()->flash('success', 'Jus trainer berhasil disimpan.');
-    }
 }

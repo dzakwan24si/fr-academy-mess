@@ -21,6 +21,37 @@ class Laporan extends Component
     public $filterKamar = '';
     public $filterKondisi = '';
 
+    public $isModalRiwayatOpen = false;
+    public $detailRiwayat = [];
+
+    public function bukaModalRiwayat($pivot_id)
+    {
+        $pivotRow = \Illuminate\Support\Facades\DB::table('aset_kamar')
+            ->join('aset_messes', 'aset_kamar.aset_mess_id', '=', 'aset_messes.id')
+            ->join('kamars', 'aset_kamar.kamar_id', '=', 'kamars.id')
+            ->select('aset_messes.nama_aset', 'kamars.nomor_kamar', 'aset_kamar.catatan_perbaikan', 'aset_kamar.foto_perbaikan', 'aset_kamar.tanggal_maintenance')
+            ->where('aset_kamar.id', $pivot_id)
+            ->first();
+
+        if ($pivotRow) {
+            $this->detailRiwayat = [
+                'nama_aset' => $pivotRow->nama_aset,
+                'nomor_kamar' => $pivotRow->nomor_kamar,
+                'teknisi' => 'Teknisi Internal', // Since we don't have teknisi_id on aset_kamar
+                'tanggal_maintenance' => $pivotRow->tanggal_maintenance,
+                'catatan_perbaikan' => $pivotRow->catatan_perbaikan,
+                'foto_perbaikan' => $pivotRow->foto_perbaikan,
+            ];
+            $this->isModalRiwayatOpen = true;
+        }
+    }
+
+    public function tutupModalRiwayat()
+    {
+        $this->isModalRiwayatOpen = false;
+        $this->detailRiwayat = [];
+    }
+
     public function render()
     {
         // Ambil data kamar beserta relasi asetnya
@@ -46,6 +77,7 @@ class Laporan extends Component
         foreach ($kamars as $kamar) {
             foreach ($kamar->asets as $aset) {
                 $laporanData->push([
+                    'pivot_id' => $aset->pivot->id,
                     'kamar_nama' => $kamar->nomor_kamar,
                     'kamar_lokasi' => $kamar->lokasi,
                     'kamar_tipe' => $kamar->tipe_kamar,
@@ -55,6 +87,8 @@ class Laporan extends Component
                     'kondisi' => $aset->pivot->kondisi,
                     'keterangan' => $aset->pivot->keterangan,
                     'tanggal_maintenance' => $aset->pivot->tanggal_maintenance,
+                    'catatan_perbaikan' => $aset->pivot->catatan_perbaikan,
+                    'foto_perbaikan' => $aset->pivot->foto_perbaikan,
                     'hilang' => $aset->pivot->kondisi === 'Hilang',
                 ]);
             }

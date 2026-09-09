@@ -74,6 +74,11 @@ Route::middleware('auth')->group(function () {
     Route::middleware('permission:akses_komplain')->group(function () {
         Route::get('/admin/komplain', \App\Livewire\Admin\Komplain\Index::class)->name('admin.komplain');
     });
+
+    // Tugas Perbaikan (Maintenance)
+    Route::middleware('permission:akses_maintenance')->group(function () {
+        Route::get('/admin/tugas-perbaikan', \App\Livewire\Admin\Maintenance\Index::class)->name('admin.maintenance');
+    });
 });
 
 Route::middleware('auth:tamu')->group(function () {

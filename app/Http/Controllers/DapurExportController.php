@@ -97,9 +97,7 @@ class DapurExportController extends Controller
             ->orderBy('tanggal', 'asc')
             ->get();
 
-        $infoHarian = \App\Models\InformasiHarianDapur::whereBetween('tanggal', [$startDate, $endDate])
-            ->get()
-            ->keyBy('tanggal');
+        // InformasiHarianDapur is deprecated for jus_trainer
 
         // Group by Tanggal, then by Waktu
         $jadwal = [];
@@ -111,7 +109,7 @@ class DapurExportController extends Controller
             $jadwal[$dateString] = [
                 'hari' => $currentDate->locale('id')->isoFormat('dddd'),
                 'tanggal_format' => $currentDate->locale('id')->isoFormat('D MMMM YYYY'),
-                'jus_trainer' => isset($infoHarian[$dateString]) ? $infoHarian[$dateString]->jus_trainer : '',
+                'jus_trainer' => '',
                 'menus' => [
                     'pagi' => [],
                     'siang' => [],
@@ -128,11 +126,20 @@ class DapurExportController extends Controller
 
         foreach ($rencanaHarians as $rencana) {
             $waktu = strtolower($rencana->waktu);
-            if (isset($jadwal[$rencana->tanggal]['menus'][$waktu])) {
-                $jadwal[$rencana->tanggal]['menus'][$waktu][] = $rencana->menu->nama_menu;
-                // Ambil porsi terbesar untuk waktu tersebut jika ada banyak menu
-                if ($rencana->target_porsi > $jadwal[$rencana->tanggal]['porsi'][$waktu]) {
-                    $jadwal[$rencana->tanggal]['porsi'][$waktu] = $rencana->target_porsi;
+            $date = $rencana->tanggal;
+            if (isset($jadwal[$date])) {
+                if ($waktu === 'jus_trainer') {
+                    $menuName = $rencana->menu ? $rencana->menu->nama_menu : 'Menu Terhapus';
+                    if (empty($jadwal[$date]['jus_trainer'])) {
+                        $jadwal[$date]['jus_trainer'] = $menuName;
+                    } else {
+                        $jadwal[$date]['jus_trainer'] .= ', ' . $menuName;
+                    }
+                } elseif (in_array($waktu, ['pagi', 'siang', 'malam'])) {
+                    $jadwal[$date]['menus'][$waktu][] = $rencana->menu ? $rencana->menu->nama_menu : 'Menu Terhapus';
+                    if ($rencana->target_porsi > $jadwal[$date]['porsi'][$waktu]) {
+                        $jadwal[$date]['porsi'][$waktu] = $rencana->target_porsi;
+                    }
                 }
             }
         }

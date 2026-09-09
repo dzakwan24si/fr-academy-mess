@@ -220,12 +220,11 @@
                             <tr class="hover:bg-gray-50/50 transition-colors">
                                 <td class="px-6 py-4 text-gray-600 font-medium">
                                     {{ \Carbon\Carbon::parse($rencana->tanggal)->format('d M Y') }}
-                                    <button wire:click="bukaModalJus('{{ $rencana->tanggal }}')" class="ml-2 px-2 py-0.5 text-[10px] font-bold bg-orange-100 text-orange-700 hover:bg-orange-200 rounded border border-orange-200 transition-colors">SET JUS</button>
                                 </td>
                                 <td class="px-6 py-4 font-bold text-gray-800">{{ $rencana->menu->nama_menu ?? 'Menu Terhapus' }}</td>
                                 <td class="px-6 py-4 text-gray-600 font-medium">
                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">
-                                        {{ ucfirst($rencana->waktu) }}
+                                        {{ $rencana->waktu === 'jus_trainer' ? 'Jus Trainer' : ucfirst($rencana->waktu) }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-gray-600">
@@ -503,6 +502,7 @@
                             <option value="Pagi">Pagi</option>
                             <option value="Siang">Siang</option>
                             <option value="Malam">Malam</option>
+                            <option value="jus_trainer">Jus Trainer</option>
                         </select>
                         @error('rencana_waktu') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                     </div>
@@ -820,38 +820,6 @@
                 </button>
                 <button wire:click="prosesCetakJadwal" class="px-4 py-2 text-sm font-semibold text-white bg-purple-600 hover:bg-purple-700 rounded-lg flex items-center gap-2">
                     Cetak PDF
-                </button>
-            </div>
-        </div>
-    </div>
-    @endif
-
-    <!-- MODAL SET JUS TRAINER -->
-    @if($isModalJusOpen)
-    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden border border-gray-100">
-            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                <div>
-                    <h3 class="text-lg font-bold text-gray-800">Set Jus Trainer</h3>
-                    <p class="text-xs text-gray-500 mt-0.5">{{ \Carbon\Carbon::parse($jus_tanggal)->format('d F Y') }}</p>
-                </div>
-                <button wire:click="tutupModalJus" class="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-            
-            <div class="p-6">
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">Nama Jus</label>
-                <input wire:model="jus_trainer_name" type="text" placeholder="Cth: Alpukat, Mangga, Naga" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#59A338] focus:ring-1 focus:ring-[#59A338]">
-                @error('jus_trainer_name') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
-            </div>
-
-            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 rounded-b-2xl">
-                <button wire:click="tutupModalJus" class="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50">
-                    Batal
-                </button>
-                <button wire:click="simpanJus" class="px-4 py-2 text-sm font-semibold text-white bg-orange-600 hover:bg-orange-700 rounded-lg">
-                    Simpan Jus
                 </button>
             </div>
         </div>

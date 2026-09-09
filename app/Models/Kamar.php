@@ -20,7 +20,7 @@ class Kamar extends Model
     public function asets()
     {
         return $this->belongsToMany(AsetMess::class, 'aset_kamar', 'kamar_id', 'aset_mess_id')
-                    ->withPivot('id', 'jumlah', 'kondisi', 'keterangan', 'tanggal_maintenance')
+                    ->withPivot('id', 'jumlah', 'kondisi', 'keterangan', 'tanggal_maintenance', 'catatan_perbaikan', 'foto_perbaikan')
                     ->withTimestamps();
     }
 }

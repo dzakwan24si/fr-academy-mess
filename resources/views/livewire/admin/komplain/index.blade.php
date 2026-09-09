@@ -90,8 +90,8 @@
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button wire:click="bukaModalProses({{ $komplain->id }})" class="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-colors tooltip" data-tip="Tindak Lanjut">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                    <button wire:click="bukaModalProses({{ $komplain->id }})" class="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-colors tooltip" data-tip="Lihat Detail">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                     </button>
                                     <button wire:click="hapus({{ $komplain->id }})" wire:confirm="Hapus data komplain ini?" class="p-2 text-red-600 hover:bg-red-50 rounded-xl transition-colors tooltip" data-tip="Hapus">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -121,30 +121,75 @@
     <!-- Modal Proses Tindak Lanjut -->
     @if($isModalOpen && $komplainDetail)
     <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity">
-        <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl transform transition-all overflow-hidden" @click.away="$wire.tutupModal()">
-            <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                <h3 class="text-xl font-bold text-gray-900">Tindak Lanjut Komplain</h3>
+        <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl transform transition-all flex flex-col max-h-[90vh]" @click.away="$wire.tutupModal()">
+            <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 shrink-0 rounded-t-3xl">
+                <h3 class="text-xl font-bold text-gray-900">Detail & Tindak Lanjut Komplain</h3>
                 <button wire:click="tutupModal" class="text-gray-400 hover:text-gray-700 bg-white hover:bg-gray-100 p-2 rounded-full transition-colors shadow-sm border border-gray-100">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
             
-            <div class="p-6">
-                <!-- Info Tamu & Masalah -->
-                <div class="bg-orange-50/50 border border-orange-100 rounded-2xl p-4 mb-6">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-lg">
-                            {{ substr($komplainDetail->reservasi->tamu->nama, 0, 1) }}
+            <div class="p-6 overflow-y-auto">
+                <!-- BAGIAN 1: LAPORAN TAMU -->
+                <div class="mb-6">
+                    <h4 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">1. Laporan Tamu</h4>
+                    <div class="bg-orange-50/50 border border-orange-100 rounded-2xl p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-lg">
+                                    {{ substr($komplainDetail->reservasi->tamu->nama, 0, 1) }}
+                                </div>
+                                <div>
+                                    <p class="font-bold text-gray-900">{{ $komplainDetail->reservasi->tamu->nama }}</p>
+                                    <p class="text-xs font-semibold text-gray-500">Kamar {{ $komplainDetail->reservasi->kamar->nomor_kamar }}</p>
+                                </div>
+                            </div>
+                            <div class="text-xs text-gray-500 text-right">
+                                {{ $komplainDetail->created_at->format('d M Y, H:i') }}
+                            </div>
                         </div>
-                        <div>
-                            <p class="font-bold text-gray-900">{{ $komplainDetail->reservasi->tamu->nama }}</p>
-                            <p class="text-xs font-semibold text-gray-500">Kamar {{ $komplainDetail->reservasi->kamar->nomor_kamar }}</p>
+                        <div class="text-sm text-gray-700 bg-white p-3 rounded-xl border border-orange-100/50 font-medium whitespace-pre-wrap break-words">
+                            "{{ $komplainDetail->deskripsi }}"
                         </div>
-                    </div>
-                    <div class="text-sm text-gray-700 bg-white p-3 rounded-xl border border-orange-100/50 font-medium">
-                        "{{ $komplainDetail->deskripsi }}"
+                        @if($komplainDetail->foto_bukti)
+                            <div class="mt-3">
+                                <p class="text-xs font-bold text-gray-500 mb-1.5">Foto dari Tamu:</p>
+                                <a href="{{ Storage::url($komplainDetail->foto_bukti) }}" target="_blank" class="block w-24 h-24 rounded-lg overflow-hidden border border-gray-200 hover:opacity-80 transition-opacity">
+                                    <img src="{{ Storage::url($komplainDetail->foto_bukti) }}" class="w-full h-full object-cover" alt="Foto Komplain Tamu">
+                                </a>
+                            </div>
+                        @endif
                     </div>
                 </div>
+
+                <!-- BAGIAN 2: HASIL PERBAIKAN TEKNISI -->
+                @if($komplainDetail->status_perbaikan === 'selesai' && ($komplainDetail->catatan_teknisi || $komplainDetail->foto_perbaikan))
+                <div class="mb-6">
+                    <h4 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">2. Hasil Perbaikan Teknisi</h4>
+                    <div class="bg-green-50 border border-green-100 rounded-2xl p-4">
+                        <div class="flex items-center gap-2 mb-3">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span class="font-bold text-green-800 text-sm">Diselesaikan oleh: {{ $komplainDetail->teknisi->name ?? 'Teknisi' }}</span>
+                        </div>
+                        <div class="text-sm text-gray-700 bg-white p-3 rounded-xl border border-green-100 font-medium whitespace-pre-wrap break-words">
+                            {{ $komplainDetail->catatan_teknisi ?: 'Tidak ada catatan teknisi.' }}
+                        </div>
+                        @if($komplainDetail->foto_perbaikan)
+                            <div class="mt-3">
+                                <p class="text-xs font-bold text-gray-500 mb-1.5">Bukti Perbaikan:</p>
+                                <a href="{{ Storage::url($komplainDetail->foto_perbaikan) }}" target="_blank" class="block w-24 h-24 rounded-lg overflow-hidden border border-gray-200 hover:opacity-80 transition-opacity relative group">
+                                    <img src="{{ Storage::url($komplainDetail->foto_perbaikan) }}" class="w-full h-full object-cover" alt="Foto Perbaikan Teknisi">
+                                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                    </div>
+                                </a>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                @endif
+                
+                <hr class="border-gray-100 mb-6">
 
                 <form wire:submit.prevent="simpanProses" class="space-y-5">
                     <div>

@@ -20,7 +20,8 @@ class PermissionSeeder extends Seeder
             'akses_dapur',
             'akses_komplain',
             'manajemen_akun',
-            'akses_survei'
+            'akses_survei',
+            'akses_maintenance'
         ];
 
         foreach ($permissions as $permission) {

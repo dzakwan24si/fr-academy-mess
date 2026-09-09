@@ -85,12 +85,15 @@
                         </td>
                         <td class="px-6 py-4">
                             <div class="text-gray-600 truncate max-w-[200px]" title="{{ $row['keterangan'] }}">
-                                {{ $row['keterangan'] ?: '-' }}
+                                {{ $row['keterangan'] ?: '' }}
                             </div>
-                            @if($row['tanggal_maintenance'])
-                            <div class="text-xs text-gray-400 mt-1">
-                                Maint: {{ \Carbon\Carbon::parse($row['tanggal_maintenance'])->format('d M Y') }}
-                            </div>
+                            @if(!empty($row['catatan_perbaikan']) || !empty($row['foto_perbaikan']))
+                                <button wire:click="bukaModalRiwayat({{ $row['pivot_id'] }})" class="mt-1 text-blue-600 hover:text-blue-800 font-semibold text-xs flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg> 
+                                    Lihat Riwayat
+                                </button>
+                            @elseif(empty($row['keterangan']))
+                                <div class="text-gray-400 font-medium">-</div>
                             @endif
                         </td>
                     </tr>
@@ -112,4 +115,94 @@
             {{ $laporanData->links() }}
         </div>
     </div>
+
+    <!-- Modal Riwayat Perbaikan -->
+    @if($isModalRiwayatOpen && $detailRiwayat)
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl transform transition-all flex flex-col max-h-[90vh]" @click.away="$wire.tutupModalRiwayat()">
+            <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 shrink-0 rounded-t-3xl">
+                <h3 class="text-xl font-bold text-gray-900">Riwayat Maintenance Aset</h3>
+                <button wire:click="tutupModalRiwayat" class="text-gray-400 hover:text-gray-700 bg-white hover:bg-gray-100 p-2 rounded-full transition-colors shadow-sm border border-gray-100">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto space-y-6">
+                <!-- Informasi Aset -->
+                <div class="bg-gray-50/50 border border-gray-100 rounded-2xl p-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-900 text-sm">{{ $detailRiwayat['nama_aset'] }}</p>
+                            <p class="text-xs font-semibold text-gray-500">Kamar {{ $detailRiwayat['nomor_kamar'] }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detail Perbaikan -->
+                <div class="bg-blue-50/30 border border-blue-100 rounded-2xl p-4">
+                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Detail Perbaikan</h4>
+                    
+                    <div class="space-y-4 text-sm">
+                        <div class="flex items-start gap-3">
+                            <div class="w-5 h-5 text-blue-500 mt-0.5">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-xs">Dikerjakan Oleh</p>
+                                <p class="font-semibold text-gray-900">{{ $detailRiwayat['teknisi'] }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-3">
+                            <div class="w-5 h-5 text-blue-500 mt-0.5">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-xs">Waktu Selesai</p>
+                                <p class="font-semibold text-gray-900">
+                                    {{ $detailRiwayat['tanggal_maintenance'] ? \Carbon\Carbon::parse($detailRiwayat['tanggal_maintenance'])->format('d M Y') : '-' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <div class="w-5 h-5 text-blue-500 mt-0.5">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-gray-500 text-xs">Catatan Teknisi</p>
+                                <div class="font-medium text-gray-800 bg-white p-3 rounded-xl border border-blue-100/50 mt-1 whitespace-pre-wrap">
+                                    {{ $detailRiwayat['catatan_perbaikan'] ?: 'Tidak ada catatan.' }}
+                                </div>
+                            </div>
+                        </div>
+
+                        @if($detailRiwayat['foto_perbaikan'])
+                        <div class="flex items-start gap-3">
+                            <div class="w-5 h-5 text-blue-500 mt-0.5">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-xs mb-1.5">Foto Bukti</p>
+                                <a href="{{ Storage::url($detailRiwayat['foto_perbaikan']) }}" target="_blank" class="block w-24 h-24 rounded-lg overflow-hidden border border-gray-200 hover:opacity-80 transition-opacity">
+                                    <img src="{{ Storage::url($detailRiwayat['foto_perbaikan']) }}" class="w-full h-full object-cover" alt="Foto Perbaikan Aset">
+                                </a>
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            
+            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/50 rounded-b-3xl flex justify-end">
+                <button wire:click="tutupModalRiwayat" class="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
 </div>
