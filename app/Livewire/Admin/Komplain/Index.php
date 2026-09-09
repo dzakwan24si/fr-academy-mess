@@ -15,6 +15,8 @@ class Index extends Component
 {
     use WithPagination;
 
+    public $perPage = 10;
+
     public $search = '';
     public $filterStatus = '';
 
@@ -106,7 +108,7 @@ class Index extends Component
         $teknisis = User::role('Teknisi')->get();
 
         return view('livewire.admin.komplain.index', [
-            'komplains' => $query->paginate(10),
+            'komplains' => $query->paginate($this->perPage),
             'teknisis' => $teknisis
         ]);
     }

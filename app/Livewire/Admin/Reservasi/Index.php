@@ -15,6 +15,8 @@ class Index extends Component
 {
     use WithPagination;
 
+    public $perPage = 10;
+
     public $search = '';
     public $filterStatus = '';
     
@@ -173,7 +175,7 @@ class Index extends Component
         }
 
         return view('livewire.admin.reservasi.index', [
-            'reservasis' => $query->paginate(10),
+            'reservasis' => $query->paginate($this->perPage),
             'availableRooms' => Kamar::where('status', 'kosong_bersih')->get()
         ]);
     }

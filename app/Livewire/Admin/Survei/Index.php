@@ -14,6 +14,8 @@ class Index extends Component
 {
     use WithPagination;
 
+    public $perPage = 10;
+    
     public $search = '';
 
     public function updatingSearch()
@@ -34,7 +36,7 @@ class Index extends Component
             });
         }
 
-        $surveis = $query->paginate(10);
+        $surveis = $query->paginate($this->perPage);
 
         // Calculate averages
         $stats = [

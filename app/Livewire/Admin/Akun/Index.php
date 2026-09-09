@@ -17,6 +17,8 @@ class Index extends Component
 {
     use WithPagination;
 
+    public $perPage = 10;
+
     public $search = '';
 
     // Modal state
@@ -144,7 +146,7 @@ class Index extends Component
         }
 
         return view('livewire.admin.akun.index', [
-            'users' => $query->paginate(10),
+            'users' => $query->paginate($this->perPage),
             'roles' => Role::all(),
             'permissionsList' => \Spatie\Permission\Models\Permission::all(),
         ]);

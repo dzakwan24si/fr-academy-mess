@@ -20,14 +20,50 @@ class Dashboard extends Component
 
         // Fetch last reservation if no active one exists, to check for rejection
         $lastReservasi = null;
+        $aktivitas = collect();
+
         if (!$reservasi) {
             $lastReservasi = Reservasi::where('tamu_id', $tamu->id)->latest()->first();
+        } else {
+            // 1. Fetch Laundry Requests
+            $laundries = \App\Models\RequestLaundry::with('detailLaundries')
+                ->where('reservasi_id', $reservasi->id)
+                ->latest()
+                ->get()
+                ->map(function($item) {
+                    $totalPcs = $item->detailLaundries->sum('jumlah');
+                    return (object) [
+                        'type' => 'laundry',
+                        'title' => 'Request Laundry (' . $totalPcs . ' Pcs)',
+                        'time' => $item->created_at,
+                        'status' => $item->status,
+                        'id' => $item->id
+                    ];
+                });
+
+            // 2. Fetch Complaints
+            $komplains = \App\Models\KomplainKerusakan::where('reservasi_id', $reservasi->id)
+                ->latest()
+                ->get()
+                ->map(function($item) {
+                    return (object) [
+                        'type' => 'komplain',
+                        'title' => 'Laporan Kerusakan',
+                        'desc' => $item->deskripsi,
+                        'time' => $item->created_at,
+                        'status' => $item->status_perbaikan,
+                        'id' => $item->id
+                    ];
+                });
+
+            $aktivitas = $laundries->concat($komplains)->sortByDesc('time')->take(5);
         }
 
         return view('livewire.guest.dashboard', [
             'tamu' => $tamu,
             'reservasi' => $reservasi,
-            'lastReservasi' => $lastReservasi
+            'lastReservasi' => $lastReservasi,
+            'aktivitas' => $aktivitas
         ]);
     }
 

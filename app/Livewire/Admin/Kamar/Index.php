@@ -14,6 +14,8 @@ class Index extends Component
 {
     use WithPagination;
 
+    public $perPage = 10;
+
     public $search = '';
     public $filterStatus = '';
 
@@ -112,7 +114,7 @@ class Index extends Component
         }
 
         return view('livewire.admin.kamar.index', [
-            'kamars' => $query->paginate(10)
+            'kamars' => $query->paginate($this->perPage)
         ]);
     }
 }

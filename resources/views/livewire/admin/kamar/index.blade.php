@@ -6,8 +6,8 @@
             <p class="text-gray-500 text-sm">Kelola data kamar, kapasitas, dan pantau status kebersihan.</p>
         </div>
         <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-            <button wire:click="bukaModal" class="px-5 py-2.5 bg-[#114045] text-white font-semibold rounded-xl hover:bg-[#0d3034] transition-colors shadow-sm flex items-center justify-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+            <button wire:click="bukaModal" class="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-[#59A338] hover:bg-[#4d8f2f] text-white rounded-xl text-sm font-semibold transition-colors shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                 Tambah Kamar
             </button>
             <div class="relative w-full sm:w-64">

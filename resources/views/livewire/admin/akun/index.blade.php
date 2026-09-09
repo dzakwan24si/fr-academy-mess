@@ -4,8 +4,8 @@
             <h1 class="text-2xl font-bold text-[#114045]">Manajemen Akun</h1>
             <p class="text-sm text-gray-500 mt-1">Kelola akses staf dan peran (role) pada sistem.</p>
         </div>
-        <button wire:click="bukaModal" class="bg-[#59A338] hover:bg-[#4a872e] text-white px-4 py-2 rounded-xl font-medium shadow-sm transition-colors flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+        <button wire:click="bukaModal" class="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-[#59A338] hover:bg-[#4d8f2f] text-white rounded-xl text-sm font-semibold transition-colors shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
             Tambah Akun
         </button>
     </div>

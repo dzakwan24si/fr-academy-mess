@@ -16,5 +16,6 @@
         @yield('content', $slot ?? '')
 
         @livewireScripts
+        @stack('scripts')
     </body>
 </html>

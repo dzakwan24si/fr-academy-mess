@@ -8,11 +8,16 @@ use Livewire\Attributes\Title;
 use App\Models\BahanBaku;
 use App\Models\Menu;
 use App\Models\RencanaMenuHarian;
+use Livewire\WithPagination;
 
 #[Layout('layouts.admin')]
 #[Title('DAPUR & MENU')]
 class Index extends Component
 {
+    use WithPagination;
+
+    public $perPage = 10;
+
     public $activeTab = 'stok'; // stok, master, rencana
 
     public function setTab($tab)
@@ -22,9 +27,9 @@ class Index extends Component
 
     public function render()
     {
-        $bahanBakus = BahanBaku::latest()->get();
-        $menus = Menu::withCount('bahanBakus')->latest()->get();
-        $rencanaHarians = RencanaMenuHarian::with(['menu', 'feedbackMasakans'])->latest()->get();
+        $bahanBakus = BahanBaku::latest()->paginate($this->perPage, ['*'], 'stokPage');
+        $menus = Menu::withCount('bahanBakus')->latest()->paginate($this->perPage, ['*'], 'menuPage');
+        $rencanaHarians = RencanaMenuHarian::with(['menu', 'feedbackMasakans'])->latest()->paginate($this->perPage, ['*'], 'rencanaPage');
 
         return view('livewire.admin.dapur.index', compact('bahanBakus', 'menus', 'rencanaHarians'));
     }

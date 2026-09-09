@@ -108,5 +108,8 @@
                 </tbody>
             </table>
         </div>
+        <div class="p-4 border-t border-gray-100">
+            {{ $laporanData->links() }}
+        </div>
     </div>
 </div>

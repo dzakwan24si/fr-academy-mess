@@ -6,11 +6,17 @@ use App\Models\Kamar;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use Livewire\WithPagination;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 #[Layout('layouts.admin')]
 #[Title('LAPORAN DISTRIBUSI ASET')]
 class Laporan extends Component
 {
+    use WithPagination;
+
+    public $perPage = 10;
+
     public $search = '';
     public $filterKamar = '';
     public $filterKondisi = '';
@@ -57,10 +63,21 @@ class Laporan extends Component
         // Sorting manual karena collection flatten
         $laporanData = $laporanData->sortBy('kamar_nama');
 
+        $page = $this->getPage();
+        $offset = ($page - 1) * $this->perPage;
+        
+        $paginator = new LengthAwarePaginator(
+            $laporanData->slice($offset, $this->perPage)->values(),
+            $laporanData->count(),
+            $this->perPage,
+            $page,
+            ['path' => \Illuminate\Pagination\Paginator::resolveCurrentPath(), 'pageName' => 'page']
+        );
+
         $semuaKamar = Kamar::orderBy('nomor_kamar')->get();
 
         return view('livewire.admin.aset.laporan', [
-            'laporanData' => $laporanData,
+            'laporanData' => $paginator,
             'semuaKamar' => $semuaKamar
         ]);
     }

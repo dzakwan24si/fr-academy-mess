@@ -11,8 +11,8 @@
                 {{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}
             </span>
             @can('akses_reservasi')
-            <a href="{{ route('admin.reservasi') }}" class="px-4 py-2 bg-[#2E7D32] hover:bg-green-700 text-white rounded-xl text-sm font-semibold shadow-sm flex items-center gap-2 transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+            <a href="{{ route('admin.reservasi') }}" class="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-[#59A338] hover:bg-[#4d8f2f] text-white rounded-xl text-sm font-semibold transition-colors shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                 Buat Reservasi
             </a>
             @endcan

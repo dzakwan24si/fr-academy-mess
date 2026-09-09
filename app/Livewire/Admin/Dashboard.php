@@ -46,7 +46,7 @@ class Dashboard extends Component
             
             $occupancy = Reservasi::whereDate('tanggal_checkin', '<=', $date)
                 ->whereDate('tanggal_checkout', '>=', $date)
-                ->whereIn('status', ['aktif', 'selesai'])
+                ->whereIn('status', ['checked_in', 'completed'])
                 ->count();
             $chartData[] = $occupancy;
         }

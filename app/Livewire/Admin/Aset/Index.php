@@ -14,6 +14,8 @@ class Index extends Component
 {
     use WithPagination;
 
+    public $perPage = 10;
+
     public $search = '';
     
     // Form Modal
@@ -110,7 +112,7 @@ class Index extends Component
                   ->orWhere('kategori', 'like', '%' . $this->search . '%');
         }
 
-        $asets = $query->paginate(10);
+        $asets = $query->paginate($this->perPage);
 
         // Pre-process agregasi kondisi
         $asets->getCollection()->transform(function ($aset) {
