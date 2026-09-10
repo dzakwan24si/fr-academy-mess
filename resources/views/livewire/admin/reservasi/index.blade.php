@@ -59,7 +59,7 @@
                             <td class="px-6 py-4">
                                 <div class="font-bold text-gray-800">{{ $rsv->tamu->nama ?? '-' }}</div>
                                 <div class="text-xs text-gray-500 mt-0.5">
-                                    {{ $rsv->tamu->perusahaan ?? 'Personal' }} <br>
+                                    {{ $rsv->tamu->perusahaan ?? 'Personal' }} ({{ $rsv->tamu->jabatan ?? '-' }})<br>
                                     <span class="italic max-w-[200px] truncate block" title="{{ $rsv->keperluan_menginap }}">"{{ $rsv->keperluan_menginap }}"</span>
                                 </div>
                             </td>
@@ -207,14 +207,14 @@
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Perusahaan asal (Opsional)</label>
-                                    <input type="text" wire:model="form_perusahaan" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm" placeholder="Nama PT / Instansi">
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Perusahaan / Instansi <span class="text-red-500">*</span></label>
+                                    <input type="text" wire:model="form_perusahaan" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm" placeholder="Nama PT / Instansi" required>
                                     @error('form_perusahaan') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Jabatan (Opsional)</label>
-                                    <input type="text" wire:model="form_jabatan" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm" placeholder="Jabatan Tamu">
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Jabatan <span class="text-red-500">*</span></label>
+                                    <input type="text" wire:model="form_jabatan" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm" placeholder="Jabatan Tamu" required>
                                     @error('form_jabatan') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                                 </div>
                             </div>

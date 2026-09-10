@@ -115,8 +115,8 @@ class Index extends Component
         $this->validate([
             'form_nama' => 'required|string|max:255',
             'form_no_hp' => 'required|string|max:20',
-            'form_perusahaan' => 'nullable|string|max:255',
-            'form_jabatan' => 'nullable|string|max:255',
+            'form_perusahaan' => 'required|string|max:255',
+            'form_jabatan' => 'required|string|max:255',
             'form_tgl_checkin' => 'required|date',
             'form_tgl_checkout' => 'required|date|after_or_equal:form_tgl_checkin',
             'form_keperluan' => 'required|string',

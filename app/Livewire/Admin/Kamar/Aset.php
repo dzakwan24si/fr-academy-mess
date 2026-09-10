@@ -102,8 +102,40 @@ class Aset extends Component
     public function render()
     {
         $masterAset = AsetMess::orderBy('nama_aset', 'asc')->get();
+        
+        $asetLorong = [];
+        if (str_contains(strtolower($this->kamar->nomor_kamar), 'lorong')) {
+            preg_match('/\d+/', $this->kamar->nomor_kamar, $matches);
+            if (!empty($matches)) {
+                $lorongNo = $matches[0];
+                $kamarIds = [];
+                for ($no = 1; $no <= 4; $no++) {
+                    $kamarIds[] = "Kamar " . sprintf('%d%02d', $lorongNo, $no);
+                }
+                
+                $kamars = Kamar::whereIn('nomor_kamar', $kamarIds)->with('asets')->get();
+                
+                // Aggregate assets
+                foreach ($kamars as $k) {
+                    foreach ($k->asets as $aset) {
+                        $key = $aset->id . '_' . $aset->pivot->kondisi;
+                        if (!isset($asetLorong[$key])) {
+                            $asetLorong[$key] = [
+                                'nama_aset' => $aset->nama_aset,
+                                'kategori' => $aset->kategori,
+                                'jumlah' => 0,
+                                'kondisi' => $aset->pivot->kondisi,
+                            ];
+                        }
+                        $asetLorong[$key]['jumlah'] += $aset->pivot->jumlah;
+                    }
+                }
+            }
+        }
+
         return view('livewire.admin.kamar.aset', [
-            'masterAset' => $masterAset
+            'masterAset' => $masterAset,
+            'asetLorong' => collect($asetLorong)->values()
         ]);
     }
 }

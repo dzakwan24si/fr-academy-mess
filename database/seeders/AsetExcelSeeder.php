@@ -444,8 +444,9 @@ class AsetExcelSeeder extends Seeder
         // Buat lorong 1-12 (Reguler) dan Executive
         $kamarMess = [];
         for ($lorong = 1; $lorong <= 12; $lorong++) {
-            for ($no = 1; $no <= 5; $no++) {
-                $nomor = sprintf('%d%02d', $lorong, $no);
+            for ($no = 1; $no <= 4; $no++) {
+                $huruf = chr(64 + $no); // 1->A, 2->B, 3->C, 4->D
+                $nomor = $lorong . $huruf;
                 $kamarMess[] = [
                     'nomor_kamar' => "Kamar $nomor",
                     'lokasi' => "Lorong $lorong",
@@ -454,16 +455,6 @@ class AsetExcelSeeder extends Seeder
                     'status' => 'kosong_bersih',
                 ];
             }
-        }
-        for ($no = 1; $no <= 5; $no++) {
-            $nomor = sprintf('VIP-%02d', $no);
-            $kamarMess[] = [
-                'nomor_kamar' => $nomor,
-                'lokasi' => "Kamar Executive",
-                'tipe_kamar' => 'Executive Single Bed',
-                'kapasitas' => 1,
-                'status' => 'kosong_bersih',
-            ];
         }
 
         foreach ($kamarMess as $kamar) {
@@ -474,27 +465,99 @@ class AsetExcelSeeder extends Seeder
         }
 
         foreach ($ruanganAsets as $ruang => $asets) {
-            $k = Kamar::firstOrCreate(
-                ['nomor_kamar' => $ruang],
-                [
-                    'lokasi' => str_contains(strtolower($ruang), 'lorong') ? 'Mess' : 'Gedung Utama',
-                    'tipe_kamar' => str_contains(strtolower($ruang), 'lorong') ? 'Reguler' : 'Fasilitas Umum',
-                    'kapasitas' => str_contains(strtolower($ruang), 'lorong') ? 2 : 50,
-                    'status' => 'terisi'
-                ]
-            );
-
-            foreach ($asets as $key => $data) {
-                $namaAset = isset($data['real_nama']) ? $data['real_nama'] : $key;
-                
-                if (isset($asetMap[$namaAset])) {
-                    // Pakai attach agar bisa insert multiple kondisi (Baik dan Rusak secara terpisah) jika perlu
-                    // Namun syncWithoutDetaching dgn foreign key yg sama biasanya replace. 
-                    // Kita asumsikan updateOrCreate via DB query untuk pivot:
-                    DB::table('aset_kamar')->updateOrInsert(
-                        ['kamar_id' => $k->id, 'aset_mess_id' => $asetMap[$namaAset], 'kondisi' => $data['kondisi']],
-                        ['jumlah' => $data['jumlah']]
+            if (str_contains(strtolower($ruang), 'lorong')) {
+                // Ekstrak nomor lorong (contoh: "Lorong  1" -> 1)
+                preg_match('/\d+/', $ruang, $matches);
+                if (!empty($matches)) {
+                    $lorongNo = $matches[0];
+                    
+                    // Buat kembali Lorong sebagai Fasilitas Umum
+                    $kamarLorong = Kamar::firstOrCreate(
+                        ['nomor_kamar' => "Lorong $lorongNo"],
+                        [
+                            'lokasi' => 'Mess',
+                            'tipe_kamar' => 'Fasilitas Umum',
+                            'kapasitas' => 50,
+                            'status' => 'terisi'
+                        ]
                     );
+
+                    // Ambil 4 kamar di lorong ini
+                    $kamarList = [];
+                    for ($no = 1; $no <= 4; $no++) {
+                        $huruf = chr(64 + $no);
+                        $nomor = $lorongNo . $huruf;
+                        $kamarData = Kamar::where('nomor_kamar', "Kamar $nomor")->first();
+                        if ($kamarData) {
+                            $kamarList[] = $kamarData;
+                        }
+                    }
+                    
+                    foreach ($asets as $key => $data) {
+                        $namaAset = isset($data['real_nama']) ? $data['real_nama'] : $key;
+                        $jumlahTersedia = $data['jumlah'];
+                        
+                        if (isset($asetMap[$namaAset]) && count($kamarList) > 0) {
+                            // Distribusikan aset ke kamar
+                            $baseCount = floor($jumlahTersedia / count($kamarList));
+                            $remainder = $jumlahTersedia % count($kamarList);
+                            
+                            // Masukkan baseCount ke tiap kamar
+                            if ($baseCount > 0) {
+                                foreach ($kamarList as $k) {
+                                    $existing = DB::table('aset_kamar')
+                                        ->where('kamar_id', $k->id)
+                                        ->where('aset_mess_id', $asetMap[$namaAset])
+                                        ->where('kondisi', $data['kondisi'])
+                                        ->first();
+                                        
+                                    if ($existing) {
+                                        DB::table('aset_kamar')
+                                            ->where('id', $existing->id)
+                                            ->update(['jumlah' => $existing->jumlah + $baseCount]);
+                                    } else {
+                                        DB::table('aset_kamar')->insert([
+                                            'kamar_id' => $k->id,
+                                            'aset_mess_id' => $asetMap[$namaAset],
+                                            'kondisi' => $data['kondisi'],
+                                            'jumlah' => $baseCount,
+                                        ]);
+                                    }
+                                }
+                            }
+                            
+                            // Sisa (remainder) dimasukkan ke Lorong (kamar mandi luar, dsb)
+                            if ($remainder > 0) {
+                                DB::table('aset_kamar')->updateOrInsert(
+                                    ['kamar_id' => $kamarLorong->id, 'aset_mess_id' => $asetMap[$namaAset], 'kondisi' => $data['kondisi']],
+                                    ['jumlah' => DB::raw('jumlah + ' . $remainder)] // Gunakan raw update untuk add
+                                );
+                            }
+                        }
+                    }
+                }
+            } else {
+                // Untuk selain Lorong (Dapur, Laundry, Teras, Kamar Executive, dsb)
+                $isKamarExecutive = str_starts_with(strtolower($ruang), 'kamar executive');
+                $k = Kamar::firstOrCreate(
+                    ['nomor_kamar' => $ruang],
+                    [
+                        'lokasi' => str_contains(strtolower($ruang), 'executive') ? 'Kamar Executive' : 'Gedung Utama',
+                        'tipe_kamar' => $isKamarExecutive ? 'Executive Single Bed' : 'Fasilitas Umum',
+                        'kapasitas' => $isKamarExecutive ? 1 : 50,
+                        'status' => $isKamarExecutive ? 'kosong_bersih' : 'terisi'
+                    ]
+                );
+
+                foreach ($asets as $key => $data) {
+                    $namaAset = isset($data['real_nama']) ? $data['real_nama'] : $key;
+                    
+                    if (isset($asetMap[$namaAset])) {
+                        DB::table('aset_kamar')->updateOrInsert(
+                            ['kamar_id' => $k->id, 'aset_mess_id' => $asetMap[$namaAset], 'kondisi' => $data['kondisi']],
+                            ['jumlah' => $data['jumlah']]
+                        );
+                    }
                 }
             }
         }

@@ -100,14 +100,14 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-1">Perusahaan / Instansi</label>
-                                <input wire:model="perusahaan" type="text" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm transition-shadow" placeholder="Nama instansi Anda">
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Perusahaan / Instansi <span class="text-red-500">*</span></label>
+                                <input wire:model="perusahaan" type="text" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm transition-shadow" placeholder="Nama instansi Anda" required>
                                 @error('perusahaan') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                             </div>
 
                             <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-1">Jabatan</label>
-                                <input wire:model="jabatan" type="text" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm transition-shadow" placeholder="Jabatan Anda">
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Jabatan <span class="text-red-500">*</span></label>
+                                <input wire:model="jabatan" type="text" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm transition-shadow" placeholder="Jabatan Anda" required>
                                 @error('jabatan') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                             </div>
                         </div>

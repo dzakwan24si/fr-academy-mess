@@ -27,12 +27,14 @@
                     @error('nama') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1.5">Perusahaan / Instansi</label>
-                    <input wire:model="perusahaan" type="text" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow" placeholder="Opsional">
+                    <label class="block text-sm font-bold text-gray-700 mb-1.5">Perusahaan / Instansi <span class="text-red-500">*</span></label>
+                    <input wire:model="perusahaan" type="text" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow" placeholder="Masukkan nama instansi/perusahaan" required>
+                    @error('perusahaan') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1.5">Jabatan</label>
-                    <input wire:model="jabatan" type="text" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow" placeholder="Opsional">
+                    <label class="block text-sm font-bold text-gray-700 mb-1.5">Jabatan <span class="text-red-500">*</span></label>
+                    <input wire:model="jabatan" type="text" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow" placeholder="Masukkan jabatan Anda" required>
+                    @error('jabatan') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                 </div>
             </div>
 

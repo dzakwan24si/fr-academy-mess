@@ -32,8 +32,8 @@ class Index extends Component
         $this->validate([
             'nama' => 'required|string|max:255',
             'no_hp' => 'required|numeric|min:10|unique:tamus,no_hp,' . $tamu->id,
-            'perusahaan' => 'nullable|string|max:255',
-            'jabatan' => 'nullable|string|max:255',
+            'perusahaan' => 'required|string|max:255',
+            'jabatan' => 'required|string|max:255',
         ]);
 
         $tamu->update([

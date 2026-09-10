@@ -21,6 +21,10 @@ class Index extends Component
     public $tanggal_checkin;
     public $tanggal_checkout;
 
+    public $search = '';
+    public $perPage = 6;
+    public $perPageOptions = [6, 12, 18, 24, 30];
+
     // Modal state
     public $isBookingModalOpen = false;
     public $selectedKamar = null;
@@ -73,8 +77,17 @@ class Index extends Component
         return redirect()->route('guest.dashboard');
     }
 
-    // Reset pagination when filter changes
     public function updatedTipeKamar()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage()
     {
         $this->resetPage();
     }
@@ -82,13 +95,24 @@ class Index extends Component
     #[Layout('layouts.app')]
     public function render()
     {
-        $query = Kamar::where('status', 'kosong_bersih');
+        $query = Kamar::query()
+            ->where('tipe_kamar', '!=', 'Fasilitas Umum')
+            ->where('nomor_kamar', 'not like', 'Lorong%')
+            ->orderByRaw("CASE WHEN status = 'kosong_bersih' THEN 0 ELSE 1 END")
+            ->orderBy('nomor_kamar', 'asc');
 
         if ($this->tipe_kamar != '') {
             $query->where('tipe_kamar', 'like', '%' . $this->tipe_kamar . '%');
         }
 
-        $kamars = $query->paginate(6);
+        if ($this->search != '') {
+            $query->where(function ($q) {
+                $q->where('nomor_kamar', 'like', '%' . $this->search . '%')
+                  ->orWhere('tipe_kamar', 'like', '%' . $this->search . '%');
+            });
+        }
+
+        $kamars = $query->paginate($this->perPage);
 
         return view('livewire.guest.booking.index', [
             'kamars' => $kamars

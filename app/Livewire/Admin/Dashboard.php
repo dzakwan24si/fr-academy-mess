@@ -18,10 +18,10 @@ class Dashboard extends Component
     {
         $today = Carbon::today();
 
-        // 1. Kamar Metrics
-        $totalKamar = Kamar::count();
-        $kamarTerisi = Kamar::where('status', 'terisi')->count();
-        $kamarKotor = Kamar::where('status', 'kosong_kotor')->count();
+        // 1. Kamar Metrics (Exclude Fasilitas Umum)
+        $totalKamar = Kamar::where('tipe_kamar', '!=', 'Fasilitas Umum')->count();
+        $kamarTerisi = Kamar::where('tipe_kamar', '!=', 'Fasilitas Umum')->where('status', 'terisi')->count();
+        $kamarKotor = Kamar::where('tipe_kamar', '!=', 'Fasilitas Umum')->where('status', 'kosong_kotor')->count();
 
         // 2. Reservation Metrics
         $checkInHariIni = Reservasi::whereDate('tanggal_checkin', $today)->count();

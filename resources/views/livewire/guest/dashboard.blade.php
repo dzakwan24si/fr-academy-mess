@@ -227,11 +227,11 @@
                     <div class="mt-8 bg-slate-800 rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm border border-slate-700">
                         <div class="flex items-center gap-3 text-white">
                             <div class="p-2 bg-slate-700/50 rounded-lg shrink-0">
-                                <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path></svg>
+                                <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             </div>
                             <div>
-                                <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold mb-0.5">Akses Wi-Fi Mess</p>
-                                <p class="text-sm font-medium">FR_Academy <span class="text-slate-500 mx-1">|</span> Pass: hospitality2026</p>
+                                <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold mb-0.5">Jadwal Ruang Makan</p>
+                                <p class="text-sm font-medium">Pagi: 06.00 <span class="text-slate-500 mx-1">|</span> Siang: 12.00 <span class="text-slate-500 mx-1">|</span> Malam: 19.00</p>
                             </div>
                         </div>
                         
@@ -243,7 +243,7 @@
                             </div>
                             <div>
                                 <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold mb-0.5">Bantuan Cepat</p>
-                                <p class="text-sm font-medium">Resepsionis: Ext. 101</p>
+                                <p class="text-sm font-medium">Koordinator Mess: Ext. 101</p>
                             </div>
                         </div>
                     </div>

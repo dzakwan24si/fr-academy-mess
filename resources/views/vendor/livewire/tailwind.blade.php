@@ -16,11 +16,17 @@ $scrollIntoViewJsSnippet = ($scrollTo !== false)
             <div class="flex items-center gap-2">
                 <span>Tampilkan</span>
                 <select wire:model.live="perPage" class="bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#59A338] cursor-pointer hover:bg-gray-100 transition-colors">
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="30">30</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
+                    @if(property_exists($this, 'perPageOptions') && is_array($this->perPageOptions))
+                        @foreach($this->perPageOptions as $option)
+                            <option value="{{ $option }}">{{ $option }}</option>
+                        @endforeach
+                    @else
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    @endif
                 </select>
                 <span>data per halaman</span>
             </div>

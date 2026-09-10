@@ -26,7 +26,16 @@
             
             <!-- Filter Section -->
             <div class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Cari Kamar</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            </div>
+                            <input wire:model.live.debounce.300ms="search" type="text" placeholder="Nama / Tipe Kamar..." class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow text-gray-700">
+                        </div>
+                    </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Tipe Kamar</label>
                         <select wire:model.live="tipe_kamar" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow text-gray-700">
@@ -62,39 +71,63 @@
             @else
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                     @foreach($kamars as $kamar)
-                        <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-gray-100 flex flex-col group cursor-pointer" wire:click="bukaModalBooking({{ $kamar->id }})">
+                        @php
+                            $isAvailable = $kamar->status == 'kosong_bersih';
+                        @endphp
+                        <div class="bg-white rounded-2xl overflow-hidden shadow-sm transition-all border border-gray-100 flex flex-col group {{ $isAvailable ? 'hover:shadow-xl cursor-pointer' : 'opacity-75 grayscale-[50%]' }}" @if($isAvailable) wire:click="bukaModalBooking({{ $kamar->id }})" @endif>
                             <!-- Cover Image -->
                             <div class="relative h-48 w-full overflow-hidden bg-gray-200">
                                 @if(str_contains(strtolower($kamar->tipe_kamar), 'executive'))
-                                    <img src="{{ asset('images/slides-23.jpg') }}" alt="Room" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                                    <img src="{{ asset('images/slides-23.jpg') }}" alt="Room" class="w-full h-full object-cover {{ $isAvailable ? 'group-hover:scale-105 transition-transform duration-700' : '' }}">
                                     <div class="absolute top-3 right-3 bg-[#59A338] text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">Executive</div>
                                 @else
-                                    <img src="{{ asset('images/slides-15.jpg') }}" alt="Room" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                                    <img src="{{ asset('images/slides-15.jpg') }}" alt="Room" class="w-full h-full object-cover {{ $isAvailable ? 'group-hover:scale-105 transition-transform duration-700' : '' }}">
                                     <div class="absolute top-3 right-3 bg-white text-[#114045] px-3 py-1 rounded-full text-xs font-bold shadow-md border border-gray-100">Reguler</div>
                                 @endif
-                                <div class="absolute top-3 left-3 bg-black/60 backdrop-blur-sm text-white px-2 py-1 rounded-md text-xs font-semibold">Tersedia</div>
+                                
+                                @if($isAvailable)
+                                    <div class="absolute top-3 left-3 bg-black/60 backdrop-blur-sm text-white px-2 py-1 rounded-md text-xs font-semibold">Tersedia</div>
+                                @else
+                                    <div class="absolute inset-0 bg-gray-900/40 flex items-center justify-center backdrop-blur-[2px]">
+                                        <span class="bg-black/70 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg border border-white/20">
+                                            {{ str_replace('_', ' ', ucwords($kamar->status, '_')) }}
+                                        </span>
+                                    </div>
+                                @endif
                             </div>
                             
                             <!-- Card Body -->
                             <div class="p-5 flex-1 flex flex-col">
-                                <h3 class="font-bold text-lg text-[#114045] mb-1">Kamar {{ $kamar->nomor_kamar }}</h3>
+                                <h3 class="font-bold text-lg text-[#114045] mb-1">{{ Str::startsWith(strtolower($kamar->nomor_kamar), 'kamar') ? $kamar->nomor_kamar : 'Kamar ' . $kamar->nomor_kamar }}</h3>
                                 <p class="text-sm text-gray-500 mb-4">{{ $kamar->tipe_kamar }}</p>
                                 
                                 <div class="flex items-center gap-4 text-sm text-gray-600 mb-5">
                                     <div class="flex items-center gap-1.5 font-medium">
-                                        <svg class="w-4 h-4 text-[#59A338]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        <svg class="w-4 h-4 {{ $isAvailable ? 'text-[#59A338]' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                         {{ $kamar->kapasitas }} Orang
                                     </div>
                                     <div class="flex items-center gap-1.5 font-medium">
-                                        <svg class="w-4 h-4 text-[#59A338]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                        Kondisi Bersih
+                                        <svg class="w-4 h-4 {{ $isAvailable ? 'text-[#59A338]' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            @if($isAvailable)
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                            @else
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                            @endif
+                                        </svg>
+                                        {{ str_replace('_', ' ', ucwords($kamar->status, '_')) }}
                                     </div>
                                 </div>
                                 
                                 <div class="mt-auto pt-4 border-t border-gray-100">
-                                    <button class="w-full py-2.5 rounded-xl bg-white border border-[#59A338] text-[#59A338] font-bold group-hover:bg-[#59A338] group-hover:text-white transition-colors">
-                                        Pilih Kamar
-                                    </button>
+                                    @if($isAvailable)
+                                        <button class="w-full py-2.5 rounded-xl bg-white border border-[#59A338] text-[#59A338] font-bold group-hover:bg-[#59A338] group-hover:text-white transition-colors">
+                                            Pilih Kamar
+                                        </button>
+                                    @else
+                                        <button disabled class="w-full py-2.5 rounded-xl bg-gray-100 border border-gray-200 text-gray-400 font-bold cursor-not-allowed">
+                                            Tidak Tersedia
+                                        </button>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -126,7 +159,7 @@
                 <div class="bg-gray-50 rounded-2xl p-4 mb-6 border border-gray-100">
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-sm text-gray-500 font-semibold">Kamar Pilihan</span>
-                        <span class="font-bold text-[#114045]">{{ $selectedKamar ? 'Kamar ' . $selectedKamar->nomor_kamar : '' }}</span>
+                        <span class="font-bold text-[#114045]">{{ $selectedKamar ? (Str::startsWith(strtolower($selectedKamar->nomor_kamar), 'kamar') ? $selectedKamar->nomor_kamar : 'Kamar ' . $selectedKamar->nomor_kamar) : '' }}</span>
                     </div>
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-sm text-gray-500 font-semibold">Check-in</span>

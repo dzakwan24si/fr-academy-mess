@@ -81,6 +81,47 @@
         </div>
     </div>
 
+    @if(isset($asetLorong) && count($asetLorong) > 0)
+    <div class="mt-8 mb-4 flex items-center justify-between relative z-10">
+        <h2 class="text-xl font-bold text-gray-800">Akumulasi Aset di Dalam Kamar Lorong Ini</h2>
+    </div>
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative z-10 mb-8">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm whitespace-nowrap">
+                <thead>
+                    <tr class="bg-gray-50/50 border-b border-gray-100 text-gray-500 font-semibold">
+                        <th class="px-6 py-4 rounded-tl-2xl">Nama Barang</th>
+                        <th class="px-6 py-4">Total Jumlah</th>
+                        <th class="px-6 py-4 rounded-tr-2xl">Kondisi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100/70">
+                    @foreach($asetLorong as $aset)
+                    <tr class="hover:bg-gray-50/50 transition-colors">
+                        <td class="px-6 py-4 font-medium text-gray-800">
+                            {{ $aset['nama_aset'] }}
+                            <div class="text-xs text-gray-500 font-normal mt-0.5">{{ $aset['kategori'] }}</div>
+                        </td>
+                        <td class="px-6 py-4 text-gray-600 font-bold">
+                            {{ $aset['jumlah'] }}
+                        </td>
+                        <td class="px-6 py-4">
+                            @if($aset['kondisi'] == 'Baik')
+                                <span class="px-2.5 py-1 bg-green-100 text-green-800 rounded-lg text-xs font-semibold tracking-wide">BAIK</span>
+                            @elseif($aset['kondisi'] == 'Rusak Ringan')
+                                <span class="px-2.5 py-1 bg-yellow-100 text-yellow-800 rounded-lg text-xs font-semibold tracking-wide">RUSAK RINGAN</span>
+                            @else
+                                <span class="px-2.5 py-1 bg-red-100 text-red-800 rounded-lg text-xs font-semibold tracking-wide">RUSAK BERAT</span>
+                            @endif
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
+
     <!-- Modal Form -->
     @if($isModalOpen)
         <div class="fixed inset-0 z-50 flex items-center justify-center p-4">

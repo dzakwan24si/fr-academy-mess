@@ -52,8 +52,8 @@ class Login extends Component
         $this->validate([
             'no_hp' => 'required|numeric|min:10|unique:tamus,no_hp',
             'nama' => 'required|string|max:255',
-            'perusahaan' => 'nullable|string|max:255',
-            'jabatan' => 'nullable|string|max:255',
+            'perusahaan' => 'required|string|max:255',
+            'jabatan' => 'required|string|max:255',
         ]);
 
         $tamu = Tamu::create([
