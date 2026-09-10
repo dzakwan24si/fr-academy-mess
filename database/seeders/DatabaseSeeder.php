@@ -19,8 +19,7 @@ class DatabaseSeeder extends Seeder
             RolesAndPermissionsSeeder::class,
             MasterDataSeeder::class,
             AsetExcelSeeder::class,
-            BahanBakuSeeder::class,
-            MenuDanResepSeeder::class,
+            MasterDataExcelSeeder::class,
         ]);
     }
 }
