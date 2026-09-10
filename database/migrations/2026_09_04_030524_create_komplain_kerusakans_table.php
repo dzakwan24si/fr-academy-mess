@@ -18,6 +18,8 @@ return new class extends Migration
             $table->text('deskripsi');
             $table->string('foto_bukti')->nullable();
             $table->enum('status_perbaikan', ['dilaporkan', 'diproses', 'selesai'])->default('dilaporkan');
+            $table->text('catatan_teknisi')->nullable();
+            $table->string('foto_perbaikan')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

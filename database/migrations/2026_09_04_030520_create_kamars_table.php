@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('kamars', function (Blueprint $table) {
             $table->id();
             $table->string('nomor_kamar')->unique();
+            $table->string('lokasi')->nullable();
             $table->string('tipe_kamar')->default('Reguler Twin Bed');
             $table->integer('kapasitas');
             $table->enum('status', ['kosong_bersih', 'kosong_kotor', 'terisi', 'maintenance'])->default('kosong_bersih');

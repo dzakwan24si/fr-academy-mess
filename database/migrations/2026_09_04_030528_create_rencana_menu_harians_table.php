@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('rencana_menu_harians', function (Blueprint $table) {
             $table->id();
             $table->date('tanggal');
-            $table->enum('waktu', ['pagi', 'siang', 'malam']);
+            $table->enum('waktu', ['pagi', 'siang', 'malam', 'jus_trainer']);
             $table->foreignId('menu_id')->constrained('menus')->onDelete('cascade');
             $table->enum('status', ['menunggu', 'sedang_masak', 'selesai'])->default('menunggu');
+            $table->integer('target_porsi')->default(0);
+            $table->decimal('estimasi_anggaran', 12, 2)->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

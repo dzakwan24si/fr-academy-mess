@@ -17,7 +17,8 @@ return new class extends Migration
             $table->foreignId('kamar_id')->constrained('kamars')->onDelete('cascade');
             $table->date('tanggal_checkin');
             $table->date('tanggal_checkout')->nullable();
-            $table->enum('status', ['pending', 'aktif', 'selesai', 'batal', 'ditolak'])->default('pending');
+            $table->text('keperluan_menginap')->nullable();
+            $table->enum('status', ['pending', 'approved', 'checked_in', 'completed', 'rejected'])->default('pending');
             $table->text('alasan_penolakan')->nullable();
             $table->timestamps();
             $table->softDeletes();

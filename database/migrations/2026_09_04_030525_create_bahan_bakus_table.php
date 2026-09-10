@@ -14,7 +14,10 @@ return new class extends Migration
         Schema::create('bahan_bakus', function (Blueprint $table) {
             $table->id();
             $table->string('nama_bahan');
-            $table->integer('stok')->default(0);
+            $table->enum('kategori_bahan', ['Kering', 'Basah'])->default('Kering');
+            $table->decimal('harga_satuan', 12, 2)->default(0);
+            $table->string('keterangan_volume')->nullable();
+            $table->decimal('stok', 10, 3)->default(0);
             $table->string('satuan');
             $table->timestamps();
             $table->softDeletes();

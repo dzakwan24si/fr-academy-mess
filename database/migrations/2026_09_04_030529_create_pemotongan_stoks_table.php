@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('rencana_menu_harian_id')->constrained('rencana_menu_harians')->onDelete('cascade');
             $table->foreignId('bahan_baku_id')->constrained('bahan_bakus')->onDelete('cascade');
-            $table->integer('jumlah_dipotong');
+            $table->decimal('jumlah_dipotong', 10, 3);
             $table->timestamps();
             $table->softDeletes();
         });

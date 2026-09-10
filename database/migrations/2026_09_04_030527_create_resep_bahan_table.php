@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('resep_bahan', function (Blueprint $table) {
             $table->foreignId('menu_id')->constrained('menus')->onDelete('cascade');
             $table->foreignId('bahan_baku_id')->constrained('bahan_bakus')->onDelete('cascade');
-            $table->integer('jumlah_dibutuhkan');
+            $table->decimal('jumlah_dibutuhkan', 10, 3);
         });
     }
 

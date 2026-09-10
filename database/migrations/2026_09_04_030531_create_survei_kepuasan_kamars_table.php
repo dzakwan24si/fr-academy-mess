@@ -16,6 +16,12 @@ return new class extends Migration
             $table->foreignId('reservasi_id')->constrained('reservasis')->onDelete('cascade');
             $table->integer('rating');
             $table->text('komentar')->nullable();
+            $table->integer('kebersihan_kamar')->nullable();
+            $table->integer('kebersihan_toilet')->nullable();
+            $table->integer('kualitas_makanan')->nullable();
+            $table->integer('kenyamanan_fasilitas')->nullable();
+            $table->integer('pelayanan_staf')->nullable();
+            $table->text('saran_masukan')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

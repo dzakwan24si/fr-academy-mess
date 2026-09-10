@@ -16,9 +16,11 @@ return new class extends Migration
             $table->foreignId('kamar_id')->constrained('kamars')->cascadeOnDelete();
             $table->foreignId('aset_mess_id')->constrained('aset_messes')->cascadeOnDelete();
             $table->integer('jumlah')->default(1);
-            $table->enum('kondisi', ['Baik', 'Rusak Ringan', 'Rusak Berat'])->default('Baik');
+            $table->enum('kondisi', ['Baik', 'Rusak Ringan', 'Rusak Berat', 'Hilang'])->default('Baik');
             $table->text('keterangan')->nullable();
             $table->date('tanggal_maintenance')->nullable();
+            $table->text('catatan_perbaikan')->nullable();
+            $table->string('foto_perbaikan')->nullable();
             $table->timestamps();
         });
     }

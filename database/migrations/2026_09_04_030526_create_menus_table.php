@@ -15,6 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('nama_menu');
             $table->text('deskripsi')->nullable();
+            $table->string('kategori')->nullable();
+            $table->string('waktu_penyajian')->nullable();
+            $table->decimal('estimasi_harga_porsi', 12, 2)->default(0);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
             $table->softDeletes();
         });
