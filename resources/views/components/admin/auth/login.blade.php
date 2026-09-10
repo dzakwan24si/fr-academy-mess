@@ -100,7 +100,7 @@ new class extends Component
                 </form>
                 
                 <div class="mt-16 text-center absolute bottom-8 left-0 right-0">
-                    <p class="text-xs font-medium text-gray-400">&copy; {{ date('Y') }} FR ACADEMY - Internal System Operational Mess</p>
+                    <p class="text-xs font-medium text-gray-400">&copy; {{ date('Y') }} FR ACADEMY - Internal System Operational Mess </p>
                 </div>
             </div>
         </div>
