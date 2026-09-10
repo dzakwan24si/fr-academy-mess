@@ -8,7 +8,10 @@ use Livewire\Attributes\Title;
 use Livewire\WithFileUploads;
 use App\Models\KomplainKerusakan;
 use App\Models\Reservasi;
+use App\Models\User;
+use App\Notifications\NewKomplainNotification;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 
 #[Layout('layouts.app')]
 #[Title('Lapor Kerusakan')]
@@ -41,12 +44,21 @@ class Index extends Component
             $fotoPath = $this->foto_bukti->store('komplain', 'public');
         }
 
-        KomplainKerusakan::create([
+        $komplain = KomplainKerusakan::create([
             'reservasi_id' => $reservasi->id,
             'deskripsi' => $this->deskripsi,
             'foto_bukti' => $fotoPath,
             'status_perbaikan' => 'dilaporkan'
         ]);
+
+        $admins = User::role(['Superadmin', 'Koordinator Mess'])->get();
+        // Teknisi may be notified if we have a role for Teknisi, but maybe let's get all users with Teknisi role if it exists, or just keep it simple. User specified "Superadmin, Koord Mess, dan Teknisi (Pak Tepung)".
+        $teknisi = User::where('name', 'like', '%Tepung%')->orWhere('email', 'like', '%teknisi%')->first();
+        if ($teknisi) {
+            $admins->push($teknisi);
+        }
+        
+        Notification::send($admins, new NewKomplainNotification($komplain));
 
         session()->flash('success', 'Laporan kerusakan berhasil dikirim. Teknisi kami akan segera menindaklanjuti.');
         $this->reset(['deskripsi', 'foto_bukti']);

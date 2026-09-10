@@ -7,6 +7,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\WithPagination;
 use App\Models\RequestLaundry;
+use App\Notifications\LaundrySelesaiNotification;
 
 #[Layout('layouts.admin')]
 #[Title('Manajemen Laundry')]
@@ -63,9 +64,17 @@ class Index extends Component
         ]);
 
         $laundry = RequestLaundry::findOrFail($this->selectedId);
+        $oldStatus = $laundry->status;
+
         $laundry->update([
             'status' => $this->status,
         ]);
+
+        if ($oldStatus != 'selesai' && $this->status == 'selesai') {
+            if ($laundry->reservasi && $laundry->reservasi->tamu) {
+                $laundry->reservasi->tamu->notify(new LaundrySelesaiNotification($laundry));
+            }
+        }
 
         $this->tutupModal();
         session()->flash('success', 'Status laundry berhasil diperbarui!');

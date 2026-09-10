@@ -5,7 +5,7 @@
 @section('content')
     <div class="min-h-screen bg-[#F4F7F6] font-sans p-4 md:p-6 flex flex-col gap-4">
         <!-- Top Header (Floating) -->
-        <header class="bg-white rounded-2xl shadow-sm h-16 flex items-center justify-between px-6 shrink-0 relative z-20">
+        <header class="bg-white rounded-2xl shadow-sm h-16 flex items-center justify-between px-6 shrink-0 relative z-40">
             <!-- Left Side -->
             <div class="flex items-center gap-6">
                 <!-- Logo -->
@@ -31,6 +31,9 @@
                     </div>
                     <span class="text-[11px] text-gray-400 font-medium mt-0.5" x-text="date">-- -- ----</span>
                 </div>
+
+                <!-- Notification Bell -->
+                <livewire:layout.notification-bell />
 
                 <!-- User Profile Dropdown -->
                 <div class="relative flex items-center gap-3 pl-6 border-l border-gray-100" x-data="{ open: false }">

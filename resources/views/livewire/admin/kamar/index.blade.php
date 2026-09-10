@@ -1,26 +1,36 @@
 <div class="p-6">
-    <!-- Header & Filter -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+    <!-- Top Action Bar -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-            <h1 class="text-2xl font-bold text-gray-800">Manajemen Kamar</h1>
-            <p class="text-gray-500 text-sm">Kelola data kamar, kapasitas, dan pantau status kebersihan.</p>
+            <h1 class="text-2xl font-bold text-gray-800 tracking-tight">Manajemen Kamar</h1>
+            <p class="text-gray-500 text-sm mt-1">Kelola data kamar, kapasitas, dan pantau status kebersihan.</p>
         </div>
-        <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+        <div class="flex items-center gap-3 w-full sm:w-auto">
             <button wire:click="bukaModal" class="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-[#59A338] hover:bg-[#4d8f2f] text-white rounded-xl text-sm font-semibold transition-colors shadow-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                Tambah Kamar
+                <span class="hidden sm:inline">Tambah Kamar</span>
             </button>
-            <div class="relative w-full sm:w-64">
-                <input wire:model.live.debounce.300ms="search" type="text" placeholder="Cari kamar..." class="w-full bg-white border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow">
-                <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            </div>
-            <select wire:model.live="filterStatus" class="w-full sm:w-48 bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow">
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 flex flex-col sm:flex-row gap-4 z-20 relative">
+        <div class="flex-1">
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Status Kamar</label>
+            <select wire:model.live="filterStatus" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow">
                 <option value="">Semua Status</option>
                 <option value="kosong_bersih">Kosong Bersih</option>
                 <option value="kosong_kotor">Kosong Kotor</option>
                 <option value="terisi">Terisi</option>
                 <option value="maintenance">Maintenance</option>
             </select>
+        </div>
+        <div class="flex-1">
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Cari Kamar</label>
+            <div class="relative">
+                <input wire:model.live.debounce.300ms="search" type="text" placeholder="Ketik nomor kamar..." class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow">
+                <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
         </div>
     </div>
 
@@ -29,12 +39,12 @@
         <div class="overflow-x-auto">
             <table class="w-full whitespace-nowrap text-left">
                 <thead>
-                    <tr class="bg-gray-50/50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                        <th class="px-6 py-4">Kamar</th>
+                    <tr class="bg-gray-50/50 border-b border-gray-100 text-gray-500 font-semibold">
+                        <th class="px-6 py-4 rounded-tl-2xl">Kamar</th>
                         <th class="px-6 py-4">Lokasi</th>
                         <th class="px-6 py-4">Tipe & Kapasitas</th>
                         <th class="px-6 py-4">Status</th>
-                        <th class="px-6 py-4 text-right">Aksi</th>
+                        <th class="px-6 py-4 text-right rounded-tr-2xl">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 text-sm">

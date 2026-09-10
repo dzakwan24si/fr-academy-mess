@@ -3,6 +3,9 @@
 namespace App\Livewire\Admin\Kamar;
 
 use App\Models\Kamar;
+use App\Models\User;
+use App\Notifications\KebersihanKamarNotification;
+use Illuminate\Support\Facades\Notification;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -81,7 +84,11 @@ class Index extends Component
             'status' => 'required|in:kosong_bersih,kosong_kotor,terisi,maintenance',
         ]);
 
-        Kamar::updateOrCreate(
+        $isNewOrUpdated = false;
+        $kamar = Kamar::find($this->kamar_id);
+        $oldStatus = $kamar ? $kamar->status : null;
+
+        $kamar = Kamar::updateOrCreate(
             ['id' => $this->kamar_id],
             [
                 'nomor_kamar' => $this->nomor_kamar,
@@ -91,6 +98,11 @@ class Index extends Component
                 'status' => $this->status,
             ]
         );
+
+        if ($oldStatus != 'kosong_bersih' && $this->status == 'kosong_bersih') {
+            $admins = User::role(['Superadmin', 'Koordinator Mess'])->get();
+            Notification::send($admins, new KebersihanKamarNotification($kamar, 'bersih'));
+        }
 
         $this->tutupModal();
     }

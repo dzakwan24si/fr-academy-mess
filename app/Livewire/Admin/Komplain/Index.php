@@ -8,6 +8,8 @@ use Livewire\Attributes\Title;
 use Livewire\WithPagination;
 use App\Models\KomplainKerusakan;
 use App\Models\User;
+use App\Notifications\KomplainSelesaiNotification;
+use Illuminate\Support\Facades\Notification;
 
 #[Layout('layouts.admin')]
 #[Title('Komplain & Kerusakan')]
@@ -69,11 +71,21 @@ class Index extends Component
         ]);
 
         $komplain = KomplainKerusakan::findOrFail($this->selectedId);
+        $oldStatus = $komplain->status_perbaikan;
         
         $komplain->update([
             'status_perbaikan' => $this->status_perbaikan,
             'teknisi_id' => $this->teknisi_id ?: null,
         ]);
+
+        if ($oldStatus != 'selesai' && $this->status_perbaikan == 'selesai') {
+            $admins = User::role(['Superadmin', 'Koordinator Mess'])->get();
+            Notification::send($admins, new KomplainSelesaiNotification($komplain));
+            
+            if ($komplain->reservasi && $komplain->reservasi->tamu) {
+                $komplain->reservasi->tamu->notify(new KomplainSelesaiNotification($komplain));
+            }
+        }
 
         // If completed, maybe free up room if it was in maintenance? 
         // For now, let's keep it simple and just update the complaint status.

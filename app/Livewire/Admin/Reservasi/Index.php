@@ -4,6 +4,11 @@ namespace App\Livewire\Admin\Reservasi;
 
 use App\Models\Reservasi;
 use App\Models\Kamar;
+use App\Models\User;
+use App\Models\Tamu;
+use App\Notifications\StatusReservasiNotification;
+use App\Notifications\KebersihanKamarNotification;
+use Illuminate\Support\Facades\Notification;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -51,6 +56,10 @@ class Index extends Component
     {
         $reservasi = Reservasi::findOrFail($id);
         $reservasi->update(['status' => 'approved']);
+
+        if ($reservasi->tamu) {
+            $reservasi->tamu->notify(new StatusReservasiNotification($reservasi));
+        }
     }
 
     public function bukaModalTolak($id)
@@ -78,6 +87,10 @@ class Index extends Component
             'status' => 'rejected',
             'alasan_penolakan' => $this->alasanTolak
         ]);
+
+        if ($reservasi->tamu) {
+            $reservasi->tamu->notify(new StatusReservasiNotification($reservasi));
+        }
 
         $this->tutupModalTolak();
     }
@@ -155,6 +168,12 @@ class Index extends Component
             
             if ($reservasi->kamar) {
                 $reservasi->kamar->update(['status' => 'kosong_kotor']);
+
+                // Notify about dirty room
+                $admins = User::role(['Superadmin', 'Koordinator Mess', 'Staf Kebersihan'])->get();
+                if ($admins->count() > 0) {
+                    Notification::send($admins, new KebersihanKamarNotification($reservasi->kamar, 'kotor'));
+                }
             }
         });
     }

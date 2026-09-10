@@ -8,7 +8,10 @@ use Livewire\Attributes\Title;
 use App\Models\KomplainKerusakan;
 use App\Models\AsetMess;
 use App\Models\Kamar;
+use App\Models\User;
+use App\Notifications\KomplainSelesaiNotification;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 
@@ -65,6 +68,14 @@ class Index extends Component
                     'catatan_teknisi' => $this->catatanTeknisi,
                     'foto_perbaikan' => $pathFoto
                 ]);
+                
+                $admins = User::role(['Superadmin', 'Koordinator Mess'])->get();
+                Notification::send($admins, new KomplainSelesaiNotification($komplain));
+                
+                if ($komplain->reservasi && $komplain->reservasi->tamu) {
+                    $komplain->reservasi->tamu->notify(new KomplainSelesaiNotification($komplain));
+                }
+
                 session()->flash('success', 'Komplain tamu berhasil diselesaikan dengan bukti perbaikan!');
             }
         } elseif ($this->tugasTipeAktif === 'aset') {

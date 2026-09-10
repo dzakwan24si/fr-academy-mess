@@ -8,8 +8,11 @@ use Livewire\Attributes\Title;
 use App\Models\RequestLaundry;
 use App\Models\DetailLaundry;
 use App\Models\Reservasi;
+use App\Models\User;
+use App\Notifications\NewLaundryRequestNotification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Carbon\Carbon;
 
 #[Layout('layouts.app')]
@@ -74,6 +77,9 @@ class Index extends Component
                     'jumlah' => $item['jumlah']
                 ]);
             }
+
+            $admins = User::role(['Superadmin', 'Koordinator Mess'])->get();
+            Notification::send($admins, new NewLaundryRequestNotification($requestLaundry));
 
             DB::commit();
 

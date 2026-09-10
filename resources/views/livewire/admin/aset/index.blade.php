@@ -1,17 +1,26 @@
 <div class="p-6">
     <!-- Top Action Bar -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h2 class="text-2xl font-bold text-gray-800 tracking-tight">Katalog Aset Mess</h2>
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800 tracking-tight">Katalog Aset Mess</h2>
+            <p class="text-gray-500 text-sm mt-1">Kelola data master dan kategori seluruh aset Mess FR Academy.</p>
+        </div>
         <div class="flex items-center gap-3 w-full sm:w-auto">
-            <div class="relative w-full sm:w-64">
-                <input wire:model.live.debounce.300ms="search" type="text" placeholder="Cari aset..." 
-                    class="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-all shadow-sm">
-                <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            </div>
             <button wire:click="bukaModal" class="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-[#59A338] hover:bg-[#4d8f2f] text-white rounded-xl text-sm font-semibold transition-colors shadow-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                 <span class="hidden sm:inline">Tambah Aset</span>
             </button>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 flex flex-col sm:flex-row gap-4 z-20 relative">
+        <div class="flex-1">
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Cari Aset</label>
+            <div class="relative">
+                <input wire:model.live.debounce.300ms="search" type="text" placeholder="Ketik nama aset..." class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow">
+                <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
         </div>
     </div>
 
@@ -20,15 +29,15 @@
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm whitespace-nowrap">
                 <thead>
-                    <tr class="bg-gray-50/50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                        <th class="px-6 py-4">No</th>
+                    <tr class="bg-gray-50/50 border-b border-gray-100 text-gray-500 font-semibold">
+                        <th class="px-6 py-4 rounded-tl-2xl">No</th>
                         <th class="px-6 py-4">Nama Barang/Aset</th>
                         <th class="px-6 py-4 text-center">Kondisi Baik</th>
                         <th class="px-6 py-4 text-center">Rusak</th>
                         <th class="px-6 py-4 text-center">Hilang</th>
                         <th class="px-6 py-4 text-center">Total</th>
                         <th class="px-6 py-4">Kategori Aset</th>
-                        <th class="px-6 py-4 text-right">Aksi</th>
+                        <th class="px-6 py-4 text-right rounded-tr-2xl">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100/70">

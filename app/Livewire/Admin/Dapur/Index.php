@@ -20,6 +20,29 @@ class Index extends Component
 
     public $activeTab = 'stok'; // stok, master, rencana
 
+    // Filter & Search states
+    public $searchStok = '';
+    public $filterKategoriStok = '';
+
+    public $searchMenu = '';
+    public $filterKategoriMenu = '';
+    public $filterWaktuMenu = '';
+
+    public $searchRencana = '';
+    public $filterStatusRencana = '';
+    public $filterWaktuRencana = '';
+
+    public function updatingSearchStok() { $this->resetPage('stokPage'); }
+    public function updatingFilterKategoriStok() { $this->resetPage('stokPage'); }
+
+    public function updatingSearchMenu() { $this->resetPage('menuPage'); }
+    public function updatingFilterKategoriMenu() { $this->resetPage('menuPage'); }
+    public function updatingFilterWaktuMenu() { $this->resetPage('menuPage'); }
+
+    public function updatingSearchRencana() { $this->resetPage('rencanaPage'); }
+    public function updatingFilterStatusRencana() { $this->resetPage('rencanaPage'); }
+    public function updatingFilterWaktuRencana() { $this->resetPage('rencanaPage'); }
+
     public function setTab($tab)
     {
         $this->activeTab = $tab;
@@ -27,9 +50,40 @@ class Index extends Component
 
     public function render()
     {
-        $bahanBakus = BahanBaku::latest()->paginate($this->perPage, ['*'], 'stokPage');
-        $menus = Menu::withCount('bahanBakus')->latest()->paginate($this->perPage, ['*'], 'menuPage');
-        $rencanaHarians = RencanaMenuHarian::with(['menu', 'feedbackMasakans'])->latest()->paginate($this->perPage, ['*'], 'rencanaPage');
+        $queryStok = BahanBaku::query();
+        if (!empty($this->searchStok)) {
+            $queryStok->where('nama_bahan', 'like', '%' . $this->searchStok . '%');
+        }
+        if (!empty($this->filterKategoriStok)) {
+            $queryStok->where('kategori_bahan', $this->filterKategoriStok);
+        }
+        $bahanBakus = $queryStok->latest()->paginate($this->perPage, ['*'], 'stokPage');
+
+        $queryMenu = Menu::withCount('bahanBakus');
+        if (!empty($this->searchMenu)) {
+            $queryMenu->where('nama_menu', 'like', '%' . $this->searchMenu . '%');
+        }
+        if (!empty($this->filterKategoriMenu)) {
+            $queryMenu->where('kategori', $this->filterKategoriMenu);
+        }
+        if (!empty($this->filterWaktuMenu)) {
+            $queryMenu->where('waktu_penyajian', $this->filterWaktuMenu);
+        }
+        $menus = $queryMenu->latest()->paginate($this->perPage, ['*'], 'menuPage');
+
+        $queryRencana = RencanaMenuHarian::with(['menu', 'feedbackMasakans']);
+        if (!empty($this->searchRencana)) {
+            $queryRencana->whereHas('menu', function ($q) {
+                $q->where('nama_menu', 'like', '%' . $this->searchRencana . '%');
+            });
+        }
+        if (!empty($this->filterStatusRencana)) {
+            $queryRencana->where('status', $this->filterStatusRencana);
+        }
+        if (!empty($this->filterWaktuRencana)) {
+            $queryRencana->where('waktu', $this->filterWaktuRencana);
+        }
+        $rencanaHarians = $queryRencana->latest()->paginate($this->perPage, ['*'], 'rencanaPage');
 
         return view('livewire.admin.dapur.index', compact('bahanBakus', 'menus', 'rencanaHarians'));
     }

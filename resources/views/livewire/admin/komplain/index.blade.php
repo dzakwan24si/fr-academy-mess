@@ -1,9 +1,9 @@
-<div class="p-6 md:p-8 max-w-7xl mx-auto space-y-6 md:space-y-8 min-h-screen">
-    <!-- Header Section -->
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div class="p-6">
+    <!-- Top Action Bar -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Komplain Fasilitas</h1>
-            <p class="text-gray-500 mt-2 font-medium">Pantau dan kelola laporan kerusakan dari tamu</p>
+            <h1 class="text-2xl font-bold text-gray-800 tracking-tight">Komplain Fasilitas</h1>
+            <p class="text-gray-500 text-sm mt-1">Pantau dan kelola laporan kerusakan dari tamu.</p>
         </div>
     </div>
 
@@ -14,22 +14,23 @@
         </div>
     @endif
 
-    <!-- Filters & Search -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex flex-col md:flex-row gap-4 justify-between items-center relative z-20">
-        <div class="w-full md:w-1/3 relative">
-            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            </div>
-            <input wire:model.live.debounce.300ms="search" type="text" placeholder="Cari Tamu atau Kamar..." class="pl-11 w-full bg-gray-50 border-transparent focus:bg-white focus:border-[#2E7D32] focus:ring-2 focus:ring-[#2E7D32]/20 rounded-xl py-2.5 text-sm transition-all">
-        </div>
-        
-        <div class="w-full md:w-auto flex gap-3">
-            <select wire:model.live="filterStatus" class="w-full md:w-48 bg-gray-50 border-transparent focus:bg-white focus:border-[#2E7D32] focus:ring-2 focus:ring-[#2E7D32]/20 rounded-xl py-2.5 px-4 text-sm font-medium text-gray-600 transition-all cursor-pointer">
+    <!-- Filter Section -->
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 flex flex-col sm:flex-row gap-4 z-20 relative">
+        <div class="flex-1">
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Status Komplain</label>
+            <select wire:model.live="filterStatus" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow">
                 <option value="">Semua Status</option>
                 <option value="dilaporkan">Dilaporkan</option>
                 <option value="diproses">Sedang Diproses</option>
                 <option value="selesai">Selesai</option>
             </select>
+        </div>
+        <div class="flex-1">
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Cari Tamu / Kamar</label>
+            <div class="relative">
+                <input wire:model.live.debounce.300ms="search" type="text" placeholder="Ketik nama atau kamar..." class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow">
+                <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
         </div>
     </div>
 
@@ -38,7 +39,7 @@
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-gray-50/80 border-b border-gray-100 text-gray-500 text-xs uppercase tracking-wider font-bold">
+                    <tr class="bg-gray-50/50 border-b border-gray-100 text-gray-500 font-semibold">
                         <th class="px-6 py-4 rounded-tl-2xl">Waktu & Tamu</th>
                         <th class="px-6 py-4">Kamar</th>
                         <th class="px-6 py-4">Masalah</th>

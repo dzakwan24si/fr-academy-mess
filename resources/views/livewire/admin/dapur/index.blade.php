@@ -40,31 +40,50 @@
         {{-- TAB 1: STOK BAHAN BAKU --}}
         @if($activeTab === 'stok')
             <div class="flex-1 flex flex-col overflow-hidden">
-                <div class="flex justify-between items-center mb-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <h2 class="text-lg font-bold text-gray-800">Daftar Stok Saat Ini</h2>
-                    <div class="flex gap-3">
-                        <button wire:click="bukaModalBelanja" class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-semibold shadow-sm flex items-center gap-2 transition-colors">
+                    <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                        <button wire:click="bukaModalBelanja" class="w-full sm:w-auto px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-sm font-semibold shadow-sm flex items-center justify-center gap-2 transition-colors">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                             Input Belanja
                         </button>
-                        <button wire:click="bukaModal" class="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-[#59A338] hover:bg-[#4d8f2f] text-white rounded-xl text-sm font-semibold transition-colors shadow-sm">
+                        <button wire:click="bukaModal" class="flex-shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-[#59A338] hover:bg-[#4d8f2f] text-white rounded-xl text-sm font-semibold transition-colors shadow-sm w-full sm:w-auto">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                             Tambah Bahan
                         </button>
                     </div>
                 </div>
 
-                <div class="flex-1 overflow-auto rounded-xl border border-gray-100 bg-white">
+                <!-- Filter Section Tab 1 -->
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 flex flex-col sm:flex-row gap-4 z-20 relative">
+                    <div class="flex-1">
+                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Kategori Bahan</label>
+                        <select wire:model.live="filterKategoriStok" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow">
+                            <option value="">Semua Kategori</option>
+                            <option value="Kering">Kering</option>
+                            <option value="Basah">Basah</option>
+                        </select>
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Cari Bahan Baku</label>
+                        <div class="relative">
+                            <input wire:model.live.debounce.300ms="searchStok" type="text" placeholder="Ketik nama bahan..." class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow">
+                            <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-auto rounded-2xl border border-gray-100 bg-white">
                     <table class="min-w-full text-left text-sm whitespace-nowrap">
                         <thead class="bg-gray-50/50 sticky top-0 z-10 shadow-sm">
-                            <tr>
-                                <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100 w-16">No</th>
-                                <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100">Nama Bahan</th>
-                                <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100">Kategori</th>
-                                <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100">Stok Saat Ini</th>
-                                <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100">Harga Satuan</th>
-                                <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100">Satuan</th>
-                                <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100 text-center">Aksi</th>
+                            <tr class="text-gray-500 font-semibold border-b border-gray-100">
+                                <th scope="col" class="px-6 py-4 rounded-tl-2xl">No</th>
+                                <th scope="col" class="px-6 py-4">Nama Bahan</th>
+                                <th scope="col" class="px-6 py-4">Kategori</th>
+                                <th scope="col" class="px-6 py-4">Stok Saat Ini</th>
+                                <th scope="col" class="px-6 py-4">Harga Satuan</th>
+                                <th scope="col" class="px-6 py-4">Satuan</th>
+                                <th scope="col" class="px-6 py-4 text-center rounded-tr-2xl">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-50">
@@ -107,25 +126,57 @@
         {{-- TAB 2: MASTER MENU & RESEP --}}
         @elseif($activeTab === 'master')
             <div class="flex-1 flex flex-col overflow-hidden">
-                <div class="flex justify-between items-center mb-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <h2 class="text-lg font-bold text-gray-800">Daftar Master Menu</h2>
-                    <button wire:click="bukaModalMenu" class="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-[#59A338] hover:bg-[#4d8f2f] text-white rounded-xl text-sm font-semibold transition-colors shadow-sm">
+                    <button wire:click="bukaModalMenu" class="flex-shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-[#59A338] hover:bg-[#4d8f2f] text-white rounded-xl text-sm font-semibold transition-colors shadow-sm w-full sm:w-auto">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         Tambah Menu
                     </button>
                 </div>
 
-                <div class="flex-1 overflow-auto rounded-xl border border-gray-100 bg-white">
+                <!-- Filter Section Tab 2 -->
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 flex flex-col sm:flex-row gap-4 z-20 relative">
+                    <div class="flex-1">
+                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Kategori Menu</label>
+                        <select wire:model.live="filterKategoriMenu" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow">
+                            <option value="">Semua Kategori</option>
+                            <option value="Umum">Umum</option>
+                            <option value="Sarapan">Sarapan</option>
+                            <option value="Coffee Break">Coffee Break</option>
+                            <option value="Makan Siang">Makan Siang</option>
+                            <option value="Makan Malam">Makan Malam</option>
+                        </select>
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Waktu</label>
+                        <select wire:model.live="filterWaktuMenu" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow">
+                            <option value="">Semua Waktu</option>
+                            <option value="Pagi">Pagi</option>
+                            <option value="Siang">Siang</option>
+                            <option value="Malam">Malam</option>
+                            <option value="Universal">Universal</option>
+                        </select>
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Cari Menu</label>
+                        <div class="relative">
+                            <input wire:model.live.debounce.300ms="searchMenu" type="text" placeholder="Ketik nama menu..." class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow">
+                            <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-auto rounded-2xl border border-gray-100 bg-white">
                     <table class="min-w-full text-left text-sm whitespace-nowrap">
                         <thead class="bg-gray-50/50 sticky top-0 z-10 shadow-sm">
-                            <tr>
-                                <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100 w-16">No</th>
-                                <th scope="col" class="px-6 py-4 font-bold text-gray-500 text-[11px] uppercase tracking-wider">Nama Menu</th>
-                                <th scope="col" class="px-6 py-4 font-bold text-gray-500 text-[11px] uppercase tracking-wider">Kategori</th>
-                                <th scope="col" class="px-6 py-4 font-bold text-gray-500 text-[11px] uppercase tracking-wider">Waktu</th>
-                                <th scope="col" class="px-6 py-4 font-bold text-gray-500 text-[11px] uppercase tracking-wider">Deskripsi</th>
-                                <th scope="col" class="px-6 py-4 font-bold text-gray-500 text-[11px] uppercase tracking-wider text-center">Jumlah Bahan</th>
-                                <th scope="col" class="px-6 py-4 font-bold text-gray-500 text-[11px] uppercase tracking-wider text-center">Aksi</th>
+                            <tr class="text-gray-500 font-semibold border-b border-gray-100">
+                                <th scope="col" class="px-6 py-4 rounded-tl-2xl">No</th>
+                                <th scope="col" class="px-6 py-4">Nama Menu</th>
+                                <th scope="col" class="px-6 py-4">Kategori</th>
+                                <th scope="col" class="px-6 py-4">Waktu</th>
+                                <th scope="col" class="px-6 py-4">Deskripsi</th>
+                                <th scope="col" class="px-6 py-4 text-center">Jumlah Bahan</th>
+                                <th scope="col" class="px-6 py-4 text-center rounded-tr-2xl">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-50">
@@ -179,40 +230,67 @@
         {{-- TAB 3: RENCANA HARIAN --}}
         @elseif($activeTab === 'rencana')
             <div class="flex-1 flex flex-col overflow-hidden">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-bold text-gray-800">Rencana Masak Hari Ini</h2>
-                    <div class="flex gap-3">
-                        <!-- Date Filter Placeholder -->
-                        <input type="date" class="px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 bg-gray-50 focus:bg-white transition-colors" value="{{ date('Y-m-d') }}">
-                        
-                        <button wire:click="bukaModalCetak" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold shadow-sm flex items-center gap-2 transition-colors">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                    <h2 class="text-lg font-bold text-gray-800">Rencana Masak Harian</h2>
+                    <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                        <button wire:click="bukaModalCetak" class="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold shadow-sm flex items-center justify-center gap-2 transition-colors">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                             Cetak Daftar Belanja
                         </button>
                         
-                        <button wire:click="bukaModalJadwal" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-semibold shadow-sm flex items-center gap-2 transition-colors">
+                        <button wire:click="bukaModalJadwal" class="w-full sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-sm font-semibold shadow-sm flex items-center justify-center gap-2 transition-colors">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                             Cetak Jadwal Menu
                         </button>
 
-                        <button wire:click="bukaModalRencana" class="px-4 py-2 bg-[#2E7D32] hover:bg-green-700 text-white rounded-lg text-sm font-semibold shadow-sm flex items-center gap-2 transition-colors">
+                        <button wire:click="bukaModalRencana" class="flex-shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-[#2E7D32] hover:bg-green-700 text-white rounded-xl text-sm font-semibold shadow-sm w-full sm:w-auto transition-colors">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                             Buat Rencana
                         </button>
                     </div>
                 </div>
 
-                <div class="flex-1 overflow-auto rounded-xl border border-gray-100 bg-white">
+                <!-- Filter Section Tab 3 -->
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 flex flex-col sm:flex-row gap-4 z-20 relative">
+                    <div class="flex-1">
+                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Status Masak</label>
+                        <select wire:model.live="filterStatusRencana" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow">
+                            <option value="">Semua Status</option>
+                            <option value="menunggu">Belum Mulai</option>
+                            <option value="sedang_masak">Sedang Masak</option>
+                            <option value="selesai">Selesai</option>
+                        </select>
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Waktu</label>
+                        <select wire:model.live="filterWaktuRencana" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow">
+                            <option value="">Semua Waktu</option>
+                            <option value="Pagi">Pagi</option>
+                            <option value="Siang">Siang</option>
+                            <option value="Malam">Malam</option>
+                            <option value="jus_trainer">Jus Trainer</option>
+                        </select>
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Cari Menu</label>
+                        <div class="relative">
+                            <input wire:model.live.debounce.300ms="searchRencana" type="text" placeholder="Ketik nama menu..." class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow">
+                            <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-auto rounded-2xl border border-gray-100 bg-white">
                     <table class="min-w-full text-left text-sm whitespace-nowrap">
                         <thead class="bg-gray-50/50 sticky top-0 z-10 shadow-sm">
-                            <tr>
-                                <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100">Tanggal</th>
-                                <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100">Nama Menu</th>
-                                <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100">Waktu</th>
-                                <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100">Target Porsi</th>
-                                <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100">Estimasi Anggaran</th>
-                                <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100">Status Masak</th>
-                                <th scope="col" class="px-6 py-4 font-bold text-gray-400 text-[11px] uppercase tracking-wider border-b border-gray-100 text-center">Aksi</th>
+                            <tr class="text-gray-500 font-semibold border-b border-gray-100">
+                                <th scope="col" class="px-6 py-4 rounded-tl-2xl">Tanggal</th>
+                                <th scope="col" class="px-6 py-4">Nama Menu</th>
+                                <th scope="col" class="px-6 py-4">Waktu</th>
+                                <th scope="col" class="px-6 py-4">Target Porsi</th>
+                                <th scope="col" class="px-6 py-4">Estimasi Anggaran</th>
+                                <th scope="col" class="px-6 py-4">Status Masak</th>
+                                <th scope="col" class="px-6 py-4 text-center rounded-tr-2xl">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-50">

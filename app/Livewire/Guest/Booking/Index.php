@@ -4,7 +4,10 @@ namespace App\Livewire\Guest\Booking;
 
 use App\Models\Kamar;
 use App\Models\Reservasi;
+use App\Models\User;
+use App\Notifications\NewReservasiNotification;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Livewire\Component;
 use Carbon\Carbon;
 use Livewire\Attributes\Layout;
@@ -53,7 +56,7 @@ class Index extends Component
 
         $tamu = Auth::guard('tamu')->user();
 
-        Reservasi::create([
+        $reservasi = Reservasi::create([
             'tamu_id' => $tamu->id,
             'kamar_id' => $this->selectedKamar->id,
             'tanggal_checkin' => $this->tanggal_checkin,
@@ -61,6 +64,9 @@ class Index extends Component
             'keperluan_menginap' => $this->keperluan,
             'status' => 'pending'
         ]);
+
+        $admins = User::role(['Superadmin', 'Koordinator Mess'])->get();
+        Notification::send($admins, new NewReservasiNotification($reservasi));
         
         $this->tutupModalBooking();
 
