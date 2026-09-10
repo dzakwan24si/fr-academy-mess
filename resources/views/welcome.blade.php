@@ -437,7 +437,6 @@
                 </div>
                 <div class="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500">
                     <p>&copy; {{ date('Y') }} Mess FR Academy. All rights reserved.</p>
-                    <p class="mt-2 md:mt-0">Designed for First Resources</p>
                 </div>
             </div>
         </footer>

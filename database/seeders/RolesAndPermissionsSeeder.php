@@ -16,20 +16,41 @@ class RolesAndPermissionsSeeder extends Seeder
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Create roles
-        $superadmin = \Spatie\Permission\Models\Role::create(['name' => 'Superadmin']);
-        $koordinator = \Spatie\Permission\Models\Role::create(['name' => 'Koordinator Mess']);
-        $kebersihan = \Spatie\Permission\Models\Role::create(['name' => 'Staf Kebersihan']);
-        $dapur = \Spatie\Permission\Models\Role::create(['name' => 'Staf Dapur']);
-        $teknisi = \Spatie\Permission\Models\Role::create(['name' => 'Teknisi']);
-        $kepalaTU = \Spatie\Permission\Models\Role::create(['name' => 'Kepala TU']);
+        $superadmin = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Superadmin']);
+        $koordinator = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Koordinator Mess']);
+        $kebersihan = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Staf Kebersihan']);
+        $dapur = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Staf Dapur']);
+        $teknisi = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Teknisi']);
+        $kepalaTU = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Kepala TU']);
 
-        // Create superadmin user
-        $user = \App\Models\User::create([
-            'name' => 'Admin Utama',
-            'email' => 'superadmin@fracademy.test',
-            'password' => 'password',
-        ]);
+        // Define users for each role
+        $usersData = [
+            ['name' => 'Admin Utama', 'email' => 'superadmin@fracademy.test', 'role' => $superadmin],
+            ['name' => 'Koordinator Mess', 'email' => 'koordinator@fracademy.test', 'role' => $koordinator],
+            ['name' => 'Staf Kebersihan', 'email' => 'kebersihan@fracademy.test', 'role' => $kebersihan],
+            ['name' => 'Staf Dapur', 'email' => 'dapur@fracademy.test', 'role' => $dapur],
+            ['name' => 'Pak Tepung Teknisi', 'email' => 'teknisi@fracademy.test', 'role' => $teknisi],
+            ['name' => 'Kepala TU', 'email' => 'kepalatu@fracademy.test', 'role' => $kepalaTU],
+        ];
 
-        $user->assignRole($superadmin);
+        // Create users and assign roles
+        foreach ($usersData as $userData) {
+            $user = \App\Models\User::firstOrCreate(
+                ['email' => $userData['email']],
+                [
+                    'name' => $userData['name'],
+                    'password' => bcrypt('password'), // Or 'password' if you have an observer/mutator. Standard is bcrypt.
+                ]
+            );
+            // In case the password logic mutates it directly or we need to ensure it's unhashed 'password'
+            if (!\Hash::info($user->password)['algoName']) {
+                $user->password = bcrypt('password');
+                $user->save();
+            }
+
+            if (!$user->hasRole($userData['role']->name)) {
+                $user->assignRole($userData['role']);
+            }
+        }
     }
 }
