@@ -342,6 +342,9 @@
                                         <button wire:click="mulaiMasak({{ $rencana->id }})" class="px-3 py-1.5 rounded-lg text-blue-700 bg-blue-50 hover:bg-blue-100 font-semibold text-xs border border-blue-200 transition-colors">
                                             Mulai Masak
                                         </button>
+                                        <button wire:click="hapusRencana({{ $rencana->id }})" onclick="confirm('Yakin ingin menghapus rencana masak ini?') || event.stopImmediatePropagation()" class="p-1.5 rounded-lg text-red-600 bg-red-50 hover:bg-red-100 transition-colors border border-transparent hover:border-red-200" title="Hapus">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        </button>
                                         @elseif($rencana->status == 'selesai')
                                             @php
                                                 $avgRating = $rencana->feedbackMasakans->avg('rating');
@@ -556,8 +559,8 @@
     <!-- MODAL BUAT RENCANA HARIAN -->
     @if($isModalRencanaOpen)
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden border border-gray-100">
-            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg border border-gray-100">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 rounded-t-2xl">
                 <div>
                     <h3 class="text-lg font-bold text-gray-800">Buat Rencana Masak</h3>
                     <p class="text-xs text-gray-500 mt-0.5">Atur jadwal memasak harian untuk Mess</p>
@@ -587,15 +590,30 @@
                 </div>
                 
                 <div class="grid grid-cols-2 gap-4">
-                    <div>
+                    <div class="relative" x-data="{
+                        initTomSelect() {
+                            if(this.$refs.select) {
+                                let ts = new TomSelect(this.$refs.select, {
+                                    create: false,
+                                    placeholder: 'Ketik nama menu untuk mencari...',
+                                    onChange: (val) => {
+                                        $wire.set('rencana_menu_id', val);
+                                    }
+                                });
+                                // Handle Livewire updates if necessary (though wire:ignore protects it)
+                            }
+                        }
+                    }" x-init="initTomSelect()">
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Pilih Menu Masakan <span class="text-red-500">*</span></label>
-                        <select wire:model="rencana_menu_id" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#59A338] focus:ring-1 focus:ring-[#59A338] transition-colors bg-white">
-                            <option value="">-- Pilih Menu --</option>
-                            @foreach($menus as $m)
-                                <option value="{{ $m->id }}">{{ $m->nama_menu }}</option>
-                            @endforeach
-                        </select>
-                        @error('rencana_menu_id') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                        <div wire:ignore>
+                            <select x-ref="select" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#59A338] focus:ring-1 focus:ring-[#59A338] transition-colors bg-white">
+                                <option value="">-- Pilih Menu --</option>
+                                @foreach($allMenus as $m)
+                                    <option value="{{ $m->id }}">{{ $m->nama_menu }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @error('rencana_menu_id') <span class="text-xs text-red-500 mt-1 block absolute -bottom-5">{{ $message }}</span> @enderror
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Target Porsi <span class="text-red-500">*</span></label>
@@ -605,7 +623,7 @@
                 </div>
             </div>
 
-            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 rounded-b-2xl">
                 <button wire:click="tutupModalRencana" class="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">
                     Batal
                 </button>

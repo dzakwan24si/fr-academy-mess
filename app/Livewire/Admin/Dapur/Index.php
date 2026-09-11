@@ -85,7 +85,9 @@ class Index extends Component
         }
         $rencanaHarians = $queryRencana->latest()->paginate($this->perPage, ['*'], 'rencanaPage');
 
-        return view('livewire.admin.dapur.index', compact('bahanBakus', 'menus', 'rencanaHarians'));
+        $allMenus = Menu::orderBy('nama_menu')->get();
+
+        return view('livewire.admin.dapur.index', compact('bahanBakus', 'menus', 'rencanaHarians', 'allMenus'));
     }
 
     public function formOpname() {}
@@ -342,6 +344,24 @@ class Index extends Component
 
         $this->tutupModalRencana();
         session()->flash('success', 'Rencana masak harian berhasil dibuat.');
+    }
+
+    public function hapusRencana($id)
+    {
+        $rencanaMenu = RencanaMenuHarian::find($id);
+        
+        if (!$rencanaMenu) {
+            session()->flash('error', 'Data Rencana Menu tidak ditemukan.');
+            return;
+        }
+
+        if ($rencanaMenu->status !== 'menunggu') {
+            session()->flash('error', 'Hanya rencana yang belum dimulai yang dapat dihapus.');
+            return;
+        }
+
+        $rencanaMenu->delete();
+        session()->flash('success', 'Rencana masak berhasil dihapus.');
     }
 
     public function mulaiMasak($id)
