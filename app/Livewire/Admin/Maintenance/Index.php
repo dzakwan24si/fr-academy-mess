@@ -72,6 +72,16 @@ class Index extends Component
                 $admins = User::role(['Superadmin', 'Koordinator Mess'])->get();
                 Notification::send($admins, new KomplainSelesaiNotification($komplain));
                 
+                if ($komplain->reservasi && $komplain->reservasi->kamar_id) {
+                    \App\Models\RiwayatAktivitas::create([
+                        'trackable_type' => \App\Models\Kamar::class,
+                        'trackable_id' => $komplain->reservasi->kamar_id,
+                        'user_id' => \Illuminate\Support\Facades\Auth::id(),
+                        'aksi' => 'Perbaikan Komplain Selesai',
+                        'keterangan' => 'Komplain (' . $komplain->judul_komplain . ') telah diselesaikan. Catatan teknisi: ' . $this->catatanTeknisi,
+                    ]);
+                }
+                
                 if ($komplain->reservasi && $komplain->reservasi->tamu) {
                     $komplain->reservasi->tamu->notify(new KomplainSelesaiNotification($komplain));
                 }
@@ -89,6 +99,17 @@ class Index extends Component
                         'catatan_perbaikan' => $this->catatanTeknisi,
                         'foto_perbaikan' => $pathFoto
                     ]);
+
+                $kamar = \App\Models\Kamar::find($this->tugasKamarIdAktif);
+                
+                \App\Models\RiwayatAktivitas::create([
+                    'trackable_type' => \App\Models\AsetMess::class,
+                    'trackable_id' => $this->tugasIdAktif,
+                    'user_id' => \Illuminate\Support\Facades\Auth::id(),
+                    'aksi' => 'Perbaikan Aset Selesai',
+                    'keterangan' => 'Kondisi aset di ' . ($kamar ? $kamar->nomor_kamar : 'kamar') . ' telah diperbaiki menjadi Baik. Catatan: ' . $this->catatanTeknisi,
+                ]);
+
                 session()->flash('success', 'Status aset berhasil dikembalikan menjadi Baik dengan bukti perbaikan!');
             }
         }

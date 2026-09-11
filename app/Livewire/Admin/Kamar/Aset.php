@@ -72,18 +72,39 @@ class Aset extends Component
         ]);
 
         if ($this->isEdit) {
+            $oldAsetPivot = $this->kamar->asets()->wherePivot('id', $this->selectedPivotId)->first();
+            $oldKondisi = $oldAsetPivot ? $oldAsetPivot->pivot->kondisi : null;
+
             $this->kamar->asets()->wherePivot('id', $this->selectedPivotId)->updateExistingPivot($this->aset_mess_id, [
                 'jumlah' => $this->jumlah,
                 'kondisi' => $this->kondisi,
                 'keterangan' => $this->keterangan,
                 'tanggal_maintenance' => $this->tanggal_maintenance,
             ]);
+
+            if ($oldKondisi !== $this->kondisi) {
+                \App\Models\RiwayatAktivitas::create([
+                    'trackable_type' => \App\Models\AsetMess::class,
+                    'trackable_id' => $this->aset_mess_id,
+                    'user_id' => \Illuminate\Support\Facades\Auth::id(),
+                    'aksi' => $this->kondisi == 'Baik' ? 'Perbaikan Aset Selesai' : 'Kondisi Aset Menurun',
+                    'keterangan' => 'Kondisi aset di ' . $this->kamar->nomor_kamar . ' berubah dari ' . $oldKondisi . ' menjadi ' . $this->kondisi . '. ' . $this->keterangan,
+                ]);
+            }
         } else {
             $this->kamar->asets()->attach($this->aset_mess_id, [
                 'jumlah' => $this->jumlah,
                 'kondisi' => $this->kondisi,
                 'keterangan' => $this->keterangan,
                 'tanggal_maintenance' => $this->tanggal_maintenance,
+            ]);
+
+            \App\Models\RiwayatAktivitas::create([
+                'trackable_type' => \App\Models\AsetMess::class,
+                'trackable_id' => $this->aset_mess_id,
+                'user_id' => \Illuminate\Support\Facades\Auth::id(),
+                'aksi' => 'Penambahan Aset ke Kamar',
+                'keterangan' => 'Aset ditambahkan ke ' . $this->kamar->nomor_kamar . ' dengan kondisi ' . $this->kondisi,
             ]);
         }
 

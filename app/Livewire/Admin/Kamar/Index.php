@@ -22,6 +22,11 @@ class Index extends Component
     public $search = '';
     public $filterStatus = '';
 
+    // Riwayat Modal
+    public $isModalRiwayatOpen = false;
+    public $riwayatList = [];
+    public $riwayatKamarTitle = '';
+
     // Form Modal
     public $isModalOpen = false;
     public $isEdit = false;
@@ -104,12 +109,44 @@ class Index extends Component
             Notification::send($admins, new KebersihanKamarNotification($kamar, 'bersih'));
         }
 
+        if ($oldStatus !== $this->status) {
+            $aksi = 'Status Kamar Diubah';
+            if ($this->status == 'kosong_bersih') $aksi = 'Kamar Dibersihkan';
+            elseif ($this->status == 'maintenance') $aksi = 'Kamar Dalam Perbaikan';
+            elseif ($this->status == 'terisi') $aksi = 'Kamar Ditempati';
+            elseif ($this->status == 'kosong_kotor') $aksi = 'Kamar Kotor';
+
+            \App\Models\RiwayatAktivitas::create([
+                'trackable_type' => \App\Models\Kamar::class,
+                'trackable_id' => $kamar->id,
+                'user_id' => \Illuminate\Support\Facades\Auth::id(),
+                'aksi' => $aksi,
+                'keterangan' => 'Status kamar diubah menjadi ' . ucwords(str_replace('_', ' ', $this->status)),
+            ]);
+        }
+
         $this->tutupModal();
     }
 
     public function hapus($id)
     {
         Kamar::findOrFail($id)->delete();
+    }
+
+    public function bukaModalRiwayat($id)
+    {
+        $kamar = Kamar::with(['riwayatAktivitas' => function($q) {
+            $q->latest();
+        }, 'riwayatAktivitas.user'])->findOrFail($id);
+        $this->riwayatList = $kamar->riwayatAktivitas;
+        $this->riwayatKamarTitle = $kamar->nomor_kamar;
+        $this->isModalRiwayatOpen = true;
+    }
+
+    public function tutupModalRiwayat()
+    {
+        $this->isModalRiwayatOpen = false;
+        $this->riwayatList = [];
     }
 
     public function render()

@@ -8,6 +8,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\WithPagination;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 #[Layout('layouts.admin')]
 #[Title('LAPORAN DISTRIBUSI ASET')]
@@ -118,8 +119,44 @@ class Laporan extends Component
 
     public function exportData()
     {
-        // TODO: Implementasi export sungguhan pakai Maatwebsite/Excel
-        // Saat ini hanya alert/notification UI
-        $this->js("alert('Fitur Export Excel/PDF akan segera tersedia!');");
+        // Ambil SEMUA data (tanpa pagination)
+        $query = Kamar::whereHas('asets');
+
+        if (!empty($this->filterKamar)) {
+            $query->where('id', $this->filterKamar);
+        }
+
+        $kamars = $query->with(['asets' => function ($q) {
+            if (!empty($this->search)) {
+                $q->where('nama_aset', 'like', '%' . $this->search . '%');
+            }
+            if (!empty($this->filterKondisi)) {
+                $q->wherePivot('kondisi', $this->filterKondisi);
+            }
+        }])->get();
+
+        $laporanData = collect();
+
+        foreach ($kamars as $kamar) {
+            foreach ($kamar->asets as $aset) {
+                $laporanData->push([
+                    'kamar_nama' => $kamar->nomor_kamar,
+                    'kamar_lokasi' => $kamar->lokasi,
+                    'aset_nama' => $aset->nama_aset,
+                    'aset_kategori' => $aset->kategori,
+                    'jumlah' => $aset->pivot->jumlah,
+                    'kondisi' => $aset->pivot->kondisi,
+                    'keterangan' => $aset->pivot->keterangan,
+                ]);
+            }
+        }
+
+        $laporanData = $laporanData->sortBy('kamar_nama')->values();
+
+        $pdf = Pdf::loadView('pdf.laporan-aset', ['laporanData' => $laporanData]);
+
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->stream();
+        }, 'Laporan-Distribusi-Aset.pdf');
     }
 }

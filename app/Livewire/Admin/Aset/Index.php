@@ -24,6 +24,11 @@ class Index extends Component
     public $isEdit = false;
     public $selectedId = null;
     public $selectedAset = null;
+    
+    // Riwayat Modal
+    public $isModalRiwayatOpen = false;
+    public $riwayatList = [];
+    public $riwayatAsetTitle = '';
 
     // Fields
     public $nama_aset;
@@ -101,6 +106,23 @@ class Index extends Component
     {
         $this->isDetailModalOpen = false;
         $this->selectedAset = null;
+    }
+
+    public function bukaModalRiwayat($id)
+    {
+        $aset = AsetMess::with(['riwayatAktivitas' => function($q) {
+            $q->latest();
+        }, 'riwayatAktivitas.user'])->findOrFail($id);
+        
+        $this->riwayatList = $aset->riwayatAktivitas;
+        $this->riwayatAsetTitle = $aset->nama_aset;
+        $this->isModalRiwayatOpen = true;
+    }
+
+    public function tutupModalRiwayat()
+    {
+        $this->isModalRiwayatOpen = false;
+        $this->riwayatList = [];
     }
 
     public function render()

@@ -37,7 +37,7 @@
         }
         
         .header-left {
-            width: 200px;
+            width: 150px;
             flex-shrink: 0;
         }
         
@@ -75,15 +75,23 @@
         }
 
         .footer-notes {
-            text-align: center;
-            font-size: 6.5pt;
-            font-weight: bold;
-            margin-top: 5px;
-            line-height: 1.2;
+            text-align: left;
+            font-size: 8pt;
+            margin-top: 15px;
+            line-height: 1.4;
+            border: 1px solid #000;
+            padding: 8px;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .footer-notes strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 9pt;
         }
         .footer-notes p {
-            margin: 0;
-            white-space: nowrap;
+            margin: 0 0 2px 0;
+            white-space: normal;
         }
 
         .info-table {
@@ -163,7 +171,9 @@
             text-align: center;
             border: none;
             font-size: 10pt;
-            margin-top: 30px;
+            margin-top: 15px;
+            page-break-inside: avoid;
+            break-inside: avoid;
         }
         .signature-table td {
             width: 33.33%;
@@ -195,20 +205,6 @@
         <!-- Left -->
         <div class="header-left">
             <img src="{{ asset('logofr.png') }}" style="height: 45px; margin-bottom: 5px;" alt="Logo FR">
-            <table class="info-table" style="margin-top: 0;">
-                <tr>
-                    <td style="width: 70px;">PELATIHAN</td>
-                    <td>: {{ strtoupper($namaPelatihan) }}</td>
-                </tr>
-                <tr>
-                    <td>JUMLAH</td>
-                    <td>: {{ $jumlahPeserta }}</td>
-                </tr>
-                <tr>
-                    <td>PERIODE</td>
-                    <td>: {{ strtoupper($periode) }}</td>
-                </tr>
-            </table>
         </div>
 
         <!-- Center -->
@@ -217,14 +213,6 @@
                 <h2>DAFTAR MENU</h2>
                 <h3>LEARNING & DEVELOPMENT</h3>
             </div>
-            
-            <div class="footer-notes">
-                <p>1. segala menu telor bulat wajib dgoreng dan disambal</p>
-                <p>2. menu ayam goreng di slice agar matang bagian kedalam</p>
-                <p>3. menu ikan goreng pastikan goreng kering matang bagian dalam</p>
-                <p>4. menu gulai ayam/sup ayam sepotong di ubah menjadi 2 ptg(berat timbangan tetap) agar tidak terlalu besar</p>
-                <p>5. menu soto/mie ayam mohon saos kecap dipisah, biar trainee yg menakar sendiri</p>
-            </div>
         </div>
 
         <!-- Right -->
@@ -232,6 +220,21 @@
             <div class="form-code">FORM/TA/04.a</div>
         </div>
     </div>
+
+    <table class="info-table" style="margin-top: 5px; margin-bottom: 15px;">
+        <tr>
+            <td style="width: 70px;">PELATIHAN</td>
+            <td>: {{ strtoupper($namaPelatihan) }}</td>
+        </tr>
+        <tr>
+            <td>JUMLAH</td>
+            <td>: {{ $jumlahPeserta }}</td>
+        </tr>
+        <tr>
+            <td>PERIODE</td>
+            <td>: {{ strtoupper($periode) }}</td>
+        </tr>
+    </table>
 
     <!-- TABEL UTAMA -->
     <table class="data-table">
@@ -277,7 +280,11 @@
                         
                         @if(count($data['menus']['pagi']) > 0)
                             <div class="porsi-footer">
-                                Jumlah Org : {{ $data['porsi']['pagi'] > 0 ? $data['porsi']['pagi'] : $jumlahPeserta }}
+                                @php
+                                    $porsiPagi = $data['porsi']['pagi'] > 0 ? $data['porsi']['pagi'] : $jumlahPeserta;
+                                    $extraPagi = $porsiPagi > $jumlahPeserta ? $porsiPagi - $jumlahPeserta : 0;
+                                @endphp
+                                Jumlah Org : {{ $jumlahPeserta }}{{ $extraPagi > 0 ? '+'.$extraPagi : '' }}
                             </div>
                         @endif
                     </div>
@@ -302,7 +309,11 @@
                         
                         @if(count($data['menus']['siang']) > 0)
                             <div class="porsi-footer">
-                                Jumlah Org : {{ $data['porsi']['siang'] > 0 ? $data['porsi']['siang'] : $jumlahPeserta }}
+                                @php
+                                    $porsiSiang = $data['porsi']['siang'] > 0 ? $data['porsi']['siang'] : $jumlahPeserta;
+                                    $extraSiang = $porsiSiang > $jumlahPeserta ? $porsiSiang - $jumlahPeserta : 0;
+                                @endphp
+                                Jumlah Org : {{ $jumlahPeserta }}{{ $extraSiang > 0 ? '+'.$extraSiang : '' }}
                             </div>
                         @endif
                     </div>
@@ -327,7 +338,11 @@
                         
                         @if(count($data['menus']['malam']) > 0)
                             <div class="porsi-footer">
-                                Jumlah Org : {{ $data['porsi']['malam'] > 0 ? $data['porsi']['malam'] : $jumlahPeserta }}
+                                @php
+                                    $porsiMalam = $data['porsi']['malam'] > 0 ? $data['porsi']['malam'] : $jumlahPeserta;
+                                    $extraMalam = $porsiMalam > $jumlahPeserta ? $porsiMalam - $jumlahPeserta : 0;
+                                @endphp
+                                Jumlah Org : {{ $jumlahPeserta }}{{ $extraMalam > 0 ? '+'.$extraMalam : '' }}
                             </div>
                         @endif
                     </div>
@@ -342,23 +357,33 @@
         <tr>
             <td>
                 <div>Disetujui oleh,</div>
-                <div style="height: 70px;"></div>
+                <div style="height: 60px;"></div>
                 <div class="signature-line"></div>
                 <div>Training Manager</div>
             </td>
             <td>
                 <div>Diperiksa oleh,</div>
-                <div style="height: 70px;"></div>
+                <div style="height: 60px;"></div>
                 <div class="signature-line"></div>
                 <div>KTU/TA</div>
             </td>
             <td>
                 <div>Dibuat oleh,</div>
-                <div style="height: 70px;"></div>
+                <div style="height: 60px;"></div>
                 <div class="signature-line"></div>
                 <div>Koord.Mess</div>
             </td>
         </tr>
     </table>
+
+    <!-- CATATAN -->
+    <div class="footer-notes">
+        <strong>Catatan Khusus:</strong>
+        <p>1. Segala menu telor bulat wajib digoreng dan disambal.</p>
+        <p>2. Menu ayam goreng di-slice agar matang bagian kedalam.</p>
+        <p>3. Menu ikan goreng pastikan goreng kering matang bagian dalam.</p>
+        <p>4. Menu gulai ayam/sup ayam sepotong di ubah menjadi 2 potong (berat timbangan tetap) agar tidak terlalu besar.</p>
+        <p>5. Menu soto/mie ayam mohon saos kecap dipisah, biar trainee yang menakar sendiri.</p>
+    </div>
 </body>
 </html>

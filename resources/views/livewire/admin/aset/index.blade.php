@@ -80,6 +80,9 @@
                         </td>
                         <td class="px-6 py-4 text-right">
                             <div class="flex items-center justify-end gap-2">
+                                <button wire:click="bukaModalRiwayat({{ $aset->id }})" class="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors" title="Riwayat Aset">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </button>
                                 <button wire:click="showDetail({{ $aset->id }})" class="p-1.5 text-blue-500 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors" title="Lihat Detail">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                 </button>
@@ -219,6 +222,53 @@
             </div>
         </div>
     </div>
+    @endif
+
+    <!-- Modal Riwayat Aset -->
+    @if($isModalRiwayatOpen)
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" wire:click="tutupModalRiwayat"></div>
+            
+            <div class="relative bg-white rounded-2xl w-full max-w-2xl p-6 shadow-xl z-10 flex flex-col max-h-[85vh]">
+                <div class="flex justify-between items-center mb-5 pb-3 border-b border-gray-100 shrink-0">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900">Riwayat Aset</h3>
+                        <p class="text-sm text-gray-500 mt-1">{{ $riwayatAsetTitle }}</p>
+                    </div>
+                    <button wire:click="tutupModalRiwayat" class="text-gray-400 hover:text-gray-600 transition-colors bg-gray-100 p-2 rounded-full">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                
+                <div class="overflow-y-auto flex-1 pr-2">
+                    <div class="relative border-l-2 border-gray-100 ml-3 md:ml-4 space-y-6 pb-4">
+                        @forelse($riwayatList as $riwayat)
+                            <div class="relative pl-6 md:pl-8">
+                                <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-white border-2 border-[#59A338]"></div>
+                                <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                                    <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-2 mb-2">
+                                        <h4 class="font-bold text-gray-800">{{ $riwayat->aksi }}</h4>
+                                        <span class="text-xs font-semibold text-gray-500 bg-white px-2.5 py-1 rounded-full border border-gray-200">
+                                            {{ \Carbon\Carbon::parse($riwayat->created_at)->translatedFormat('d M Y, H:i') }}
+                                        </span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-2">{{ $riwayat->keterangan }}</p>
+                                    <div class="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                        Oleh: {{ $riwayat->user ? $riwayat->user->name : 'Sistem' }}
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="pl-6 md:pl-8 py-8 text-center text-gray-500">
+                                <svg class="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <p class="text-sm font-medium">Belum ada riwayat tercatat untuk aset ini.</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        </div>
     @endif
 </div>
 

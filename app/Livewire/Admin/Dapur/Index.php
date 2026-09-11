@@ -31,6 +31,7 @@ class Index extends Component
     public $searchRencana = '';
     public $filterStatusRencana = '';
     public $filterWaktuRencana = '';
+    public $filterTanggalRencana = '';
 
     public function updatingSearchStok() { $this->resetPage('stokPage'); }
     public function updatingFilterKategoriStok() { $this->resetPage('stokPage'); }
@@ -42,6 +43,7 @@ class Index extends Component
     public function updatingSearchRencana() { $this->resetPage('rencanaPage'); }
     public function updatingFilterStatusRencana() { $this->resetPage('rencanaPage'); }
     public function updatingFilterWaktuRencana() { $this->resetPage('rencanaPage'); }
+    public function updatingFilterTanggalRencana() { $this->resetPage('rencanaPage'); }
 
     public function setTab($tab)
     {
@@ -82,6 +84,9 @@ class Index extends Component
         }
         if (!empty($this->filterWaktuRencana)) {
             $queryRencana->where('waktu', $this->filterWaktuRencana);
+        }
+        if (!empty($this->filterTanggalRencana)) {
+            $queryRencana->whereDate('tanggal', $this->filterTanggalRencana);
         }
         $rencanaHarians = $queryRencana->latest()->paginate($this->perPage, ['*'], 'rencanaPage');
 

@@ -80,6 +80,9 @@
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                                         Aset
                                     </a>
+                                    <button wire:click="bukaModalRiwayat({{ $kamar->id }})" class="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors" title="Riwayat Kamar">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    </button>
                                     <button wire:click="bukaModal({{ $kamar->id }})" class="p-2 text-gray-400 hover:text-[#59A338] hover:bg-green-50 rounded-lg transition-colors" title="Edit Kamar">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                                     </button>
@@ -173,6 +176,60 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    @endif
+
+    <!-- Modal Riwayat Kamar -->
+    @if($isModalRiwayatOpen)
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" wire:click="tutupModalRiwayat"></div>
+            
+            <div class="relative bg-white rounded-2xl w-full max-w-2xl p-6 shadow-xl z-10 flex flex-col max-h-[85vh]">
+                <div class="flex justify-between items-center mb-5 pb-3 border-b border-gray-100 shrink-0">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900">Riwayat Kamar</h3>
+                        <p class="text-sm text-gray-500 mt-1">{{ $riwayatKamarTitle }}</p>
+                    </div>
+                    <button wire:click="tutupModalRiwayat" class="text-gray-400 hover:text-gray-600 transition-colors bg-gray-100 p-2 rounded-full">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                
+                <div class="overflow-y-auto flex-1 pr-2">
+                    <div class="relative border-l-2 border-gray-100 ml-3 md:ml-4 space-y-6 pb-4">
+                        @forelse($riwayatList as $riwayat)
+                            <div class="relative pl-6 md:pl-8">
+                                <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-white border-2 border-[#59A338]"></div>
+                                <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                                    <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-2 mb-2">
+                                        <h4 class="font-bold text-gray-800">{{ $riwayat->aksi }}</h4>
+                                        <span class="text-xs font-semibold text-gray-500 bg-white px-2.5 py-1 rounded-full border border-gray-200">
+                                            {{ \Carbon\Carbon::parse($riwayat->created_at)->translatedFormat('d M Y, H:i') }}
+                                        </span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-2">{{ $riwayat->keterangan }}</p>
+                                    @if($riwayat->foto_bukti)
+                                        <div class="mb-3 mt-2">
+                                            <a href="{{ Storage::url($riwayat->foto_bukti) }}" target="_blank" class="block w-24 h-24 sm:w-32 sm:h-32 rounded-lg overflow-hidden border border-gray-200 hover:ring-2 hover:ring-[#59A338] transition-all">
+                                                <img src="{{ Storage::url($riwayat->foto_bukti) }}" alt="Foto Bukti" class="w-full h-full object-cover">
+                                            </a>
+                                        </div>
+                                    @endif
+                                    <div class="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                        Oleh: {{ $riwayat->user ? $riwayat->user->name : 'Sistem' }}
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="pl-6 md:pl-8 py-8 text-center text-gray-500">
+                                <svg class="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <p class="text-sm font-medium">Belum ada riwayat tercatat untuk kamar ini.</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
             </div>
         </div>
     @endif

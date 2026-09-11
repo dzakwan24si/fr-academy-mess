@@ -48,9 +48,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/laundry', \App\Livewire\Admin\Laundry\Index::class)->name('admin.laundry');
     });
 
-    // --- Laporan & Pengaturan ---
-    Route::middleware(['can:akses_survei'])->group(function () {
+    // Sistem & Evaluasi
+    Route::middleware('permission:akses_survei')->group(function () {
         Route::get('/admin/survei', \App\Livewire\Admin\Survei\Index::class)->name('admin.survei.index');
+        // Laporan Okupansi juga diletakkan di sini, atau bisa dibatasi khusus admin utama
+        Route::get('/admin/laporan/okupansi', \App\Livewire\Admin\Laporan\Okupansi::class)->name('admin.laporan.okupansi');
     });
 
     // Manajemen Akun
@@ -62,6 +64,11 @@ Route::middleware('auth')->group(function () {
     Route::middleware('permission:akses_kamar')->group(function () {
         Route::get('/admin/kamar', \App\Livewire\Admin\Kamar\Index::class)->name('admin.kamar');
         Route::get('/admin/kamar/{kamar}/aset', \App\Livewire\Admin\Kamar\Aset::class)->name('admin.kamar.aset');
+    });
+
+    // Tugas Kebersihan
+    Route::middleware('permission:akses_kebersihan')->group(function () {
+        Route::get('/admin/tugas-kebersihan', \App\Livewire\Admin\Kebersihan\Index::class)->name('admin.kebersihan');
     });
 
     // Aset

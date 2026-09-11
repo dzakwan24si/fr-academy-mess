@@ -23,4 +23,9 @@ class Kamar extends Model
                     ->withPivot('id', 'jumlah', 'kondisi', 'keterangan', 'tanggal_maintenance', 'catatan_perbaikan', 'foto_perbaikan')
                     ->withTimestamps();
     }
+
+    public function riwayatAktivitas()
+    {
+        return $this->morphMany(RiwayatAktivitas::class, 'trackable')->latest();
+    }
 }

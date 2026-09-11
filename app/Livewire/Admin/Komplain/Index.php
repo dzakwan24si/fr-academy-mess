@@ -85,6 +85,16 @@ class Index extends Component
             if ($komplain->reservasi && $komplain->reservasi->tamu) {
                 $komplain->reservasi->tamu->notify(new KomplainSelesaiNotification($komplain));
             }
+
+            if ($komplain->reservasi && $komplain->reservasi->kamar_id) {
+                \App\Models\RiwayatAktivitas::create([
+                    'trackable_type' => \App\Models\Kamar::class,
+                    'trackable_id' => $komplain->reservasi->kamar_id,
+                    'user_id' => \Illuminate\Support\Facades\Auth::id(),
+                    'aksi' => 'Perbaikan Komplain Selesai',
+                    'keterangan' => 'Komplain (' . $komplain->judul_komplain . ') telah diselesaikan oleh Admin.',
+                ]);
+            }
         }
 
         // If completed, maybe free up room if it was in maintenance? 

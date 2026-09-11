@@ -14,7 +14,12 @@ class AsetMess extends Model
     public function kamars()
     {
         return $this->belongsToMany(Kamar::class, 'aset_kamar', 'aset_mess_id', 'kamar_id')
-                    ->withPivot('id', 'jumlah', 'kondisi', 'keterangan', 'tanggal_maintenance')
+                    ->withPivot('id', 'jumlah', 'kondisi', 'keterangan', 'tanggal_maintenance', 'catatan_perbaikan', 'foto_perbaikan')
                     ->withTimestamps();
+    }
+
+    public function riwayatAktivitas()
+    {
+        return $this->morphMany(RiwayatAktivitas::class, 'trackable')->latest();
     }
 }
