@@ -2,19 +2,36 @@
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http; // Tambahkan ini untuk request ke API Cloudflare
 
 new class extends Component
 {
     public $email;
     public $password;
     public $remember = false;
+    public $turnstileToken; // Tambahkan variabel untuk menyimpan token Cloudflare
 
     public function login()
     {
         $this->validate([
             'email' => 'required|email',
             'password' => 'required',
+            'turnstileToken' => 'required', // Pastikan token diisi (user sudah verifikasi)
+        ], [
+            'turnstileToken.required' => 'Harap selesaikan verifikasi keamanan (Cloudflare).'
         ]);
+
+        // Validasi token ke server Cloudflare
+        $response = Http::asForm()->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+            'secret' => '0x4AAAAAAEzPGKSsKiRsoVbsX1tzF-N7x8k', // Ganti dengan Secret Key dari Dasbor Cloudflare
+            'response' => $this->turnstileToken,
+            'remoteip' => request()->ip(),
+        ]);
+
+        if (! $response->json('success')) {
+            $this->addError('turnstileToken', 'Verifikasi keamanan gagal. Silakan coba lagi.');
+            return;
+        }
 
         if (Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
             session()->regenerate();
@@ -78,6 +95,15 @@ new class extends Component
                         </div>
                     </div>
 
+                    <!-- WIDGET CLOUDFLARE TURNSTILE -->
+                    <div wire:ignore>
+                        <div class="cf-turnstile" 
+                             data-sitekey="0x4AAAAAAEzPGJLBNyo86KAl" 
+                             data-callback="turnstileCallback">
+                        </div>
+                    </div>
+                    @error('turnstileToken') <p class="mt-2 text-sm text-red-600 font-medium">{{ $message }}</p> @enderror
+
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
                             <input wire:model="remember" id="remember_me" type="checkbox" class="h-4 w-4 text-[#008000] focus:ring-[#008000] border-gray-300 rounded cursor-pointer">
@@ -105,4 +131,14 @@ new class extends Component
             </div>
         </div>
     </div>
+
+    <!-- SCRIPT CLOUDFLARE -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <script>
+        // Fungsi ini akan dipanggil otomatis oleh Cloudflare saat verifikasi sukses
+        function turnstileCallback(token) {
+            // Memasukkan token ke variabel Livewire
+            @this.set('turnstileToken', token);
+        }
+    </script>
 @endsection
