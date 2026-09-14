@@ -12,7 +12,7 @@ Route::get('/sitemap.xml', function () {
 })->name('sitemap');
 
 Route::get('/login', function () {
-    return Blade::render('<livewire:admin.auth.login />');
+    return view('admin.auth.login-wrapper');
 })->name('login');
 
 Route::get('/tamu/login', \App\Livewire\Guest\Auth\Login::class)->name('guest.login');

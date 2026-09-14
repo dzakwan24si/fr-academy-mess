@@ -47,10 +47,7 @@ new class extends Component
 };
 ?>
 
-@extends('layouts.app')
-@section('content')
-    <!-- PERHATIKAN: Semua kode SEKARANG berada di dalam SATU div pembungkus utama -->
-    <div> 
+<div>
         <div class="min-h-screen flex font-sans">
             <!-- Left Side: Image & Branding -->
             <div class="hidden lg:flex lg:w-1/2 relative bg-[#114045]">
@@ -158,4 +155,3 @@ new class extends Component
             });
         </script>
     </div> <!-- PENUTUP div root pembungkus utama -->
-@endsection
