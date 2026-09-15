@@ -83,6 +83,7 @@
         <img src="{{ public_path('logofr.png') }}" alt="FR Academy Logo">
         <h1>FR Academy Mess</h1>
         <p>Laporan Kepuasan Pelayanan Mess</p>
+        <p style="font-size: 13px; font-weight: bold; margin-top: 5px;">Periode: {{ $bulan }} {{ $tahun }}</p>
         <p style="font-size: 12px;">Tanggal Dicetak: {{ \Carbon\Carbon::now()->translatedFormat('d F Y, H:i') }}</p>
     </div>
 
@@ -115,7 +116,7 @@
                             @endif
                         </span>
                     </td>
-                    <td class="text-center"><strong>{{ $row->rating }}</strong> ⭐</td>
+                    <td class="text-center"><strong>{{ $row->rating }}</strong> / 5</td>
                     <td>
                         <div>"{{ $row->komentar ?: 'Tidak ada komentar.' }}"</div>
                         @if($row->saran_masukan)

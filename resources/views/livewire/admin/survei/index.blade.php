@@ -18,6 +18,26 @@
         </div>
     </div>
 
+    <!-- Filter Section -->
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 flex flex-col sm:flex-row gap-4 z-20 relative">
+        <div class="flex-1 max-w-xs">
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Bulan</label>
+            <select wire:model.live="bulan" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow">
+                @for($i = 1; $i <= 12; $i++)
+                    <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}">{{ \Carbon\Carbon::create()->month($i)->translatedFormat('F') }}</option>
+                @endfor
+            </select>
+        </div>
+        <div class="flex-1 max-w-xs">
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Tahun</label>
+            <select wire:model.live="tahun" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow">
+                @for($i = 2024; $i <= date('Y') + 1; $i++)
+                    <option value="{{ $i }}">{{ $i }}</option>
+                @endfor
+            </select>
+        </div>
+    </div>
+
     <!-- Ringkasan Statistik -->
     <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
         <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center">

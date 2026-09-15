@@ -18,6 +18,14 @@ class Index extends Component
     public $perPage = 10;
     
     public $search = '';
+    public $bulan;
+    public $tahun;
+
+    public function mount()
+    {
+        $this->bulan = date('m');
+        $this->tahun = date('Y');
+    }
 
     public function updatingSearch()
     {
@@ -27,6 +35,8 @@ class Index extends Component
     public function render()
     {
         $query = SurveiKepuasanKamar::with(['reservasi.tamu', 'reservasi.kamar'])
+            ->whereMonth('created_at', $this->bulan)
+            ->whereYear('created_at', $this->tahun)
             ->latest();
 
         if ($this->search) {
@@ -40,13 +50,15 @@ class Index extends Component
         $surveis = $query->paginate($this->perPage);
 
         // Calculate averages
+        $statsQuery = SurveiKepuasanKamar::whereMonth('created_at', $this->bulan)->whereYear('created_at', $this->tahun);
+        
         $stats = [
-            'total' => SurveiKepuasanKamar::count(),
-            'avg_kamar' => SurveiKepuasanKamar::avg('kebersihan_kamar') ?? 0,
-            'avg_toilet' => SurveiKepuasanKamar::avg('kebersihan_toilet') ?? 0,
-            'avg_makanan' => SurveiKepuasanKamar::avg('kualitas_makanan') ?? 0,
-            'avg_fasilitas' => SurveiKepuasanKamar::avg('kenyamanan_fasilitas') ?? 0,
-            'avg_staf' => SurveiKepuasanKamar::avg('pelayanan_staf') ?? 0,
+            'total' => (clone $statsQuery)->count(),
+            'avg_kamar' => (clone $statsQuery)->avg('kebersihan_kamar') ?? 0,
+            'avg_toilet' => (clone $statsQuery)->avg('kebersihan_toilet') ?? 0,
+            'avg_makanan' => (clone $statsQuery)->avg('kualitas_makanan') ?? 0,
+            'avg_fasilitas' => (clone $statsQuery)->avg('kenyamanan_fasilitas') ?? 0,
+            'avg_staf' => (clone $statsQuery)->avg('pelayanan_staf') ?? 0,
         ];
 
         return view('livewire.admin.survei.index', compact('surveis', 'stats'));
@@ -55,6 +67,8 @@ class Index extends Component
     public function exportPdf()
     {
         $query = SurveiKepuasanKamar::with(['reservasi.tamu', 'reservasi.kamar'])
+            ->whereMonth('created_at', $this->bulan)
+            ->whereYear('created_at', $this->tahun)
             ->latest();
 
         if ($this->search) {
@@ -86,6 +100,8 @@ class Index extends Component
             'data' => $data,
             'totalResponden' => $totalResponden,
             'rataRataRating' => round((float) $rataRataRating, 1),
+            'bulan' => \Carbon\Carbon::create()->month($this->bulan)->translatedFormat('F'),
+            'tahun' => $this->tahun
         ]);
 
         return response()->streamDownload(function () use ($pdf) {
