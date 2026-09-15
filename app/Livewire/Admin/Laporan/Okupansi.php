@@ -34,11 +34,18 @@ class Okupansi extends Component
 
     public function getQuery()
     {
-        return Reservasi::with(['tamu', 'kamar'])
-            ->whereIn('status', ['approved', 'checked_in', 'completed'])
-            ->whereMonth('tanggal_checkin', $this->bulan)
-            ->whereYear('tanggal_checkin', $this->tahun)
-            ->orderBy('tanggal_checkin', 'desc');
+        $query = Reservasi::with(['tamu', 'kamar'])
+            ->whereIn('status', ['approved', 'checked_in', 'completed']);
+
+        if ($this->bulan !== 'all') {
+            $query->whereMonth('tanggal_checkin', $this->bulan);
+        }
+
+        if ($this->tahun !== 'all') {
+            $query->whereYear('tanggal_checkin', $this->tahun);
+        }
+
+        return $query->orderBy('tanggal_checkin', 'desc');
     }
 
     public function render()
@@ -59,12 +66,12 @@ class Okupansi extends Component
     public function exportPdf()
     {
         $data = $this->getQuery()->get();
-        $namaBulan = Carbon::create()->month($this->bulan)->translatedFormat('F');
+        $namaBulan = $this->bulan === 'all' ? 'Semua Bulan' : Carbon::create()->month($this->bulan)->translatedFormat('F');
 
         $pdf = Pdf::loadView('pdf.laporan-okupansi', [
             'data' => $data,
             'bulan' => $namaBulan,
-            'tahun' => $this->tahun
+            'tahun' => $this->tahun === 'all' ? 'Semua Tahun' : $this->tahun
         ]);
 
         return response()->streamDownload(function () use ($pdf) {

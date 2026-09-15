@@ -35,9 +35,15 @@ class Index extends Component
     public function render()
     {
         $query = SurveiKepuasanKamar::with(['reservasi.tamu', 'reservasi.kamar'])
-            ->whereMonth('created_at', $this->bulan)
-            ->whereYear('created_at', $this->tahun)
             ->latest();
+
+        if ($this->bulan !== 'all') {
+            $query->whereMonth('created_at', $this->bulan);
+        }
+
+        if ($this->tahun !== 'all') {
+            $query->whereYear('created_at', $this->tahun);
+        }
 
         if ($this->search) {
             $query->whereHas('reservasi.tamu', function ($q) {
@@ -50,7 +56,15 @@ class Index extends Component
         $surveis = $query->paginate($this->perPage);
 
         // Calculate averages
-        $statsQuery = SurveiKepuasanKamar::whereMonth('created_at', $this->bulan)->whereYear('created_at', $this->tahun);
+        $statsQuery = SurveiKepuasanKamar::query();
+
+        if ($this->bulan !== 'all') {
+            $statsQuery->whereMonth('created_at', $this->bulan);
+        }
+
+        if ($this->tahun !== 'all') {
+            $statsQuery->whereYear('created_at', $this->tahun);
+        }
         
         $stats = [
             'total' => (clone $statsQuery)->count(),
@@ -67,9 +81,15 @@ class Index extends Component
     public function exportPdf()
     {
         $query = SurveiKepuasanKamar::with(['reservasi.tamu', 'reservasi.kamar'])
-            ->whereMonth('created_at', $this->bulan)
-            ->whereYear('created_at', $this->tahun)
             ->latest();
+
+        if ($this->bulan !== 'all') {
+            $query->whereMonth('created_at', $this->bulan);
+        }
+
+        if ($this->tahun !== 'all') {
+            $query->whereYear('created_at', $this->tahun);
+        }
 
         if ($this->search) {
             $query->whereHas('reservasi.tamu', function ($q) {
@@ -100,8 +120,8 @@ class Index extends Component
             'data' => $data,
             'totalResponden' => $totalResponden,
             'rataRataRating' => round((float) $rataRataRating, 1),
-            'bulan' => \Carbon\Carbon::create()->month($this->bulan)->translatedFormat('F'),
-            'tahun' => $this->tahun
+            'bulan' => $this->bulan === 'all' ? 'Semua Bulan' : \Carbon\Carbon::create()->month($this->bulan)->translatedFormat('F'),
+            'tahun' => $this->tahun === 'all' ? 'Semua Tahun' : $this->tahun
         ]);
 
         return response()->streamDownload(function () use ($pdf) {

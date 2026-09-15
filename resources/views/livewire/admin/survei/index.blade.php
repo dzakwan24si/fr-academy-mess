@@ -23,6 +23,7 @@
         <div class="flex-1 max-w-xs">
             <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Bulan</label>
             <select wire:model.live="bulan" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow">
+                <option value="all">Semua Bulan</option>
                 @for($i = 1; $i <= 12; $i++)
                     <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}">{{ \Carbon\Carbon::create()->month($i)->translatedFormat('F') }}</option>
                 @endfor
@@ -31,6 +32,7 @@
         <div class="flex-1 max-w-xs">
             <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Tahun</label>
             <select wire:model.live="tahun" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow">
+                <option value="all">Semua Tahun</option>
                 @for($i = 2024; $i <= date('Y') + 1; $i++)
                     <option value="{{ $i }}">{{ $i }}</option>
                 @endfor
