@@ -59,6 +59,7 @@
                             <td class="px-6 py-4">
                                 <div class="font-bold text-gray-800">{{ $rsv->tamu->nama ?? '-' }}</div>
                                 <div class="text-xs text-gray-500 mt-0.5">
+                                    <span class="font-medium text-gray-700">{{ $rsv->tamu->no_hp ?? '-' }}</span><br>
                                     {{ $rsv->tamu->perusahaan ?? 'Personal' }} ({{ $rsv->tamu->jabatan ?? '-' }})<br>
                                     <span class="italic max-w-[200px] truncate block" title="{{ $rsv->keperluan_menginap }}">"{{ $rsv->keperluan_menginap }}"</span>
                                 </div>
@@ -89,7 +90,12 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <div class="flex justify-end gap-2">
+                                <div class="flex justify-end items-center gap-2">
+                                    <!-- Tombol Detail Selalu Muncul -->
+                                    <button wire:click="bukaModalDetail({{ $rsv->id }})" class="p-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-600 hover:bg-gray-100 hover:text-[#59A338] transition-colors" title="Lihat Detail Tamu">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                    </button>
+
                                     @if($rsv->status == 'pending')
                                         <!-- Approval Buttons -->
                                         <button wire:click="setujuiBooking({{ $rsv->id }})" class="p-2 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-colors" title="Setujui">
@@ -107,11 +113,6 @@
                                         <!-- Check-out Button -->
                                         <button wire:click="prosesCheckOut({{ $rsv->id }})" class="px-4 py-2 rounded-lg bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-colors text-xs shadow-sm">
                                             Proses Check-Out
-                                        </button>
-                                    @else
-                                        <!-- View Button -->
-                                        <button class="p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors" title="Lihat Detail">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                         </button>
                                     @endif
                                 </div>
@@ -135,6 +136,85 @@
         @endif
     </div>
 
+    <!-- Modal Detail Reservasi -->
+    @if($isModalDetailOpen && $detailReservasi)
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" wire:click="tutupModalDetail"></div>
+            
+            <div class="relative bg-white rounded-2xl w-full max-w-lg shadow-xl z-10 flex flex-col max-h-[90vh]">
+                <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 rounded-t-2xl">
+                    <h3 class="text-lg font-bold text-gray-900">Detail Reservasi (RSV-{{ str_pad($detailReservasi->id, 4, '0', STR_PAD_LEFT) }})</h3>
+                    <button wire:click="tutupModalDetail" class="text-gray-400 hover:text-gray-600 p-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                
+                <div class="p-6 overflow-y-auto">
+                    <!-- Data Tamu -->
+                    <div class="mb-6">
+                        <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Informasi Tamu</h4>
+                        <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-xs text-gray-500">Nama Lengkap</p>
+                                    <p class="font-semibold text-gray-800">{{ $detailReservasi->tamu->nama ?? '-' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500">Nomor Handphone</p>
+                                    <p class="font-semibold text-gray-800">{{ $detailReservasi->tamu->no_hp ?? '-' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500">Perusahaan</p>
+                                    <p class="font-semibold text-gray-800">{{ $detailReservasi->tamu->perusahaan ?? 'Personal' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500">Jabatan</p>
+                                    <p class="font-semibold text-gray-800">{{ $detailReservasi->tamu->jabatan ?? '-' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Reservasi -->
+                    <div>
+                        <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Detail Menginap</h4>
+                        <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <p class="text-xs text-blue-600/80">Check-In</p>
+                                    <p class="font-semibold text-blue-900">{{ \Carbon\Carbon::parse($detailReservasi->tanggal_checkin)->format('d M Y') }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-blue-600/80">Check-Out</p>
+                                    <p class="font-semibold text-blue-900">{{ \Carbon\Carbon::parse($detailReservasi->tanggal_checkout)->format('d M Y') }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-blue-600/80">Kamar</p>
+                                    <p class="font-semibold text-blue-900">{{ $detailReservasi->kamar->nomor_kamar ?? 'Belum Ditentukan' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-blue-600/80">Status</p>
+                                    <p class="font-semibold text-blue-900 capitalize">{{ str_replace('_', ' ', $detailReservasi->status) }}</p>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-xs text-blue-600/80">Keperluan Menginap</p>
+                                <p class="font-medium text-blue-900">{{ $detailReservasi->keperluan_menginap }}</p>
+                            </div>
+                            
+                            @if($detailReservasi->status == 'rejected' && $detailReservasi->alasan_penolakan)
+                                <div class="mt-4 pt-4 border-t border-red-200">
+                                    <p class="text-xs text-red-600/80 font-bold">Alasan Penolakan</p>
+                                    <p class="font-medium text-red-900">{{ $detailReservasi->alasan_penolakan }}</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+    
     <!-- Modal Tolak Reservasi -->
     @if($isModalTolakOpen)
         <div class="fixed inset-0 z-50 flex items-center justify-center p-4">

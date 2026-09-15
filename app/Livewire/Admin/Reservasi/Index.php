@@ -29,6 +29,11 @@ class Index extends Component
     public $alasanTolak = '';
     public $selectedReservasiId = null;
 
+    // Detail Modal
+    public $isModalDetailOpen = false;
+    public $detailReservasi = null;
+
+
     // Form Walk-in Reservation
     public $isModalBuatOpen = false;
     public $form_nama = '';
@@ -75,6 +80,19 @@ class Index extends Component
         $this->selectedReservasiId = null;
         $this->alasanTolak = '';
     }
+
+    public function bukaModalDetail($id)
+    {
+        $this->detailReservasi = Reservasi::with(['tamu', 'kamar'])->findOrFail($id);
+        $this->isModalDetailOpen = true;
+    }
+
+    public function tutupModalDetail()
+    {
+        $this->isModalDetailOpen = false;
+        $this->detailReservasi = null;
+    }
+
 
     public function tolakBooking()
     {

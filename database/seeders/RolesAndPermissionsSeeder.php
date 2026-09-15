@@ -22,6 +22,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $dapur = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Staf Dapur']);
         $teknisi = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Teknisi']);
         $kepalaTU = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Kepala TU']);
+        $laundry = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Staf Laundry']);
 
         // Define users for each role
         $usersData = [
@@ -31,6 +32,7 @@ class RolesAndPermissionsSeeder extends Seeder
             ['name' => 'Staf Dapur', 'email' => 'dapur@fracademy.test', 'role' => $dapur],
             ['name' => 'Pak Tepung Teknisi', 'email' => 'teknisi@fracademy.test', 'role' => $teknisi],
             ['name' => 'Kepala TU', 'email' => 'kepalatu@fracademy.test', 'role' => $kepalaTU],
+            ['name' => 'Staf Laundry', 'email' => 'laundry@fracademy.test', 'role' => $laundry],
         ];
 
         // Create users and assign roles

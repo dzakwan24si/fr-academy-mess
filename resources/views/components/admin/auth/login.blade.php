@@ -116,15 +116,11 @@ new class extends Component
             </div>
         </div>
 
-        <!-- SCRIPT CLOUDFLARE (Sekarang berada DI DALAM div root pembungkus) -->
-        <!-- Perhatikan parameter ?render=explicit -->
-        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
-        
         <script>
             let widgetId;
 
-            // Fungsi untuk me-render widget secara manual
-            function renderTurnstile() {
+            // Fungsi global untuk me-render widget secara manual
+            window.renderTurnstile = function() {
                 if (typeof turnstile !== 'undefined') {
                     // Jika sudah ada widget, reset dulu untuk mencegah error duplikasi/memory leak
                     if (widgetId !== undefined) {
@@ -133,6 +129,7 @@ new class extends Component
                         // Render widget baru
                         widgetId = turnstile.render('#cf-turnstile-container', {
                             sitekey: '0x4AAAAAAEzPGJLBNyo86KAl', // Ganti dengan Site Key
+                            theme: 'light', // Ubah tema kotak menjadi warna putih/terang
                             callback: function(token) {
                                 // Set token ke variabel Livewire saat berhasil diceklis
                                 @this.set('turnstileToken', token);
@@ -140,11 +137,11 @@ new class extends Component
                         });
                     }
                 }
-            }
+            };
 
-            // Jalankan render saat Livewire (atau browser) selesai dimuat
-            document.addEventListener('livewire:navigated', renderTurnstile);
-            document.addEventListener('DOMContentLoaded', renderTurnstile);
+            // Jalankan render saat Livewire navigasi (SPA mode)
+            document.addEventListener('livewire:navigated', window.renderTurnstile);
+
 
             // Dengarkan event dari backend jika verifikasi/login gagal agar widget di-reset
             window.addEventListener('reset-turnstile', event => {
@@ -154,4 +151,8 @@ new class extends Component
                 }
             });
         </script>
+        
+        <!-- SCRIPT CLOUDFLARE (Sekarang menggunakan callback onload agar langsung muncul) -->
+        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=renderTurnstile" async defer></script>
+
     </div> <!-- PENUTUP div root pembungkus utama -->
