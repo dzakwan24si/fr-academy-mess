@@ -72,8 +72,8 @@
                             {{ $reservasis->firstItem() + $index }}
                         </td>
                         <td class="px-6 py-4">
-                            <div class="font-bold text-gray-800">{{ $row->tamu->nama_tamu ?? $row->tamu->nama_lengkap ?? 'Tamu' }}</div>
-                            <div class="text-xs text-gray-500 mt-0.5">{{ $row->tamu->instansi ?? $row->tamu->nama_perusahaan ?? '-' }}</div>
+                            <div class="font-bold text-gray-800">{{ $row->tamu->nama ?? 'Tamu' }}</div>
+                            <div class="text-xs text-gray-500 mt-0.5">{{ $row->tamu->perusahaan ?? '-' }} ({{ $row->tamu->jabatan ?? '-' }})</div>
                         </td>
                         <td class="px-6 py-4">
                             @if($row->kamar)

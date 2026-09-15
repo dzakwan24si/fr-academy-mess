@@ -105,10 +105,11 @@
                 <tr>
                     <td>{{ \Carbon\Carbon::parse($row->created_at)->translatedFormat('d M Y') }}</td>
                     <td>
-                        <strong>{{ $row->reservasi->tamu->nama_tamu ?? $row->reservasi->tamu->nama_lengkap ?? 'Tamu' }}</strong><br>
+                        <strong>{{ $row->reservasi->tamu->nama ?? 'Tamu' }}</strong><br>
                         <span style="font-size: 10px; color: #666;">
+                            {{ $row->reservasi->tamu->perusahaan ?? '-' }} ({{ $row->reservasi->tamu->jabatan ?? '-' }})<br>
                             @if($row->reservasi->kamar)
-                                Kamar {{ $row->reservasi->kamar->nomor_kamar }}
+                                {{ $row->reservasi->kamar->nomor_kamar }}
                             @else
                                 Tanpa Kamar
                             @endif

@@ -104,8 +104,8 @@
             @forelse($data as $index => $row)
                 <tr>
                     <td class="text-center">{{ $index + 1 }}</td>
-                    <td><strong>{{ $row->tamu->nama_tamu ?? $row->tamu->nama_lengkap ?? 'Tamu' }}</strong></td>
-                    <td>{{ $row->tamu->instansi ?? $row->tamu->nama_perusahaan ?? '-' }}</td>
+                    <td><strong>{{ $row->tamu->nama ?? 'Tamu' }}</strong></td>
+                    <td>{{ $row->tamu->perusahaan ?? '-' }} ({{ $row->tamu->jabatan ?? '-' }})</td>
                     <td>
                         @if($row->kamar)
                             {{ $row->kamar->nomor_kamar }}<br>
