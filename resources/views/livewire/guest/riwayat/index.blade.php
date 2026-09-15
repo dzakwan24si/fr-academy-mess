@@ -80,7 +80,7 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-gray-800">
-                                    {{ $riwayat->kamar ? 'Kamar ' . $riwayat->kamar->nomor_kamar : 'Belum Ada Kamar' }}
+                                    {{ $riwayat->kamar ? $riwayat->kamar->nomor_kamar : 'Belum Ada Kamar' }}
                                     @if($riwayat->kamar)
                                         <span class="text-xs font-normal text-gray-500 ml-1">({{ $riwayat->kamar->tipe_kamar }})</span>
                                     @endif
