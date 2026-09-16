@@ -21,7 +21,12 @@ new class extends Component
             'turnstileToken.required' => 'Harap selesaikan verifikasi keamanan (Cloudflare).'
         ]);
 
-        $response = Http::asForm()->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+        $http = Http::asForm();
+        if (app()->environment('local')) {
+            $http = $http->withoutVerifying();
+        }
+
+        $response = $http->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
             'secret' => '0x4AAAAAAEzPGKSsKiRsoVbsX1tzF-N7x8k', // Ganti dengan Secret Key
             'response' => $this->turnstileToken,
             'remoteip' => request()->ip(),

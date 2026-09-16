@@ -96,6 +96,7 @@ Route::middleware('auth:tamu')->group(function () {
     Route::get('/tamu/booking', \App\Livewire\Guest\Booking\Index::class)->name('guest.booking');
     Route::get('/tamu/dashboard', \App\Livewire\Guest\Dashboard::class)->name('guest.dashboard');
     Route::get('/tamu/riwayat', \App\Livewire\Guest\Riwayat\Index::class)->name('guest.riwayat');
+    Route::get('/tamu/reservasi/{id}/e-ticket', [\App\Http\Controllers\Guest\ETicketController::class, 'download'])->name('guest.eticket');
     Route::get('/tamu/profil', \App\Livewire\Guest\Profil\Index::class)->name('guest.profil');
     Route::get('/tamu/komplain', \App\Livewire\Guest\Komplain\Index::class)->name('guest.komplain');
     Route::get('/tamu/laundry', \App\Livewire\Guest\Laundry\Index::class)->name('guest.laundry');

@@ -66,7 +66,7 @@ class Okupansi extends Component
     public function exportPdf()
     {
         $data = $this->getQuery()->get();
-        $namaBulan = $this->bulan === 'all' ? 'Semua Bulan' : Carbon::create()->month($this->bulan)->translatedFormat('F');
+        $namaBulan = $this->bulan === 'all' ? 'Semua Bulan' : Carbon::create()->month((int) $this->bulan)->translatedFormat('F');
 
         $pdf = Pdf::loadView('pdf.laporan-okupansi', [
             'data' => $data,

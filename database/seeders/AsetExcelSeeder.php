@@ -446,7 +446,7 @@ class AsetExcelSeeder extends Seeder
         for ($lorong = 1; $lorong <= 12; $lorong++) {
             for ($no = 1; $no <= 4; $no++) {
                 $huruf = chr(64 + $no); // 1->A, 2->B, 3->C, 4->D
-                $nomor = $lorong . $huruf;
+                $nomor = str_pad($lorong, 2, '0', STR_PAD_LEFT) . $huruf; // 01A, 02B, dll
                 $kamarMess[] = [
                     'nomor_kamar' => "Kamar $nomor",
                     'lokasi' => "Lorong $lorong",
@@ -486,7 +486,7 @@ class AsetExcelSeeder extends Seeder
                     $kamarList = [];
                     for ($no = 1; $no <= 4; $no++) {
                         $huruf = chr(64 + $no);
-                        $nomor = $lorongNo . $huruf;
+                        $nomor = str_pad($lorongNo, 2, '0', STR_PAD_LEFT) . $huruf;
                         $kamarData = Kamar::where('nomor_kamar', "Kamar $nomor")->first();
                         if ($kamarData) {
                             $kamarList[] = $kamarData;

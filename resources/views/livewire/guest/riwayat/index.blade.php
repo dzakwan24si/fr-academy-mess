@@ -105,17 +105,26 @@
                         </div>
                         <div class="md:text-right flex md:flex-col items-center md:items-end justify-between md:justify-center border-t md:border-t-0 border-gray-100 pt-3 md:pt-0">
                             <div class="text-xs text-gray-400 mb-1 hidden md:block">Status Reservasi</div>
-                            @if($riwayat->status == 'pending')
-                                <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">Pending</span>
-                            @elseif($riwayat->status == 'approved')
-                                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">Disetujui</span>
-                            @elseif($riwayat->status == 'checked_in')
-                                <span class="px-3 py-1 bg-[#E8F5E9] text-[#2E7D32] rounded-full text-xs font-semibold">Menginap</span>
-                            @elseif($riwayat->status == 'completed')
-                                <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-semibold">Selesai</span>
-                            @elseif($riwayat->status == 'rejected' || $riwayat->status == 'batal')
-                                <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold">Ditolak</span>
-                            @endif
+                            <div class="flex flex-col gap-2 items-end">
+                                @if($riwayat->status == 'pending')
+                                    <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">Pending</span>
+                                @elseif($riwayat->status == 'approved')
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">Disetujui</span>
+                                @elseif($riwayat->status == 'checked_in')
+                                    <span class="px-3 py-1 bg-[#E8F5E9] text-[#2E7D32] rounded-full text-xs font-semibold">Menginap</span>
+                                @elseif($riwayat->status == 'completed')
+                                    <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-semibold">Selesai</span>
+                                @elseif($riwayat->status == 'rejected' || $riwayat->status == 'batal')
+                                    <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold">Ditolak</span>
+                                @endif
+
+                                @if(in_array($riwayat->status, ['approved', 'checked_in', 'completed']))
+                                    <a href="{{ route('guest.eticket', $riwayat->id) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#59A338] text-white hover:bg-green-700 transition-colors rounded-lg text-xs font-semibold shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                        E-Ticket
+                                    </a>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 @empty

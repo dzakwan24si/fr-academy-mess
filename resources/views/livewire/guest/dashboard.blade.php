@@ -89,15 +89,24 @@
                                     </div>
                                 </div>
 
-                                @if($reservasi->status == 'checked_in')
-                                    <button class="w-full bg-white/20 hover:bg-white/30 border border-white/30 backdrop-blur-md text-white font-bold py-3.5 rounded-xl transition-all shadow-sm">
-                                        Ajukan Check-out
-                                    </button>
-                                @else
-                                    <div class="w-full bg-black/20 backdrop-blur-sm text-white/80 font-semibold py-3 rounded-xl text-center text-sm border border-black/10">
-                                        Silakan tunggu validasi admin
-                                    </div>
-                                @endif
+                                <div class="space-y-3">
+                                    @if($reservasi->status == 'checked_in')
+                                        <button class="w-full bg-white/20 hover:bg-white/30 border border-white/30 backdrop-blur-md text-white font-bold py-3.5 rounded-xl transition-all shadow-sm">
+                                            Ajukan Check-out
+                                        </button>
+                                    @elseif($reservasi->status == 'pending')
+                                        <div class="w-full bg-black/20 backdrop-blur-sm text-white/80 font-semibold py-3 rounded-xl text-center text-sm border border-black/10">
+                                            Silakan tunggu validasi admin
+                                        </div>
+                                    @endif
+
+                                    @if(in_array($reservasi->status, ['approved', 'checked_in']))
+                                        <a href="{{ route('guest.eticket', $reservasi->id) }}" target="_blank" class="block w-full text-center bg-white/90 hover:bg-white text-[#114045] font-bold py-3.5 rounded-xl transition-all shadow-sm">
+                                            <svg class="w-5 h-5 inline-block mr-1 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                            Unduh E-Ticket
+                                        </a>
+                                    @endif
+                                </div>
                             @elseif($lastReservasi && $lastReservasi->status == 'rejected')
                                 <div class="text-center py-4">
                                     <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-500/20 text-red-100 mb-4">

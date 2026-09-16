@@ -151,7 +151,8 @@ class Index extends Component
 
     public function render()
     {
-        $query = Kamar::orderBy('nomor_kamar', 'asc');
+        $query = Kamar::orderByRaw("CASE WHEN tipe_kamar = 'Fasilitas Umum' THEN 1 ELSE 0 END")
+                      ->orderBy('nomor_kamar', 'asc');
 
         if (!empty($this->search)) {
             $query->where('nomor_kamar', 'like', '%' . $this->search . '%')

@@ -120,7 +120,7 @@ class Index extends Component
             'data' => $data,
             'totalResponden' => $totalResponden,
             'rataRataRating' => round((float) $rataRataRating, 1),
-            'bulan' => $this->bulan === 'all' ? 'Semua Bulan' : \Carbon\Carbon::create()->month($this->bulan)->translatedFormat('F'),
+            'bulan' => $this->bulan === 'all' ? 'Semua Bulan' : \Carbon\Carbon::create()->month((int) $this->bulan)->translatedFormat('F'),
             'tahun' => $this->tahun === 'all' ? 'Semua Tahun' : $this->tahun
         ]);
 
