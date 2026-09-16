@@ -91,7 +91,7 @@
 
                                 <div class="space-y-3">
                                     @if($reservasi->status == 'checked_in')
-                                        <button class="w-full bg-white/20 hover:bg-white/30 border border-white/30 backdrop-blur-md text-white font-bold py-3.5 rounded-xl transition-all shadow-sm">
+                                        <button wire:click="ajukanCheckout" wire:confirm="Apakah Anda yakin ingin melakukan check-out sekarang? Anda tidak akan dapat kembali masuk ke kamar setelah ini." class="w-full bg-white/20 hover:bg-white/30 border border-white/30 backdrop-blur-md text-white font-bold py-3.5 rounded-xl transition-all shadow-sm">
                                             Ajukan Check-out
                                         </button>
                                     @elseif($reservasi->status == 'pending')

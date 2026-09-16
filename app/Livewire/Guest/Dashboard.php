@@ -130,4 +130,41 @@ class Dashboard extends Component
         $this->tutupModalSurvei();
         session()->flash('success_survei', 'Terima kasih atas penilaian Anda!');
     }
+
+    public function ajukanCheckout()
+    {
+        $tamu = Auth::guard('tamu')->user();
+        $reservasi = Reservasi::where('tamu_id', $tamu->id)
+            ->where('status', 'checked_in')
+            ->first();
+            
+        if ($reservasi) {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($reservasi) {
+                $reservasi->update(['status' => 'completed']);
+                
+                if ($reservasi->kamar) {
+                    $reservasi->kamar->update(['status' => 'kosong_kotor']);
+
+                    // Notify about dirty room
+                    $admins = \App\Models\User::role(['Superadmin', 'Koordinator Mess', 'Staf Kebersihan'])->get();
+                    if ($admins->count() > 0) {
+                        \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\KebersihanKamarNotification($reservasi->kamar, 'kotor'));
+                    }
+                }
+            });
+            
+            // Log activity manually for the checkout
+            \Illuminate\Support\Facades\DB::table('riwayat_aktivitas')->insert([
+                'user_id' => null, // Guest action, not admin
+                'trackable_type' => \App\Models\Reservasi::class,
+                'trackable_id' => $reservasi->id,
+                'aksi' => 'Checkout',
+                'keterangan' => 'Tamu melakukan self check-out melalui dashboard tamu.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            
+            return redirect()->route('guest.dashboard');
+        }
+    }
 }

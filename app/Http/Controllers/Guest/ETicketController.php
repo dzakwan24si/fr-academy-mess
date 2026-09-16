@@ -43,8 +43,6 @@ class ETicketController extends Controller
 
         $fileName = 'E-Ticket-' . str_pad($reservasi->id, 4, '0', STR_PAD_LEFT) . '-' . str_replace(' ', '-', $reservasi->tamu->nama) . '.pdf';
 
-        return response()->streamDownload(function () use ($pdf) {
-            echo $pdf->stream();
-        }, $fileName);
+        return $pdf->download($fileName);
     }
 }
