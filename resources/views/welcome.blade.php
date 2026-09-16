@@ -360,9 +360,9 @@
                                 Kipas Angin & Wi-Fi
                             </div>
                         </div>
-                        <button class="w-full py-3.5 rounded-xl bg-[#114045] text-white font-semibold hover:bg-[#0a282c] transition-colors">
-                            Lihat Galeri
-                        </button>
+                        <a href="#hero-slider" class="block text-center w-full py-3.5 rounded-xl bg-[#114045] text-white font-semibold hover:bg-[#0a282c] transition-colors">
+                            Login untuk Reservasi
+                        </a>
                     </div>
                 </div>
 
@@ -387,9 +387,9 @@
                                 </div>
                             </div>
 
-                            <button class="w-full py-3 rounded-xl bg-white border-2 border-[#114045] text-[#114045] font-semibold hover:bg-gray-50 transition-colors">
-                                Lihat Galeri
-                            </button>
+                            <a href="#hero-slider" class="block text-center w-full py-3 rounded-xl bg-white border-2 border-[#114045] text-[#114045] font-semibold hover:bg-gray-50 transition-colors">
+                                Login untuk Reservasi
+                            </a>
                         </div>
                     </div>
                 </div>
