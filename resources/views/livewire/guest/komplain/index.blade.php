@@ -78,7 +78,7 @@
                                         <div class="flex text-sm text-gray-600 justify-center">
                                             <label class="relative cursor-pointer bg-white rounded-md font-medium text-orange-600 hover:text-orange-500 focus-within:outline-none">
                                                 <span>{{ $foto_bukti ? 'Ganti foto' : 'Pilih foto' }}</span>
-                                                <input wire:model="foto_bukti" type="file" class="sr-only" accept="image/*">
+                                                <input wire:model="foto_bukti" type="file" class="sr-only" accept="image/*" capture="environment">
                                             </label>
                                             <p class="pl-1">atau tarik & lepas</p>
                                         </div>
