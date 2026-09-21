@@ -26,7 +26,7 @@ class Index extends Component
     {
         $this->validate([
             'deskripsi' => 'required|string|min:10',
-            'foto_bukti' => 'nullable|image|max:5120', // Max 5MB
+            'foto_bukti' => 'nullable|image|max:20480', // Max 20MB
         ]);
 
         $tamu = Auth::guard('tamu')->user();

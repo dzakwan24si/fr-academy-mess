@@ -22,5 +22,8 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Support\Facades\Gate::before(function ($user, $ability) {
             return $user->hasRole('Superadmin') ? true : null;
         });
+
+        // Tingkatkan batas ukuran upload foto kamera untuk komponen Livewire (Max 20MB)
+        config(['livewire.temporary_file_upload.rules' => ['required', 'file', 'max:20480']]);
     }
 }
