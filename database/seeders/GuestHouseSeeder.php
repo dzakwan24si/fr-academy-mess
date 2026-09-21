@@ -11,22 +11,29 @@ class GuestHouseSeeder extends Seeder
     {
         $guestHouses = [
             [
-                'nomor_kamar' => 'G1A',
-                'lokasi' => 'Guest House G1',
+                'nomor_kamar' => 'G1.03A.1',
+                'lokasi' => 'Guest House G1 (03A)',
                 'tipe_kamar' => 'Guest House',
                 'kapasitas' => 2,
                 'status' => 'kosong_bersih',
             ],
             [
-                'nomor_kamar' => 'G1B',
-                'lokasi' => 'Guest House G1',
+                'nomor_kamar' => 'G1.03A.2',
+                'lokasi' => 'Guest House G1 (03A)',
                 'tipe_kamar' => 'Guest House',
                 'kapasitas' => 2,
                 'status' => 'kosong_bersih',
             ],
             [
-                'nomor_kamar' => 'G1C',
-                'lokasi' => 'Guest House G1',
+                'nomor_kamar' => 'G1.10.1',
+                'lokasi' => 'Guest House G1 (10)',
+                'tipe_kamar' => 'Guest House',
+                'kapasitas' => 2,
+                'status' => 'kosong_bersih',
+            ],
+            [
+                'nomor_kamar' => 'G1.10.2',
+                'lokasi' => 'Guest House G1 (10)',
                 'tipe_kamar' => 'Guest House',
                 'kapasitas' => 2,
                 'status' => 'kosong_bersih',

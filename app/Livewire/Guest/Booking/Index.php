@@ -104,7 +104,7 @@ class Index extends Component
             ->where('tipe_kamar', '!=', 'Fasilitas Umum')
             ->where('nomor_kamar', 'not like', 'Lorong%')
             ->orderByRaw("CASE WHEN status = 'kosong_bersih' THEN 0 ELSE 1 END")
-            ->orderBy('nomor_kamar', 'asc');
+            ->orderByRaw("REPLACE(nomor_kamar, 'Kamar ', '') ASC");
 
         if ($this->tipe_kamar != '') {
             $query->where('tipe_kamar', 'like', '%' . $this->tipe_kamar . '%');

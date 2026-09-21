@@ -27,6 +27,18 @@
             </select>
         </div>
         <div class="flex-1">
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Tgl Check-in</label>
+            <input wire:model.live="filterTanggal" type="date" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow text-gray-600">
+        </div>
+        <div class="flex-1">
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Kategori Tamu</label>
+            <select wire:model.live="filterKategori" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow">
+                <option value="">Semua Kategori</option>
+                <option value="tamu_umum">Tamu Umum</option>
+                <option value="trainee">Trainee</option>
+            </select>
+        </div>
+        <div class="flex-1">
             <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Cari Tamu</label>
             <div class="relative">
                 <input wire:model.live.debounce.300ms="search" type="text" placeholder="Ketik nama tamu..." class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow">
@@ -43,6 +55,7 @@
                     <tr class="bg-gray-50/50 border-b border-gray-100 text-gray-500 font-semibold">
                         <th class="px-6 py-4 rounded-tl-2xl">No RSV / Tgl</th>
                         <th class="px-6 py-4">Data Tamu</th>
+                        <th class="px-6 py-4">Kategori</th>
                         <th class="px-6 py-4">Kamar</th>
                         <th class="px-6 py-4">Jam Tiba</th>
                         <th class="px-6 py-4">Durasi</th>
@@ -64,6 +77,15 @@
                                     {{ $rsv->tamu->perusahaan ?? 'Personal' }} ({{ $rsv->tamu->jabatan ?? '-' }})<br>
                                     <span class="italic max-w-[200px] truncate block" title="{{ $rsv->keperluan_menginap }}">"{{ $rsv->keperluan_menginap }}"</span>
                                 </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                @if(isset($rsv->tamu->kategori))
+                                    <span class="inline-flex items-center px-2.5 py-1 text-xs font-bold rounded-full {{ $rsv->tamu->kategori == 'trainee' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700' }}">
+                                        {{ $rsv->tamu->kategori == 'trainee' ? 'Trainee' : 'Tamu Umum' }}
+                                    </span>
+                                @else
+                                    <span class="text-gray-400 italic">-</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4">
                                 @if($rsv->kamar)
@@ -180,6 +202,10 @@
                                 <div>
                                     <p class="text-xs text-gray-500">Jabatan</p>
                                     <p class="font-semibold text-gray-800">{{ $detailReservasi->tamu->jabatan ?? '-' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500">Kategori Tamu</p>
+                                    <p class="font-semibold text-gray-800">{{ isset($detailReservasi->tamu->kategori) ? ($detailReservasi->tamu->kategori == 'trainee' ? 'Trainee' : 'Tamu Umum') : '-' }}</p>
                                 </div>
                             </div>
                         </div>

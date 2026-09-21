@@ -42,7 +42,6 @@
                             <option value="">Semua Tipe Kamar</option>
                             <option value="Reguler">Reguler</option>
                             <option value="Executive">Executive</option>
-                            <option value="VIP">VIP</option>
                             <option value="Guest House">Guest House</option>
                         </select>
                     </div>
@@ -79,7 +78,22 @@
                         <div class="bg-white rounded-2xl overflow-hidden shadow-sm transition-all border border-gray-100 flex flex-col group {{ $isAvailable ? 'hover:shadow-xl cursor-pointer' : 'opacity-75 grayscale-[50%]' }}" @if($isAvailable) wire:click="bukaModalBooking({{ $kamar->id }})" @endif>
                             <!-- Cover Image -->
                             <div class="relative h-48 w-full overflow-hidden bg-gray-200">
-                                @if(str_contains(strtolower($kamar->tipe_kamar), 'executive'))
+                                @if($kamar->nomor_kamar == 'G1.03A.1')
+                                    <img src="{{ asset('images/slides-29.jpg') }}" alt="Room" class="w-full h-full object-cover {{ $isAvailable ? 'group-hover:scale-105 transition-transform duration-700' : '' }}">
+                                    <div class="absolute top-3 right-3 bg-[#59A338] text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">Guest House</div>
+                                @elseif($kamar->nomor_kamar == 'G1.03A.2')
+                                    <img src="{{ asset('images/slides-28.jpg') }}" alt="Room" class="w-full h-full object-cover {{ $isAvailable ? 'group-hover:scale-105 transition-transform duration-700' : '' }}">
+                                    <div class="absolute top-3 right-3 bg-[#59A338] text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">Guest House</div>
+                                @elseif($kamar->nomor_kamar == 'G1.10.1')
+                                    <img src="{{ asset('images/slides-27.jpg') }}" alt="Room" class="w-full h-full object-cover {{ $isAvailable ? 'group-hover:scale-105 transition-transform duration-700' : '' }}">
+                                    <div class="absolute top-3 right-3 bg-[#59A338] text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">Guest House</div>
+                                @elseif($kamar->nomor_kamar == 'G1.10.2')
+                                    <img src="{{ asset('images/slides-26.jpg') }}" alt="Room" class="w-full h-full object-cover {{ $isAvailable ? 'group-hover:scale-105 transition-transform duration-700' : '' }}">
+                                    <div class="absolute top-3 right-3 bg-[#59A338] text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">Guest House</div>
+                                @elseif(str_contains(strtolower($kamar->tipe_kamar), 'guest house'))
+                                    <img src="{{ asset('images/slides-25.jpg') }}" alt="Room" class="w-full h-full object-cover {{ $isAvailable ? 'group-hover:scale-105 transition-transform duration-700' : '' }}">
+                                    <div class="absolute top-3 right-3 bg-[#59A338] text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">Guest House</div>
+                                @elseif(str_contains(strtolower($kamar->tipe_kamar), 'executive'))
                                     <img src="{{ asset('images/slides-23.jpg') }}" alt="Room" class="w-full h-full object-cover {{ $isAvailable ? 'group-hover:scale-105 transition-transform duration-700' : '' }}">
                                     <div class="absolute top-3 right-3 bg-[#59A338] text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">Executive</div>
                                 @else

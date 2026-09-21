@@ -15,7 +15,9 @@ Route::get('/login', function () {
     return view('admin.auth.login-wrapper');
 })->name('login');
 
-Route::get('/tamu/login', \App\Livewire\Guest\Auth\Login::class)->name('guest.login');
+Route::get('/tamu/login', function () {
+    return redirect()->route('home');
+})->name('guest.login');
 
 Route::post('/logout', function (\Illuminate\Http\Request $request) {
     if (\Illuminate\Support\Facades\Auth::guard('tamu')->check()) {

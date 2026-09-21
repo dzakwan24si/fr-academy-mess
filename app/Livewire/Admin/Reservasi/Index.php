@@ -24,6 +24,8 @@ class Index extends Component
 
     public $search = '';
     public $filterStatus = '';
+    public $filterKategori = '';
+    public $filterTanggal = '';
     
     public $isModalTolakOpen = false;
     public $alasanTolak = '';
@@ -53,7 +55,7 @@ class Index extends Component
     public $tanggalKembali = '';
     public $tanggalCheckoutBaru = '';
 
-    protected $queryString = ['search', 'filterStatus'];
+    protected $queryString = ['search', 'filterStatus', 'filterKategori', 'filterTanggal'];
 
     public function updatingSearch()
     {
@@ -298,6 +300,16 @@ class Index extends Component
 
         if (!empty($this->filterStatus)) {
             $query->where('status', $this->filterStatus);
+        }
+
+        if (!empty($this->filterKategori)) {
+            $query->whereHas('tamu', function ($q) {
+                $q->where('kategori', $this->filterKategori);
+            });
+        }
+
+        if (!empty($this->filterTanggal)) {
+            $query->whereDate('tanggal_checkin', $this->filterTanggal);
         }
 
         return view('livewire.admin.reservasi.index', [

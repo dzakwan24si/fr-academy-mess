@@ -241,7 +241,7 @@
                 <div class="w-full overflow-hidden">
                     <div class="marquee-left gap-6 md:gap-8 px-3">
                         @php
-                            $imagesRow1 = ['slides-5.jpg', 'slides-12.jpg', 'slides-7.jpg', 'slides-18.jpg', 'slides-9.jpg', 'slides-20.jpg'];
+                            $imagesRow1 = ['slides-5.jpg', 'slides-12.jpg', 'slides-7.jpg', 'slides-18.jpg', 'slides-9.jpg', 'slides-20.jpg', 'slides-25.jpg', 'slides-26.jpg'];
                         @endphp
                         @foreach(array_merge($imagesRow1, $imagesRow1) as $img)
                         <div class="flex-shrink-0 w-72 md:w-96 h-56 md:h-72 rounded-[1.5rem] md:rounded-[2rem] overflow-hidden group shadow-lg">
@@ -255,7 +255,7 @@
                 <div class="w-full overflow-hidden">
                     <div class="marquee-right gap-6 md:gap-8 px-3">
                         @php
-                            $imagesRow2 = ['slides-21.jpg', 'slides-14.jpg', 'slides-16.jpg', 'slides-23.jpg', 'slides-19.jpg', 'slides-11.jpg'];
+                            $imagesRow2 = ['slides-21.jpg', 'slides-14.jpg', 'slides-16.jpg', 'slides-23.jpg', 'slides-19.jpg', 'slides-11.jpg', 'slides-27.jpg', 'slides-28.jpg', 'slides-29.jpg'];
                         @endphp
                         @foreach(array_merge($imagesRow2, $imagesRow2) as $img)
                         <div class="flex-shrink-0 w-80 md:w-[28rem] h-56 md:h-72 rounded-[1.5rem] md:rounded-[2rem] overflow-hidden group shadow-lg">
@@ -336,7 +336,7 @@
                     <p class="text-gray-500 max-w-2xl mx-auto">Kami menyediakan berbagai tipe kamar yang disesuaikan dengan tingkat jabatan dan kebutuhan istirahat Anda.</p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-5xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
                     <!-- Card 1: Reguler -->
                 <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-2xl transition-all duration-300 group">
                     <div class="relative h-64 overflow-hidden">
@@ -387,7 +387,34 @@
                                 </div>
                             </div>
 
-                            <a href="#hero-slider" class="block text-center w-full py-3 rounded-xl bg-white border-2 border-[#114045] text-[#114045] font-semibold hover:bg-gray-50 transition-colors">
+                            <a href="#hero-slider" class="block text-center w-full py-3.5 rounded-xl bg-[#114045] text-white font-semibold hover:bg-[#0a282c] transition-colors">
+                                Login untuk Reservasi
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Guest House -->
+                    <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-2xl transition-all duration-300 group">
+                        <div class="relative h-64 overflow-hidden">
+                            <img src="{{ asset('images/slides-25.jpg') }}" alt="Guest House" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                            <div class="absolute top-4 right-4 bg-[#59A338] text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">Premium</div>
+                        </div>
+                        <div class="p-8">
+                            <h3 class="text-2xl font-bold text-[#114045] mb-2">Guest House</h3>
+                            <p class="text-gray-500 text-sm mb-6 line-clamp-2">Fasilitas rumah tamu eksklusif dengan ruang tamu yang luas dan dapur pribadi untuk kenyamanan beristirahat maksimal.</p>
+                            
+                            <div class="flex items-center gap-4 mb-8">
+                                <div class="flex items-center gap-1.5 text-gray-600 text-sm font-medium">
+                                    <svg class="w-5 h-5 text-[#59A338]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    4 Orang
+                                </div>
+                                <div class="flex items-center gap-1.5 text-gray-600 text-sm font-medium">
+                                    <svg class="w-5 h-5 text-[#59A338]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                    AC & Kulkas
+                                </div>
+                            </div>
+
+                            <a href="#hero-slider" class="block text-center w-full py-3.5 rounded-xl bg-[#114045] text-white font-semibold hover:bg-[#0a282c] transition-colors">
                                 Login untuk Reservasi
                             </a>
                         </div>
