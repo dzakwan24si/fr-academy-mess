@@ -288,42 +288,53 @@
                     </p>
                 </div>
 
-                <!-- Grid Flow (Cards) -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
-                    
-                    <!-- Item 1: Login -->
-                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center text-center hover:shadow-xl transition-all duration-300">
-                        <div class="w-16 h-16 rounded-full bg-[#eaf4e6] text-[#59A338] flex items-center justify-center mb-6 shadow-inner">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-[#114045] mb-3">1. Login Praktis</h3>
-                        <p class="text-gray-500 leading-relaxed">
-                            Cukup gunakan Nomor HP yang terdaftar saat check-in, tanpa perlu repot menghafal password.
-                        </p>
-                    </div>
+                <!-- Process Flow -->
+                <div class="relative max-w-5xl mx-auto mt-20">
+                    <!-- Connecting Dashed Line (Desktop Only) -->
+                    <div class="hidden md:block absolute top-12 left-[15%] right-[15%] h-0.5 border-t-2 border-dashed border-[#59A338]/30 z-0"></div>
 
-                    <!-- Item 2: Pesan Layanan -->
-                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center text-center hover:shadow-xl transition-all duration-300">
-                        <div class="w-16 h-16 rounded-full bg-[#eaf4e6] text-[#59A338] flex items-center justify-center mb-6 shadow-inner">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-8 relative z-10">
+                        
+                        <!-- Item 1: Login -->
+                        <div class="flex flex-col items-center text-center group">
+                            <div class="w-24 h-24 rounded-full bg-white shadow-xl flex items-center justify-center mb-6 border-[6px] border-[#eaf4e6] group-hover:border-[#59A338]/40 group-hover:scale-105 transition-all duration-300 relative">
+                                <svg class="w-10 h-10 text-[#114045]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                                <!-- Step Number -->
+                                <div class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-[#59A338] text-white font-bold flex items-center justify-center shadow-lg border-2 border-white">1</div>
+                            </div>
+                            <h3 class="text-xl font-bold text-[#114045] mb-3">Login Praktis</h3>
+                            <p class="text-gray-500 leading-relaxed max-w-xs mx-auto">
+                                Cukup gunakan Nomor HP yang terdaftar saat check-in, tanpa repot menghafal password.
+                            </p>
                         </div>
-                        <h3 class="text-xl font-bold text-[#114045] mb-3">2. Pesan Layanan</h3>
-                        <p class="text-gray-500 leading-relaxed">
-                            Pesan layanan laundry atau laporkan kendala fasilitas kamar hanya dengan beberapa klik.
-                        </p>
-                    </div>
 
-                    <!-- Item 3: Beri Penilaian -->
-                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center text-center hover:shadow-xl transition-all duration-300">
-                        <div class="w-16 h-16 rounded-full bg-[#eaf4e6] text-[#59A338] flex items-center justify-center mb-6 shadow-inner">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+                        <!-- Item 2: Pesan Layanan -->
+                        <div class="flex flex-col items-center text-center group md:translate-y-8">
+                            <div class="w-24 h-24 rounded-full bg-white shadow-xl flex items-center justify-center mb-6 border-[6px] border-[#eaf4e6] group-hover:border-[#59A338]/40 group-hover:scale-105 transition-all duration-300 relative">
+                                <svg class="w-10 h-10 text-[#114045]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                                <!-- Step Number -->
+                                <div class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-[#59A338] text-white font-bold flex items-center justify-center shadow-lg border-2 border-white">2</div>
+                            </div>
+                            <h3 class="text-xl font-bold text-[#114045] mb-3">Pesan Layanan</h3>
+                            <p class="text-gray-500 leading-relaxed max-w-xs mx-auto">
+                                Pesan layanan laundry atau laporkan kendala fasilitas kamar hanya dengan beberapa klik.
+                            </p>
                         </div>
-                        <h3 class="text-xl font-bold text-[#114045] mb-3">3. Beri Penilaian</h3>
-                        <p class="text-gray-500 leading-relaxed">
-                            Bantu kami menjaga kualitas dengan memberikan rating masakan dapur dan kebersihan kamar Anda.
-                        </p>
+
+                        <!-- Item 3: Beri Penilaian -->
+                        <div class="flex flex-col items-center text-center group">
+                            <div class="w-24 h-24 rounded-full bg-white shadow-xl flex items-center justify-center mb-6 border-[6px] border-[#eaf4e6] group-hover:border-[#59A338]/40 group-hover:scale-105 transition-all duration-300 relative">
+                                <svg class="w-10 h-10 text-[#114045]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+                                <!-- Step Number -->
+                                <div class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-[#59A338] text-white font-bold flex items-center justify-center shadow-lg border-2 border-white">3</div>
+                            </div>
+                            <h3 class="text-xl font-bold text-[#114045] mb-3">Beri Penilaian</h3>
+                            <p class="text-gray-500 leading-relaxed max-w-xs mx-auto">
+                                Bantu kami menjaga kualitas dengan memberikan rating masakan dapur dan kebersihan kamar.
+                            </p>
+                        </div>
                     </div>
-                    
+                </div>    
                 </div>
             </div>
         </section>
