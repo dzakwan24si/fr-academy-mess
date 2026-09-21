@@ -96,15 +96,9 @@ new class extends Component
                         </div>
                         @error('turnstileToken') <p class="mt-2 text-sm text-red-600 font-medium">{{ $message }}</p> @enderror
 
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <input wire:model="remember" id="remember_me" type="checkbox" class="h-4 w-4 text-[#008000] focus:ring-[#008000] border-gray-300 rounded cursor-pointer">
-                                <label for="remember_me" class="ml-2 block text-sm text-gray-500 font-medium cursor-pointer">Ingat Saya</label>
-                            </div>
-                            
-                            <div class="text-sm">
-                                <a href="#" class="font-bold text-[#008000] hover:text-green-700 transition-colors">Lupa Kata Sandi?</a>
-                            </div>
+                        <div class="flex items-center">
+                            <input wire:model="remember" id="remember_me" type="checkbox" class="h-4 w-4 text-[#008000] focus:ring-[#008000] border-gray-300 rounded cursor-pointer">
+                            <label for="remember_me" class="ml-2 block text-sm text-gray-500 font-medium cursor-pointer">Ingat Saya</label>
                         </div>
 
                         <div>
