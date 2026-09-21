@@ -199,12 +199,25 @@ class Index extends Component
             $reservasi->update(['status' => 'completed']);
             
             if ($reservasi->kamar) {
-                $reservasi->kamar->update(['status' => 'kosong_kotor']);
+                // Check remaining active guests in the room
+                $activeGuests = Reservasi::where('kamar_id', $reservasi->kamar_id)
+                    ->whereIn('status', ['approved', 'checked_in'])
+                    ->count();
 
-                // Notify about dirty room
-                $admins = User::role(['Superadmin', 'Koordinator Mess', 'Staf Kebersihan'])->get();
-                if ($admins->count() > 0) {
-                    Notification::send($admins, new KebersihanKamarNotification($reservasi->kamar, 'kotor'));
+                if ($activeGuests == 0) {
+                    $reservasi->kamar->update(['status' => 'kosong_kotor']);
+
+                    // Notify about dirty room
+                    $admins = User::role(['Superadmin', 'Koordinator Mess', 'Staf Kebersihan'])->get();
+                    if ($admins->count() > 0) {
+                        Notification::send($admins, new KebersihanKamarNotification($reservasi->kamar, 'kotor'));
+                    }
+                } else {
+                    // Notify about partial dirty room
+                    $admins = User::role(['Superadmin', 'Koordinator Mess', 'Staf Kebersihan'])->get();
+                    if ($admins->count() > 0) {
+                        Notification::send($admins, new KebersihanKamarNotification($reservasi->kamar, 'kotor_sebagian'));
+                    }
                 }
             }
         });
@@ -260,15 +273,28 @@ class Index extends Component
         $reservasi = Reservasi::findOrFail($this->selectedOffReservasiId);
 
         \Illuminate\Support\Facades\DB::transaction(function () use ($reservasi) {
-            // Selesaikan reservasi yang sekarang (Kamar jadi kotor)
+            // Selesaikan reservasi yang sekarang
             $reservasi->update(['status' => 'completed', 'tanggal_checkout' => \Carbon\Carbon::today()->format('Y-m-d')]);
 
             if ($reservasi->kamar) {
-                $reservasi->kamar->update(['status' => 'kosong_kotor']);
-                // Beri notifikasi ke petugas kebersihan
-                $admins = User::role(['Superadmin', 'Koordinator Mess', 'Staf Kebersihan'])->get();
-                if ($admins->count() > 0) {
-                    Notification::send($admins, new KebersihanKamarNotification($reservasi->kamar, 'kotor'));
+                // Check remaining active guests in the room
+                $activeGuests = Reservasi::where('kamar_id', $reservasi->kamar_id)
+                    ->whereIn('status', ['approved', 'checked_in'])
+                    ->count();
+
+                if ($activeGuests == 0) {
+                    $reservasi->kamar->update(['status' => 'kosong_kotor']);
+                    // Beri notifikasi ke petugas kebersihan
+                    $admins = User::role(['Superadmin', 'Koordinator Mess', 'Staf Kebersihan'])->get();
+                    if ($admins->count() > 0) {
+                        Notification::send($admins, new KebersihanKamarNotification($reservasi->kamar, 'kotor'));
+                    }
+                } else {
+                    // Notify about partial dirty room
+                    $admins = User::role(['Superadmin', 'Koordinator Mess', 'Staf Kebersihan'])->get();
+                    if ($admins->count() > 0) {
+                        Notification::send($admins, new KebersihanKamarNotification($reservasi->kamar, 'kotor_sebagian'));
+                    }
                 }
             }
 
@@ -312,9 +338,20 @@ class Index extends Component
             $query->whereDate('tanggal_checkin', $this->filterTanggal);
         }
 
+        $availableRooms = Kamar::whereIn('status', ['kosong_bersih', 'terisi'])
+            ->where('tipe_kamar', '!=', 'Fasilitas Umum')
+            ->where('nomor_kamar', 'not like', 'Lorong%')
+            ->withCount(['reservasis as active_guests_count' => function ($query) {
+                $query->whereIn('status', ['approved', 'checked_in']);
+            }])
+            ->get()
+            ->filter(function ($kamar) {
+                return $kamar->active_guests_count < $kamar->kapasitas;
+            });
+
         return view('livewire.admin.reservasi.index', [
             'reservasis' => $query->paginate($this->perPage),
-            'availableRooms' => Kamar::where('status', 'kosong_bersih')->get()
+            'availableRooms' => $availableRooms
         ]);
     }
 }

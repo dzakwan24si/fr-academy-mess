@@ -376,13 +376,15 @@
 
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-700 mb-1">Pilih Kamar (Opsional)</label>
-                                    <select wire:model="form_kamar_id" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm">
+                                    <select wire:model="form_kamar_id" id="form_kamar_id" class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm bg-gray-50">
                                         <option value="">-- Alokasikan Nanti --</option>
                                         @foreach($availableRooms as $kamar)
-                                            <option value="{{ $kamar->id }}">{{ $kamar->nomor_kamar }} ({{ $kamar->tipe_kamar }})</option>
+                                            <option value="{{ $kamar->id }}">
+                                                {{ $kamar->nomor_kamar }} ({{ str_replace([' Twin Bed', ' Single Bed'], '', $kamar->tipe_kamar) }}) - Tersedia ({{ $kamar->active_guests_count ?? 0 }}/{{ $kamar->kapasitas }} terisi)
+                                            </option>
                                         @endforeach
                                     </select>
-                                    <p class="text-[11px] text-gray-400 mt-1">Hanya menampilkan kamar yang berstatus kosong & bersih.</p>
+                                    <p class="text-[11px] text-gray-400 mt-1">Hanya menampilkan kamar yang masih memiliki sisa kapasitas.</p>
                                     @error('form_kamar_id') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                                 </div>
 

@@ -143,12 +143,25 @@ class Dashboard extends Component
                 $reservasi->update(['status' => 'completed']);
                 
                 if ($reservasi->kamar) {
-                    $reservasi->kamar->update(['status' => 'kosong_kotor']);
+                    // Check remaining active guests in the room
+                    $activeGuests = \App\Models\Reservasi::where('kamar_id', $reservasi->kamar_id)
+                        ->whereIn('status', ['approved', 'checked_in'])
+                        ->count();
 
-                    // Notify about dirty room
-                    $admins = \App\Models\User::role(['Superadmin', 'Koordinator Mess', 'Staf Kebersihan'])->get();
-                    if ($admins->count() > 0) {
-                        \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\KebersihanKamarNotification($reservasi->kamar, 'kotor'));
+                    if ($activeGuests == 0) {
+                        $reservasi->kamar->update(['status' => 'kosong_kotor']);
+
+                        // Notify about dirty room
+                        $admins = \App\Models\User::role(['Superadmin', 'Koordinator Mess', 'Staf Kebersihan'])->get();
+                        if ($admins->count() > 0) {
+                            \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\KebersihanKamarNotification($reservasi->kamar, 'kotor'));
+                        }
+                    } else {
+                        // Notify about partial dirty room
+                        $admins = \App\Models\User::role(['Superadmin', 'Koordinator Mess', 'Staf Kebersihan'])->get();
+                        if ($admins->count() > 0) {
+                            \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\KebersihanKamarNotification($reservasi->kamar, 'kotor_sebagian'));
+                        }
                     }
                 }
             });

@@ -73,7 +73,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                     @foreach($kamars as $kamar)
                         @php
-                            $isAvailable = $kamar->status == 'kosong_bersih';
+                            $isAvailable = in_array($kamar->status, ['kosong_bersih', 'terisi']) && ($kamar->active_guests_count < $kamar->kapasitas);
                         @endphp
                         <div class="bg-white rounded-2xl overflow-hidden shadow-sm transition-all border border-gray-100 flex flex-col group {{ $isAvailable ? 'hover:shadow-xl cursor-pointer' : 'opacity-75 grayscale-[50%]' }}" @if($isAvailable) wire:click="bukaModalBooking({{ $kamar->id }})" @endif>
                             <!-- Cover Image -->
@@ -102,11 +102,17 @@
                                 @endif
                                 
                                 @if($isAvailable)
-                                    <div class="absolute top-3 left-3 bg-black/60 backdrop-blur-sm text-white px-2 py-1 rounded-md text-xs font-semibold">Tersedia</div>
+                                    <div class="absolute top-3 left-3 bg-black/60 backdrop-blur-sm text-white px-2 py-1 rounded-md text-xs font-semibold">
+                                        Tersedia ({{ $kamar->active_guests_count }}/{{ $kamar->kapasitas }})
+                                    </div>
                                 @else
                                     <div class="absolute inset-0 bg-gray-900/40 flex items-center justify-center backdrop-blur-[2px]">
                                         <span class="bg-black/70 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg border border-white/20">
-                                            {{ str_replace('_', ' ', ucwords($kamar->status, '_')) }}
+                                            @if($kamar->active_guests_count >= $kamar->kapasitas)
+                                                Penuh ({{ $kamar->active_guests_count }}/{{ $kamar->kapasitas }})
+                                            @else
+                                                {{ str_replace('_', ' ', ucwords($kamar->status, '_')) }}
+                                            @endif
                                         </span>
                                     </div>
                                 @endif
@@ -130,7 +136,11 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                                             @endif
                                         </svg>
-                                        {{ str_replace('_', ' ', ucwords($kamar->status, '_')) }}
+                                        @if($kamar->active_guests_count >= $kamar->kapasitas)
+                                            Penuh
+                                        @else
+                                            {{ str_replace('_', ' ', ucwords($kamar->status, '_')) }}
+                                        @endif
                                     </div>
                                 </div>
                                 

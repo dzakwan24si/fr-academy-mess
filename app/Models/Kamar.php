@@ -28,4 +28,9 @@ class Kamar extends Model
     {
         return $this->morphMany(RiwayatAktivitas::class, 'trackable')->latest();
     }
+
+    public function reservasis()
+    {
+        return $this->hasMany(Reservasi::class, 'kamar_id');
+    }
 }

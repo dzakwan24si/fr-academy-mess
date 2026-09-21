@@ -101,6 +101,9 @@ class Index extends Component
     public function render()
     {
         $query = Kamar::query()
+            ->withCount(['reservasis as active_guests_count' => function ($query) {
+                $query->whereIn('status', ['approved', 'checked_in']);
+            }])
             ->where('tipe_kamar', '!=', 'Fasilitas Umum')
             ->where('nomor_kamar', 'not like', 'Lorong%')
             ->orderByRaw("CASE WHEN status = 'kosong_bersih' THEN 0 ELSE 1 END")
