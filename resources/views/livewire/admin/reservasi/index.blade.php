@@ -44,6 +44,7 @@
                         <th class="px-6 py-4 rounded-tl-2xl">No RSV / Tgl</th>
                         <th class="px-6 py-4">Data Tamu</th>
                         <th class="px-6 py-4">Kamar</th>
+                        <th class="px-6 py-4">Jam Tiba</th>
                         <th class="px-6 py-4">Durasi</th>
                         <th class="px-6 py-4">Status</th>
                         <th class="px-6 py-4 text-right rounded-tr-2xl">Aksi</th>
@@ -71,6 +72,12 @@
                                 @else
                                     <span class="text-gray-400 italic">Kamar Dihapus</span>
                                 @endif
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-100 border border-gray-200">
+                                    <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <span class="font-medium text-gray-700 text-xs">{{ $rsv->perkiraan_jam_checkin ? \Carbon\Carbon::parse($rsv->perkiraan_jam_checkin)->format('H:i') : '-' }}</span>
+                                </div>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="font-medium text-gray-700">{{ \Carbon\Carbon::parse($rsv->tanggal_checkin)->format('d M Y') }}</div>
@@ -110,7 +117,10 @@
                                             Proses Check-In
                                         </button>
                                     @elseif($rsv->status == 'checked_in')
-                                        <!-- Check-out Button -->
+                                        <!-- Check-out & Off Button -->
+                                        <button wire:click="bukaModalOff({{ $rsv->id }})" class="px-4 py-2 rounded-lg bg-yellow-500 text-white font-bold hover:bg-yellow-600 transition-colors text-xs shadow-sm" title="Trainee pergi sementara">
+                                            Off Sementara
+                                        </button>
                                         <button wire:click="prosesCheckOut({{ $rsv->id }})" class="px-4 py-2 rounded-lg bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-colors text-xs shadow-sm">
                                             Proses Check-Out
                                         </button>
@@ -120,7 +130,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                            <td colspan="7" class="px-6 py-12 text-center text-gray-500">
                                 <svg class="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
                                 <p class="text-base font-medium">Tidak ada data reservasi ditemukan</p>
                             </td>
@@ -191,6 +201,10 @@
                                 <div>
                                     <p class="text-xs text-blue-600/80">Kamar</p>
                                     <p class="font-semibold text-blue-900">{{ $detailReservasi->kamar->nomor_kamar ?? 'Belum Ditentukan' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-blue-600/80">Jam Tiba</p>
+                                    <p class="font-semibold text-blue-900">{{ $detailReservasi->perkiraan_jam_checkin ? \Carbon\Carbon::parse($detailReservasi->perkiraan_jam_checkin)->format('H:i') . ' WIB' : '-' }}</p>
                                 </div>
                                 <div>
                                     <p class="text-xs text-blue-600/80">Status</p>
@@ -292,10 +306,20 @@
                                     @error('form_perusahaan') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                                 </div>
 
-                                <div>
-                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Jabatan <span class="text-red-500">*</span></label>
-                                    <input type="text" wire:model="form_jabatan" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm" placeholder="Jabatan Tamu" required>
-                                    @error('form_jabatan') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-1">Jabatan <span class="text-red-500">*</span></label>
+                                        <input type="text" wire:model="form_jabatan" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm" placeholder="Jabatan Tamu" required>
+                                        @error('form_jabatan') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-1">Kategori <span class="text-red-500">*</span></label>
+                                        <select wire:model="form_kategori" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm" required>
+                                            <option value="tamu_umum">Tamu Umum</option>
+                                            <option value="trainee">Trainee</option>
+                                        </select>
+                                        @error('form_kategori') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                                    </div>
                                 </div>
                             </div>
 
@@ -313,10 +337,15 @@
                                         @error('form_tgl_checkin') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-semibold text-gray-700 mb-1">Check-out <span class="text-red-500">*</span></label>
-                                        <input type="date" wire:model="form_tgl_checkout" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm" required>
-                                        @error('form_tgl_checkout') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                                        <label class="block text-sm font-semibold text-gray-700 mb-1">Jam Tiba <span class="text-red-500">*</span></label>
+                                        <input type="time" wire:model="form_jam_checkin" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm" required>
+                                        @error('form_jam_checkin') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                                     </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Check-out <span class="text-red-500">*</span></label>
+                                    <input type="date" wire:model="form_tgl_checkout" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm" required>
+                                    @error('form_tgl_checkout') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                                 </div>
 
                                 <div>
@@ -349,6 +378,43 @@
                         <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#2E7D32] text-white font-semibold hover:bg-green-700 transition-colors shadow-sm flex items-center gap-2">
                             <span wire:loading.remove wire:target="simpanWalkIn">Simpan Reservasi</span>
                             <span wire:loading wire:target="simpanWalkIn">Memproses...</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
+
+    <!-- Modal Off Sementara -->
+    @if($isModalOffOpen)
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" wire:click="tutupModalOff"></div>
+            
+            <div class="relative bg-white rounded-2xl w-full max-w-md p-6 shadow-xl z-10">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Pindah Status: Off Sementara</h3>
+                <p class="text-sm text-gray-500 mb-4">Reservasi saat ini akan diselesaikan, dan kamar akan ditandai kotor. Sistem akan otomatis membooking ulang kamar ini untuk tanggal kembali trainee.</p>
+                
+                <form wire:submit.prevent="simpanOffSementara">
+                    <div class="mb-5">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal Kembali (Check-in Ulang)</label>
+                        <input type="date" wire:model.live="tanggalKembali" class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-sm" required>
+                        @error('tanggalKembali') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="mb-5">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal Selesai (Check-out Akhir)</label>
+                        <input type="date" wire:model="tanggalCheckoutBaru" class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-sm" required>
+                        @error('tanggalCheckoutBaru') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                        <p class="text-xs text-gray-500 mt-1">Otomatis mengikuti check-out lama kecuali sudah terlewat.</p>
+                    </div>
+                    
+                    <div class="flex justify-end gap-3">
+                        <button type="button" wire:click="tutupModalOff" class="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-colors">
+                            Batal
+                        </button>
+                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-yellow-500 text-white font-semibold hover:bg-yellow-600 transition-colors shadow-sm">
+                            <span wire:loading.remove wire:target="simpanOffSementara">Konfirmasi Off</span>
+                            <span wire:loading wire:target="simpanOffSementara">Memproses...</span>
                         </button>
                     </div>
                 </form>

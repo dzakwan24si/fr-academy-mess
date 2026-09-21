@@ -53,6 +53,52 @@
         </div>
     </div>
 
+    <!-- Charts Section -->
+    <div id="chart-data-container" class="hidden"
+        data-trainee="{{ $traineeCount }}"
+        data-umum="{{ $umumCount }}"
+        data-kamarlabels="{{ json_encode($topKamar->pluck('kamar.nomor_kamar')->toArray()) }}"
+        data-kamardata="{{ json_encode($topKamar->pluck('total')->toArray()) }}"
+        data-komplainlabels="{{ json_encode($topKomplain->pluck('nomor_kamar')->toArray()) }}"
+        data-komplaindata="{{ json_encode($topKomplain->pluck('total')->toArray()) }}">
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 relative z-10">
+        <!-- Chart 1: Trainee vs Umum -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+            <h3 class="text-sm font-bold text-gray-700 mb-4 text-center">Proporsi Tamu (Trainee vs Umum)</h3>
+            <div wire:ignore class="relative h-48 w-full flex justify-center">
+                <canvas id="tamuChart"></canvas>
+            </div>
+            <div class="mt-4 flex justify-between text-xs font-semibold">
+                <div class="text-center w-1/2">
+                    <span class="block text-gray-500">Trainee</span>
+                    <span class="text-lg text-blue-600">{{ $traineeCount }}</span>
+                </div>
+                <div class="text-center w-1/2 border-l border-gray-100">
+                    <span class="block text-gray-500">Umum</span>
+                    <span class="text-lg text-[#59A338]">{{ $umumCount }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart 2: Top Kamar -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+            <h3 class="text-sm font-bold text-gray-700 mb-4 text-center">Peringkat Kamar Sering Disewa</h3>
+            <div wire:ignore class="relative h-48 w-full">
+                <canvas id="kamarChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Chart 3: Top Komplain -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+            <h3 class="text-sm font-bold text-gray-700 mb-4 text-center">Peringkat Kamar Sering Komplain</h3>
+            <div wire:ignore class="relative h-48 w-full">
+                <canvas id="komplainChart"></canvas>
+            </div>
+        </div>
+    </div>
+
     <!-- Data Table Card -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative z-10">
         <div class="overflow-x-auto">
@@ -122,3 +168,107 @@
         @endif
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+@script
+<script>
+    let tamuChartInstance = null;
+    let kamarChartInstance = null;
+    let komplainChartInstance = null;
+
+    function renderCharts() {
+        const dataContainer = document.getElementById('chart-data-container');
+        if (!dataContainer) return;
+        
+        const traineeCount = parseInt(dataContainer.dataset.trainee) || 0;
+        const umumCount = parseInt(dataContainer.dataset.umum) || 0;
+        const kamarLabels = JSON.parse(dataContainer.dataset.kamarlabels || '[]');
+        const kamarData = JSON.parse(dataContainer.dataset.kamardata || '[]');
+        const komplainLabels = JSON.parse(dataContainer.dataset.komplainlabels || '[]');
+        const komplainData = JSON.parse(dataContainer.dataset.komplaindata || '[]');
+
+        const tamuCtx = document.getElementById('tamuChart')?.getContext('2d');
+        const kamarCtx = document.getElementById('kamarChart')?.getContext('2d');
+        const komplainCtx = document.getElementById('komplainChart')?.getContext('2d');
+
+        if(tamuChartInstance) tamuChartInstance.destroy();
+        if(kamarChartInstance) kamarChartInstance.destroy();
+        if(komplainChartInstance) komplainChartInstance.destroy();
+
+        if (tamuCtx) {
+            tamuChartInstance = new Chart(tamuCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Trainee', 'Tamu Umum'],
+                    datasets: [{
+                        data: [traineeCount, umumCount],
+                        backgroundColor: ['#3b82f6', '#59A338'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        if (kamarCtx) {
+            kamarChartInstance = new Chart(kamarCtx, {
+                type: 'bar',
+                data: {
+                    labels: kamarLabels,
+                    datasets: [{
+                        label: 'Total Disewa',
+                        data: kamarData,
+                        backgroundColor: '#59A338',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    }
+                }
+            });
+        }
+
+        if (komplainCtx) {
+            komplainChartInstance = new Chart(komplainCtx, {
+                type: 'bar',
+                data: {
+                    labels: komplainLabels,
+                    datasets: [{
+                        label: 'Total Komplain',
+                        data: komplainData,
+                        backgroundColor: '#ef4444',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    }
+                }
+            });
+        }
+    }
+
+    // Render initially
+    setTimeout(renderCharts, 100);
+
+    // Re-render when Livewire updates the DOM (e.g., filter changed)
+    $wire.on('charts-updated', () => {
+        setTimeout(renderCharts, 100);
+    });
+</script>
+@endscript

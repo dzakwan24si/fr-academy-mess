@@ -6,6 +6,10 @@
             <p class="text-gray-500 text-sm mt-1">Kelola data kamar, kapasitas, dan pantau status kebersihan.</p>
         </div>
         <div class="flex items-center gap-3 w-full sm:w-auto">
+            <a href="{{ route('admin.barcode.cetak') }}" target="_blank" class="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-white border-2 border-[#59A338] text-[#59A338] hover:bg-gray-50 rounded-xl text-sm font-semibold transition-colors shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                <span>Cetak Barcode</span>
+            </a>
             <button wire:click="bukaModal" class="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-[#59A338] hover:bg-[#4d8f2f] text-white rounded-xl text-sm font-semibold transition-colors shadow-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                 <span >Tambah Kamar</span>
@@ -143,7 +147,9 @@
                                 <option value="Reguler Twin Bed">Reguler Twin Bed</option>
                                 <option value="Reguler Single Bed">Reguler Single Bed</option>
                                 <option value="Executive Twin Bed">Executive Twin Bed</option>
+                                <option value="VIP Single Bed">VIP Single Bed</option>
                                 <option value="Executive Single Bed">Executive Single Bed</option>
+                                <option value="Guest House">Guest House</option>
                             </select>
                             @error('tipe_kamar') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                         </div>

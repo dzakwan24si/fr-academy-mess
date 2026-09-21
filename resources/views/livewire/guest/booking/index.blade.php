@@ -42,6 +42,8 @@
                             <option value="">Semua Tipe Kamar</option>
                             <option value="Reguler">Reguler</option>
                             <option value="Executive">Executive</option>
+                            <option value="VIP">VIP</option>
+                            <option value="Guest House">Guest House</option>
                         </select>
                     </div>
                     <div>
@@ -172,6 +174,12 @@
                 </div>
                 
                 <form wire:submit.prevent="konfirmasiBooking">
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Perkiraan Jam Tiba (Wajib) <span class="text-red-500">*</span></label>
+                        <input type="time" wire:model="perkiraan_jam_checkin" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow" required>
+                        @error('perkiraan_jam_checkin') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+
                     <div class="mb-6">
                         <label class="block text-sm font-bold text-gray-700 mb-2">Keperluan Menginap (Wajib) <span class="text-red-500">*</span></label>
                         <textarea wire:model="keperluan" rows="3" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow resize-none" placeholder="Contoh: Mengikuti pelatihan dasar angkatan 5..." required></textarea>

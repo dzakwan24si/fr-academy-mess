@@ -36,6 +36,20 @@
                     <input wire:model="jabatan" type="text" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#59A338] focus:border-transparent transition-shadow" placeholder="Masukkan jabatan Anda" required>
                     @error('jabatan') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                 </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Kategori <span class="text-red-500">*</span></label>
+                    <div class="flex gap-4">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" wire:model="kategori" value="tamu_umum" class="text-[#59A338] focus:ring-[#59A338]">
+                            <span class="text-sm font-medium text-gray-700">Tamu Umum</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" wire:model="kategori" value="trainee" class="text-[#59A338] focus:ring-[#59A338]">
+                            <span class="text-sm font-medium text-gray-700">Trainee</span>
+                        </label>
+                    </div>
+                    @error('kategori') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                </div>
             </div>
 
             <div class="flex flex-col md:flex-row gap-4">

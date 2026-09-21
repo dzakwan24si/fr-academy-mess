@@ -13,6 +13,7 @@ class Login extends Component
     public $nama;
     public $perusahaan;
     public $jabatan;
+    public $kategori = 'tamu_umum';
     
     public $isRegistering = false;
 
@@ -54,6 +55,7 @@ class Login extends Component
             'nama' => 'required|string|max:255',
             'perusahaan' => 'required|string|max:255',
             'jabatan' => 'required|string|max:255',
+            'kategori' => 'required|in:tamu_umum,trainee',
         ]);
 
         $tamu = Tamu::create([
@@ -61,6 +63,7 @@ class Login extends Component
             'nama' => $this->nama,
             'perusahaan' => $this->perusahaan,
             'jabatan' => $this->jabatan,
+            'kategori' => $this->kategori,
         ]);
 
         Auth::guard('tamu')->login($tamu);

@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             RolesAndPermissionsSeeder::class,
             AsetExcelSeeder::class,
             MasterDataExcelSeeder::class,
+            GuestHouseSeeder::class,
         ]);
     }
 }

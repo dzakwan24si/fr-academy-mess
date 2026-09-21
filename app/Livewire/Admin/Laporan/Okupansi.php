@@ -29,6 +29,7 @@ class Okupansi extends Component
     {
         if ($property === 'bulan' || $property === 'tahun') {
             $this->resetPage();
+            $this->dispatch('charts-updated');
         }
     }
 
@@ -56,10 +57,59 @@ class Okupansi extends Component
         $totalTamu = $this->getQuery()->count();
         $totalSelesai = $this->getQuery()->where('status', 'completed')->count();
 
+        // Data Chart: Trainee vs Tamu Umum
+        $traineeCount = $this->getQuery()->whereHas('tamu', function($q) {
+            $q->where('kategori', 'trainee');
+        })->count();
+        
+        $umumCount = $totalTamu - $traineeCount;
+
+        // Data Chart: Kamar Paling Sering Digunakan
+        $topKamarQuery = Reservasi::whereNotNull('kamar_id')
+            ->whereIn('status', ['approved', 'checked_in', 'completed']);
+            
+        if ($this->bulan !== 'all') {
+            $topKamarQuery->whereMonth('tanggal_checkin', $this->bulan);
+        }
+        if ($this->tahun !== 'all') {
+            $topKamarQuery->whereYear('tanggal_checkin', $this->tahun);
+        }
+
+        $topKamar = $topKamarQuery
+            ->select('kamar_id', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
+            ->groupBy('kamar_id')
+            ->orderBy('total', 'desc')
+            ->with('kamar')
+            ->get();
+
+        // Data Chart: Kamar Paling Sering Komplain
+        $topKomplainQuery = \Illuminate\Support\Facades\DB::table('komplain_kerusakans')
+            ->join('reservasis', 'komplain_kerusakans.reservasi_id', '=', 'reservasis.id')
+            ->join('kamars', 'reservasis.kamar_id', '=', 'kamars.id')
+            ->whereNull('komplain_kerusakans.deleted_at')
+            ->whereNull('reservasis.deleted_at');
+
+        if ($this->bulan !== 'all') {
+            $topKomplainQuery->whereMonth('reservasis.tanggal_checkin', $this->bulan);
+        }
+        if ($this->tahun !== 'all') {
+            $topKomplainQuery->whereYear('reservasis.tanggal_checkin', $this->tahun);
+        }
+
+        $topKomplain = $topKomplainQuery
+            ->select('kamars.nomor_kamar', \Illuminate\Support\Facades\DB::raw('count(komplain_kerusakans.id) as total'))
+            ->groupBy('kamars.nomor_kamar')
+            ->orderBy('total', 'desc')
+            ->get();
+
         return view('livewire.admin.laporan.okupansi', [
             'reservasis' => $reservasis,
             'totalTamu' => $totalTamu,
             'totalSelesai' => $totalSelesai,
+            'traineeCount' => $traineeCount,
+            'umumCount' => $umumCount,
+            'topKamar' => $topKamar,
+            'topKomplain' => $topKomplain,
         ]);
     }
 

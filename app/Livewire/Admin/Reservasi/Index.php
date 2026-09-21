@@ -40,10 +40,18 @@ class Index extends Component
     public $form_no_hp = '';
     public $form_perusahaan = '';
     public $form_jabatan = '';
+    public $form_kategori = 'tamu_umum';
     public $form_tgl_checkin = '';
+    public $form_jam_checkin = '';
     public $form_tgl_checkout = '';
     public $form_kamar_id = '';
     public $form_keperluan = '';
+
+    // Off Sementara Modal
+    public $isModalOffOpen = false;
+    public $selectedOffReservasiId = null;
+    public $tanggalKembali = '';
+    public $tanggalCheckoutBaru = '';
 
     protected $queryString = ['search', 'filterStatus'];
 
@@ -116,8 +124,8 @@ class Index extends Component
     public function bukaModalBuat()
     {
         $this->reset([
-            'form_nama', 'form_no_hp', 'form_perusahaan', 'form_jabatan',
-            'form_tgl_checkin', 'form_tgl_checkout', 'form_kamar_id', 'form_keperluan'
+            'form_nama', 'form_no_hp', 'form_perusahaan', 'form_jabatan', 'form_kategori',
+            'form_tgl_checkin', 'form_jam_checkin', 'form_tgl_checkout', 'form_kamar_id', 'form_keperluan'
         ]);
         $this->form_tgl_checkin = \Carbon\Carbon::today()->format('Y-m-d');
         $this->isModalBuatOpen = true;
@@ -135,7 +143,9 @@ class Index extends Component
             'form_no_hp' => 'required|string|max:20',
             'form_perusahaan' => 'required|string|max:255',
             'form_jabatan' => 'required|string|max:255',
+            'form_kategori' => 'required|in:tamu_umum,trainee',
             'form_tgl_checkin' => 'required|date',
+            'form_jam_checkin' => 'required',
             'form_tgl_checkout' => 'required|date|after_or_equal:form_tgl_checkin',
             'form_keperluan' => 'required|string',
             'form_kamar_id' => 'nullable|exists:kamars,id'
@@ -147,7 +157,8 @@ class Index extends Component
             [
                 'nama' => $this->form_nama,
                 'perusahaan' => $this->form_perusahaan,
-                'jabatan' => $this->form_jabatan
+                'jabatan' => $this->form_jabatan,
+                'kategori' => $this->form_kategori
             ]
         );
 
@@ -156,6 +167,7 @@ class Index extends Component
             'tamu_id' => $tamu->id,
             'kamar_id' => $this->form_kamar_id ?: null,
             'tanggal_checkin' => $this->form_tgl_checkin,
+            'perkiraan_jam_checkin' => $this->form_jam_checkin ?: null,
             'tanggal_checkout' => $this->form_tgl_checkout,
             'keperluan_menginap' => $this->form_keperluan,
             'status' => 'approved'
@@ -194,6 +206,83 @@ class Index extends Component
                 }
             }
         });
+    }
+
+    public function bukaModalOff($id)
+    {
+        $this->selectedOffReservasiId = $id;
+        $reservasi = Reservasi::findOrFail($id);
+        $this->tanggalKembali = \Carbon\Carbon::today()->addDays(1)->format('Y-m-d');
+        
+        // Default tanggal checkout baru adalah tanggal checkout lama
+        // Kecuali jika tanggal checkout lama ternyata lebih awal dari tanggal kembali,
+        // maka atur defaultnya ke tanggal kembali + 1 hari.
+        if (\Carbon\Carbon::parse($reservasi->tanggal_checkout)->isBefore($this->tanggalKembali)) {
+            $this->tanggalCheckoutBaru = \Carbon\Carbon::parse($this->tanggalKembali)->addDays(1)->format('Y-m-d');
+        } else {
+            $this->tanggalCheckoutBaru = $reservasi->tanggal_checkout;
+        }
+
+        $this->isModalOffOpen = true;
+    }
+
+    public function updatedTanggalKembali($value)
+    {
+        if ($this->selectedOffReservasiId) {
+            $reservasi = Reservasi::find($this->selectedOffReservasiId);
+            if ($reservasi) {
+                if (\Carbon\Carbon::parse($reservasi->tanggal_checkout)->isBefore($value)) {
+                    $this->tanggalCheckoutBaru = \Carbon\Carbon::parse($value)->addDays(1)->format('Y-m-d');
+                } else {
+                    $this->tanggalCheckoutBaru = $reservasi->tanggal_checkout;
+                }
+            }
+        }
+    }
+
+    public function tutupModalOff()
+    {
+        $this->isModalOffOpen = false;
+        $this->selectedOffReservasiId = null;
+        $this->tanggalKembali = '';
+        $this->tanggalCheckoutBaru = '';
+    }
+
+    public function simpanOffSementara()
+    {
+        $this->validate([
+            'tanggalKembali' => 'required|date|after_or_equal:today',
+            'tanggalCheckoutBaru' => 'required|date|after_or_equal:tanggalKembali'
+        ]);
+
+        $reservasi = Reservasi::findOrFail($this->selectedOffReservasiId);
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($reservasi) {
+            // Selesaikan reservasi yang sekarang (Kamar jadi kotor)
+            $reservasi->update(['status' => 'completed', 'tanggal_checkout' => \Carbon\Carbon::today()->format('Y-m-d')]);
+
+            if ($reservasi->kamar) {
+                $reservasi->kamar->update(['status' => 'kosong_kotor']);
+                // Beri notifikasi ke petugas kebersihan
+                $admins = User::role(['Superadmin', 'Koordinator Mess', 'Staf Kebersihan'])->get();
+                if ($admins->count() > 0) {
+                    Notification::send($admins, new KebersihanKamarNotification($reservasi->kamar, 'kotor'));
+                }
+            }
+
+            // Buat reservasi baru untuk kembalinya trainee
+            Reservasi::create([
+                'tamu_id' => $reservasi->tamu_id,
+                'kamar_id' => $reservasi->kamar_id,
+                'tanggal_checkin' => $this->tanggalKembali,
+                'perkiraan_jam_checkin' => $reservasi->perkiraan_jam_checkin,
+                'tanggal_checkout' => $this->tanggalCheckoutBaru,
+                'keperluan_menginap' => $reservasi->keperluan_menginap,
+                'status' => 'approved'
+            ]);
+        });
+
+        $this->tutupModalOff();
     }
 
     public function render()

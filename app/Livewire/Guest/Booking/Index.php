@@ -19,6 +19,7 @@ class Index extends Component
 
     public $tipe_kamar = '';
     public $tanggal_checkin;
+    public $perkiraan_jam_checkin;
     public $tanggal_checkout;
 
     public $search = '';
@@ -41,6 +42,7 @@ class Index extends Component
         $this->selectedKamar = Kamar::find($kamarId);
         $this->isBookingModalOpen = true;
         $this->keperluan = '';
+        $this->perkiraan_jam_checkin = '';
     }
 
     public function tutupModalBooking()
@@ -48,12 +50,14 @@ class Index extends Component
         $this->isBookingModalOpen = false;
         $this->selectedKamar = null;
         $this->keperluan = '';
+        $this->perkiraan_jam_checkin = '';
     }
 
     public function konfirmasiBooking()
     {
         $this->validate([
             'tanggal_checkin' => 'required|date|after_or_equal:today',
+            'perkiraan_jam_checkin' => 'required',
             'tanggal_checkout' => 'required|date|after:tanggal_checkin',
             'keperluan' => 'required|string|min:5',
         ]);
@@ -64,6 +68,7 @@ class Index extends Component
             'tamu_id' => $tamu->id,
             'kamar_id' => $this->selectedKamar->id,
             'tanggal_checkin' => $this->tanggal_checkin,
+            'perkiraan_jam_checkin' => $this->perkiraan_jam_checkin ?: null,
             'tanggal_checkout' => $this->tanggal_checkout,
             'keperluan_menginap' => $this->keperluan,
             'status' => 'pending'

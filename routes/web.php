@@ -67,6 +67,10 @@ Route::middleware('auth')->group(function () {
     // Kamar
     Route::middleware('permission:akses_kamar')->group(function () {
         Route::get('/admin/kamar', \App\Livewire\Admin\Kamar\Index::class)->name('admin.kamar');
+        
+        // Barcode
+        Route::get('/barcode/cetak', [\App\Http\Controllers\Admin\BarcodeController::class, 'cetak'])->name('admin.barcode.cetak');
+        
         Route::get('/admin/kamar/{kamar}/aset', \App\Livewire\Admin\Kamar\Aset::class)->name('admin.kamar.aset');
     });
 
