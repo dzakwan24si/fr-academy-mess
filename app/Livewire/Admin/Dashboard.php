@@ -14,6 +14,34 @@ use Carbon\Carbon;
 #[Layout('layouts.admin')]
 class Dashboard extends Component
 {
+    public $chartRange = 7;
+    public $showDetailModal = false;
+    public $detailType = '';
+    public $detailTitle = '';
+    public $detailData = [];
+    public function updatedChartRange()
+    {
+        $data = $this->getChartData();
+        $this->dispatch('chart-updated', chartData: $data['data'], chartDates: $data['dates']);
+    }
+
+    private function getChartData()
+    {
+        $chartDates = [];
+        $chartData = [];
+        for ($i = $this->chartRange - 1; $i >= 0; $i--) {
+            $date = Carbon::today()->subDays($i);
+            $chartDates[] = $date->format('d M');
+            
+            $occupancy = Reservasi::whereDate('tanggal_checkin', '<=', $date)
+                ->whereDate('tanggal_checkout', '>=', $date)
+                ->whereIn('status', ['checked_in', 'completed'])
+                ->count();
+            $chartData[] = $occupancy;
+        }
+        return ['dates' => $chartDates, 'data' => $chartData];
+    }
+
     public function render()
     {
         $today = Carbon::today();
@@ -37,19 +65,10 @@ class Dashboard extends Component
         $porsiSiang = RencanaMenuHarian::whereDate('tanggal', $today)->where('waktu', 'Siang')->max('target_porsi') ?? 0;
         $porsiMalam = RencanaMenuHarian::whereDate('tanggal', $today)->where('waktu', 'Malam')->max('target_porsi') ?? 0;
 
-        // 5. Chart Data (7 Days Occupancy)
-        $chartDates = [];
-        $chartData = [];
-        for ($i = 6; $i >= 0; $i--) {
-            $date = Carbon::today()->subDays($i);
-            $chartDates[] = $date->format('d M');
-            
-            $occupancy = Reservasi::whereDate('tanggal_checkin', '<=', $date)
-                ->whereDate('tanggal_checkout', '>=', $date)
-                ->whereIn('status', ['checked_in', 'completed'])
-                ->count();
-            $chartData[] = $occupancy;
-        }
+        // 5. Chart Data
+        $chartInfo = $this->getChartData();
+        $chartDates = $chartInfo['dates'];
+        $chartData = $chartInfo['data'];
 
         // 6. Quick Info Tables (Recent 5 Reservations)
         $recentReservations = Reservasi::with(['tamu', 'kamar'])
@@ -85,5 +104,66 @@ class Dashboard extends Component
     public function delete($id)
     {
         // Placeholder untuk 'Delete'
+    }
+
+    public function showDetail($type)
+    {
+        $this->detailType = $type;
+        $this->showDetailModal = true;
+        $today = Carbon::today();
+
+        switch ($type) {
+            case 'okupansi':
+                $this->detailTitle = 'Detail Kamar Terisi';
+                // Ambil semua reservasi aktif beserta data kamar dan tamu
+                $this->detailData = Reservasi::with(['tamu', 'kamar'])
+                    ->whereIn('status', ['checked_in'])
+                    ->orderBy('tanggal_checkin', 'desc')
+                    ->get();
+                break;
+
+            case 'kedatangan':
+                $this->detailTitle = 'Jadwal Kedatangan Hari Ini';
+                $this->detailData = Reservasi::with(['tamu', 'kamar'])
+                    ->whereDate('tanggal_checkin', $today)
+                    ->get();
+                break;
+
+            case 'kepulangan':
+                $this->detailTitle = 'Jadwal Kepulangan Hari Ini';
+                $this->detailData = Reservasi::with(['tamu', 'kamar'])
+                    ->whereDate('tanggal_checkout', $today)
+                    ->get();
+                break;
+
+            case 'pending':
+                $this->detailTitle = 'Reservasi Menunggu Persetujuan';
+                $this->detailData = Reservasi::with(['tamu', 'kamar'])
+                    ->where('status', 'pending')
+                    ->get();
+                break;
+
+            case 'perlu_bersih':
+                $this->detailTitle = 'Daftar Kamar Perlu Dibersihkan';
+                $this->detailData = Kamar::whereIn('status', ['kosong_kotor', 'kotor_sebagian'])
+                    ->where('tipe_kamar', '!=', 'Fasilitas Umum')
+                    ->get();
+                break;
+
+            case 'komplain_baru':
+                $this->detailTitle = 'Laporan Komplain Baru';
+                $this->detailData = KomplainKerusakan::with(['reservasi.tamu', 'reservasi.kamar'])
+                    ->where('status_perbaikan', 'dilaporkan')
+                    ->latest()
+                    ->get();
+                break;
+        }
+    }
+
+    public function closeDetailModal()
+    {
+        $this->showDetailModal = false;
+        $this->detailType = '';
+        $this->detailData = [];
     }
 }
