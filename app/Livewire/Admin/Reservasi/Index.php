@@ -142,6 +142,34 @@ class Index extends Component
         $this->tutupModalTolak();
     }
 
+    public function updatedFormNoHp($value)
+    {
+        if (strlen($value) >= 10) {
+            $tamu = Tamu::where('no_hp', $value)->first();
+            if ($tamu) {
+                $this->form_nama = $tamu->nama;
+                $this->form_perusahaan = $tamu->perusahaan;
+                $this->form_jabatan = $tamu->jabatan;
+                $this->form_kategori = $tamu->kategori;
+            }
+        }
+    }
+
+    public function updatedFormNama($value)
+    {
+        if (strlen($value) >= 4) {
+            $tamu = Tamu::where('nama', $value)->first();
+            if ($tamu) {
+                if (empty($this->form_no_hp)) {
+                    $this->form_no_hp = $tamu->no_hp;
+                }
+                $this->form_perusahaan = $tamu->perusahaan;
+                $this->form_jabatan = $tamu->jabatan;
+                $this->form_kategori = $tamu->kategori;
+            }
+        }
+    }
+
     public function bukaModalBuat()
     {
         $this->reset([
