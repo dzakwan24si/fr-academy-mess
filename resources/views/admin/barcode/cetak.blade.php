@@ -139,6 +139,9 @@
                     <div class="small-img">
                         <img src="data:image/png;base64,{{ $kamarBase64 }}" alt="QR Kamar" style="width: 100%; height: 100%;">
                     </div>
+                    <div style="font-size: 11px; color: #444; margin-top: 8px; font-style: italic; font-weight: 500;">
+                        * Login menggunakan Nomor Handphone
+                    </div>
                 </div>
             </td>
 
