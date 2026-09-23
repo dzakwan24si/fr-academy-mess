@@ -134,7 +134,7 @@
             <td>
                 <div class="small-barcode-box">
                     <div class="small-title">{{ stripos($kamar->nomor_kamar, 'Kamar') !== false ? $kamar->nomor_kamar : 'Kamar ' . $kamar->nomor_kamar }}</div>
-                    <div style="font-size: 12px; color: #666; margin-bottom: 15px;">Scan untuk pengajuan laundry atau komplain kerusakan.</div>
+                    <div style="font-size: 12px; color: #666; margin-bottom: 15px;">Scan untuk akses sistem layanan kamar dan pelaporan masalah.</div>
                     
                     <div class="small-img">
                         <img src="data:image/png;base64,{{ $kamarBase64 }}" alt="QR Kamar" style="width: 100%; height: 100%;">
