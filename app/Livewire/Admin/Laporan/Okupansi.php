@@ -38,20 +38,28 @@ class Okupansi extends Component
         $query = Reservasi::with(['tamu', 'kamar'])
             ->whereIn('status', ['approved', 'checked_in', 'completed']);
 
-        if ($this->bulan !== 'all') {
+        if ($this->bulan !== 'all' && $this->tahun !== 'all') {
+            $startOfMonth = Carbon::create($this->tahun, $this->bulan, 1)->startOfMonth()->format('Y-m-d');
+            $endOfMonth = Carbon::create($this->tahun, $this->bulan, 1)->endOfMonth()->format('Y-m-d');
+            
+            $query->where('tanggal_checkin', '<=', $endOfMonth)
+                  ->where('tanggal_checkout', '>=', $startOfMonth);
+        } elseif ($this->tahun !== 'all') {
+            $startOfYear = Carbon::create($this->tahun, 1, 1)->startOfYear()->format('Y-m-d');
+            $endOfYear = Carbon::create($this->tahun, 1, 1)->endOfYear()->format('Y-m-d');
+            
+            $query->where('tanggal_checkin', '<=', $endOfYear)
+                  ->where('tanggal_checkout', '>=', $startOfYear);
+        } elseif ($this->bulan !== 'all') {
             $query->whereMonth('tanggal_checkin', $this->bulan);
         }
 
-        if ($this->tahun !== 'all') {
-            $query->whereYear('tanggal_checkin', $this->tahun);
-        }
-
-        return $query->orderBy('tanggal_checkin', 'desc');
+        return $query;
     }
 
     public function render()
     {
-        $reservasis = $this->getQuery()->paginate(15);
+        $reservasis = $this->getQuery()->orderBy('tanggal_checkin', 'desc')->paginate(15);
         
         // Data rekap untuk UI (opsional, tapi bagus untuk manajerial)
         $totalTamu = $this->getQuery()->count();
@@ -65,17 +73,9 @@ class Okupansi extends Component
         $umumCount = $totalTamu - $traineeCount;
 
         // Data Chart: Kamar Paling Sering Digunakan
-        $topKamarQuery = Reservasi::whereNotNull('kamar_id')
-            ->whereIn('status', ['approved', 'checked_in', 'completed']);
-            
-        if ($this->bulan !== 'all') {
-            $topKamarQuery->whereMonth('tanggal_checkin', $this->bulan);
-        }
-        if ($this->tahun !== 'all') {
-            $topKamarQuery->whereYear('tanggal_checkin', $this->tahun);
-        }
-
-        $topKamar = $topKamarQuery
+        // Clone the base query to preserve filters but change the select/group/order
+        $topKamar = $this->getQuery()
+            ->whereNotNull('kamar_id')
             ->select('kamar_id', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
             ->groupBy('kamar_id')
             ->orderBy('total', 'desc')
@@ -89,11 +89,20 @@ class Okupansi extends Component
             ->whereNull('komplain_kerusakans.deleted_at')
             ->whereNull('reservasis.deleted_at');
 
-        if ($this->bulan !== 'all') {
+        if ($this->bulan !== 'all' && $this->tahun !== 'all') {
+            $startOfMonth = Carbon::create($this->tahun, $this->bulan, 1)->startOfMonth()->format('Y-m-d');
+            $endOfMonth = Carbon::create($this->tahun, $this->bulan, 1)->endOfMonth()->format('Y-m-d');
+            
+            $topKomplainQuery->where('reservasis.tanggal_checkin', '<=', $endOfMonth)
+                             ->where('reservasis.tanggal_checkout', '>=', $startOfMonth);
+        } elseif ($this->tahun !== 'all') {
+            $startOfYear = Carbon::create($this->tahun, 1, 1)->startOfYear()->format('Y-m-d');
+            $endOfYear = Carbon::create($this->tahun, 1, 1)->endOfYear()->format('Y-m-d');
+            
+            $topKomplainQuery->where('reservasis.tanggal_checkin', '<=', $endOfYear)
+                             ->where('reservasis.tanggal_checkout', '>=', $startOfYear);
+        } elseif ($this->bulan !== 'all') {
             $topKomplainQuery->whereMonth('reservasis.tanggal_checkin', $this->bulan);
-        }
-        if ($this->tahun !== 'all') {
-            $topKomplainQuery->whereYear('reservasis.tanggal_checkin', $this->tahun);
         }
 
         $topKomplain = $topKomplainQuery
@@ -115,7 +124,7 @@ class Okupansi extends Component
 
     public function exportPdf()
     {
-        $data = $this->getQuery()->get();
+        $data = $this->getQuery()->orderBy('tanggal_checkin', 'desc')->get();
         $namaBulan = $this->bulan === 'all' ? 'Semua Bulan' : Carbon::create()->month((int) $this->bulan)->translatedFormat('F');
 
         $pdf = Pdf::loadView('pdf.laporan-okupansi', [

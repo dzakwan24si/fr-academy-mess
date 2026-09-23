@@ -55,6 +55,25 @@ class Index extends Component
     public $tanggalKembali = '';
     public $tanggalCheckoutBaru = '';
 
+    // Edit Modal
+    public $isModalEditOpen = false;
+    public $edit_reservasi_id = null;
+    public $edit_tamu_id = null;
+    public $edit_nama = '';
+    public $edit_no_hp = '';
+    public $edit_perusahaan = '';
+    public $edit_jabatan = '';
+    public $edit_kategori = '';
+    public $edit_tgl_checkin = '';
+    public $edit_jam_checkin = '';
+    public $edit_tgl_checkout = '';
+    public $edit_kamar_id = '';
+    public $edit_keperluan = '';
+
+    // Delete Modal
+    public $isModalHapusOpen = false;
+    public $delete_reservasi_id = null;
+
     protected $queryString = ['search', 'filterStatus', 'filterKategori', 'filterTanggal'];
 
     public function updatingSearch()
@@ -176,6 +195,148 @@ class Index extends Component
         ]);
 
         $this->tutupModalBuat();
+    }
+
+    public function bukaModalEdit($id)
+    {
+        $reservasi = Reservasi::with('tamu')->findOrFail($id);
+        
+        $this->edit_reservasi_id = $reservasi->id;
+        $this->edit_tamu_id = $reservasi->tamu_id;
+        
+        if ($reservasi->tamu) {
+            $this->edit_nama = $reservasi->tamu->nama;
+            $this->edit_no_hp = $reservasi->tamu->no_hp;
+            $this->edit_perusahaan = $reservasi->tamu->perusahaan;
+            $this->edit_jabatan = $reservasi->tamu->jabatan;
+            $this->edit_kategori = $reservasi->tamu->kategori;
+        }
+
+        $this->edit_tgl_checkin = $reservasi->tanggal_checkin;
+        $this->edit_jam_checkin = $reservasi->perkiraan_jam_checkin;
+        $this->edit_tgl_checkout = $reservasi->tanggal_checkout;
+        $this->edit_kamar_id = $reservasi->kamar_id;
+        $this->edit_keperluan = $reservasi->keperluan_menginap;
+
+        $this->isModalEditOpen = true;
+    }
+
+    public function tutupModalEdit()
+    {
+        $this->isModalEditOpen = false;
+        $this->reset([
+            'edit_reservasi_id', 'edit_tamu_id', 'edit_nama', 'edit_no_hp',
+            'edit_perusahaan', 'edit_jabatan', 'edit_kategori', 'edit_tgl_checkin',
+            'edit_jam_checkin', 'edit_tgl_checkout', 'edit_kamar_id', 'edit_keperluan'
+        ]);
+    }
+
+    public function simpanEdit()
+    {
+        $this->validate([
+            'edit_nama' => 'required|string|max:255',
+            'edit_no_hp' => 'required|string|max:20',
+            'edit_perusahaan' => 'required|string|max:255',
+            'edit_jabatan' => 'required|string|max:255',
+            'edit_kategori' => 'required|in:tamu_umum,trainee',
+            'edit_tgl_checkin' => 'required|date',
+            'edit_tgl_checkout' => 'required|date|after_or_equal:edit_tgl_checkin',
+            'edit_keperluan' => 'required|string',
+            'edit_kamar_id' => 'nullable|exists:kamars,id'
+        ]);
+
+        $reservasi = Reservasi::findOrFail($this->edit_reservasi_id);
+        
+        \Illuminate\Support\Facades\DB::transaction(function () use ($reservasi) {
+            // Check jika pindah kamar
+            $oldKamarId = $reservasi->kamar_id;
+            
+            // Update Data Reservasi
+            $reservasi->update([
+                'kamar_id' => $this->edit_kamar_id ?: null,
+                'tanggal_checkin' => $this->edit_tgl_checkin,
+                'perkiraan_jam_checkin' => $this->edit_jam_checkin ?: null,
+                'tanggal_checkout' => $this->edit_tgl_checkout,
+                'keperluan_menginap' => $this->edit_keperluan,
+            ]);
+
+            // Update Data Tamu
+            if ($reservasi->tamu) {
+                // Pastikan no hp tidak bentrok dengan tamu lain
+                $existingTamu = \App\Models\Tamu::where('no_hp', $this->edit_no_hp)
+                    ->where('id', '!=', $reservasi->tamu_id)
+                    ->first();
+                    
+                $reservasi->tamu->update([
+                    'nama' => $this->edit_nama,
+                    'no_hp' => $existingTamu ? $this->edit_no_hp . '-1' : $this->edit_no_hp,
+                    'perusahaan' => $this->edit_perusahaan,
+                    'jabatan' => $this->edit_jabatan,
+                    'kategori' => $this->edit_kategori
+                ]);
+            }
+
+            // Update status kamar lama jika ditinggalkan dan kosong
+            if ($oldKamarId && $oldKamarId != $this->edit_kamar_id) {
+                $oldKamar = \App\Models\Kamar::find($oldKamarId);
+                if ($oldKamar) {
+                    $activeGuests = Reservasi::where('kamar_id', $oldKamarId)
+                        ->whereIn('status', ['approved', 'checked_in'])
+                        ->count();
+                    if ($activeGuests == 0) {
+                        $oldKamar->update(['status' => 'kosong_kotor']); // atau kosong bersih tergantung logic, default kosong kotor
+                    }
+                }
+            }
+
+            // Update status kamar baru jika terisi
+            if ($this->edit_kamar_id) {
+                $newKamar = \App\Models\Kamar::find($this->edit_kamar_id);
+                if ($newKamar && $reservasi->status == 'checked_in' && $newKamar->status != 'terisi') {
+                    $newKamar->update(['status' => 'terisi']);
+                }
+            }
+        });
+
+        $this->tutupModalEdit();
+    }
+
+    public function konfirmasiHapus($id)
+    {
+        $this->delete_reservasi_id = $id;
+        $this->isModalHapusOpen = true;
+    }
+
+    public function tutupModalHapus()
+    {
+        $this->isModalHapusOpen = false;
+        $this->delete_reservasi_id = null;
+    }
+
+    public function hapusReservasi()
+    {
+        $reservasi = Reservasi::findOrFail($this->delete_reservasi_id);
+        
+        \Illuminate\Support\Facades\DB::transaction(function () use ($reservasi) {
+            $kamarId = $reservasi->kamar_id;
+            
+            $reservasi->forceDelete();
+            
+            // Cek apakah kamar menjadi kosong setelah dihapus
+            if ($kamarId) {
+                $kamar = \App\Models\Kamar::find($kamarId);
+                if ($kamar) {
+                    $activeGuests = Reservasi::where('kamar_id', $kamarId)
+                        ->whereIn('status', ['approved', 'checked_in'])
+                        ->count();
+                    if ($activeGuests == 0 && $kamar->status == 'terisi') {
+                        $kamar->update(['status' => 'kosong_bersih']); 
+                    }
+                }
+            }
+        });
+
+        $this->tutupModalHapus();
     }
 
     public function prosesCheckIn($id)
@@ -320,7 +481,8 @@ class Index extends Component
 
         if (!empty($this->search)) {
             $query->whereHas('tamu', function ($q) {
-                $q->where('nama', 'like', '%' . $this->search . '%');
+                $q->where('nama', 'like', '%' . $this->search . '%')
+                  ->orWhere('no_hp', 'like', '%' . $this->search . '%');
             });
         }
 
