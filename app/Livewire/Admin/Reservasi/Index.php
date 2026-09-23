@@ -477,7 +477,8 @@ class Index extends Component
     public function render()
     {
         $query = Reservasi::with(['tamu', 'kamar'])
-            ->orderBy('created_at', 'desc');
+            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc');
 
         if (!empty($this->search)) {
             $query->whereHas('tamu', function ($q) {
