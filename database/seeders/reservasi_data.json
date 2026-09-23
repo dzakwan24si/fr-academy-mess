@@ -1,0 +1,482 @@
+[
+  {
+    "nama": "Adi Pranata",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 01A",
+    "no_hp": "082172836910"
+  },
+  {
+    "nama": "Anung Rizky Wibowo",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 01A",
+    "no_hp": "0895423780605"
+  },
+  {
+    "nama": "Alfi Fernando",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 01B",
+    "no_hp": "081275748445"
+  },
+  {
+    "nama": "Arthur Silitonga",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 01B",
+    "no_hp": "083832113733"
+  },
+  {
+    "nama": "Angga Surya Darma",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 01C",
+    "no_hp": "085215850880"
+  },
+  {
+    "nama": "Galih Ardian Hari Sasangka",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 01C",
+    "no_hp": "085802042903"
+  },
+  {
+    "nama": "Azis Maulana",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 01D",
+    "no_hp": "082329498579"
+  },
+  {
+    "nama": "Bagus Kesuma",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 01D",
+    "no_hp": "0895399916754"
+  },
+  {
+    "nama": "Yoga Pratama Setyoyuniyanto",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 02A",
+    "no_hp": "085877155120"
+  },
+  {
+    "nama": "Yudi Ario Saputra",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 02A",
+    "no_hp": "082154813776"
+  },
+  {
+    "nama": "Zaki Almatin",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 02B",
+    "no_hp": "081275740679"
+  },
+  {
+    "nama": "Ridho Diaz Ramadhan",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 02B",
+    "no_hp": "0895378038822"
+  },
+  {
+    "nama": "Ardi Winata",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 02C",
+    "no_hp": "081267903561"
+  },
+  {
+    "nama": "Muhammad Syahputra",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 02C",
+    "no_hp": "081398083821"
+  },
+  {
+    "nama": "Rizky Anggara",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 02D",
+    "no_hp": "089663660474"
+  },
+  {
+    "nama": "Tohoan Pandiangan",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 02D",
+    "no_hp": "081361652854"
+  },
+  {
+    "nama": "Wahyu Chandra Arie Wardana",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 03A",
+    "no_hp": "089509594466"
+  },
+  {
+    "nama": "Sofyan Kusnadi",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 03A",
+    "no_hp": "082285089938"
+  },
+  {
+    "nama": "Rajiv Irhamnas Andrisa Riva'I",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 03B",
+    "no_hp": "081261416316"
+  },
+  {
+    "nama": "Rezi Widyan Ananta",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 03B",
+    "no_hp": "08116095991"
+  },
+  {
+    "nama": "Muda Pramudias",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 03C",
+    "no_hp": "082381852387"
+  },
+  {
+    "nama": "Muhammad Fadhil Rangkuti",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 03C",
+    "no_hp": "082161087115"
+  },
+  {
+    "nama": "Kevin Lastua Febrian Ambarita",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 03D",
+    "no_hp": "081266753198"
+  },
+  {
+    "nama": "M Ulil Azmi Sagala",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 03D",
+    "no_hp": "085190689948"
+  },
+  {
+    "nama": "Juan Sebastian Saritua Sinurat",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 04A",
+    "no_hp": "082161618918"
+  },
+  {
+    "nama": "Samuel Sefyantony",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 04A",
+    "no_hp": "081372092591"
+  },
+  {
+    "nama": "Diky Putra Pratama",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 04B",
+    "no_hp": "083142637444"
+  },
+  {
+    "nama": "Dio Subayu Jonathan",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 04B",
+    "no_hp": "082178884171"
+  },
+  {
+    "nama": "Dandy Bagaskara Hartono",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 04C",
+    "no_hp": "085175224624"
+  },
+  {
+    "nama": "Fadhil Muhammad Raihan Basro",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 04C",
+    "no_hp": "082164035151"
+  },
+  {
+    "nama": "Hanif Febrio",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 04D",
+    "no_hp": "089636865846"
+  },
+  {
+    "nama": "Ikhsan Rizani Aulia",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 04D",
+    "no_hp": "081346158757"
+  },
+  {
+    "nama": "Ari Purba",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 05A",
+    "no_hp": "081210619409"
+  },
+  {
+    "nama": "Ishadi Arafi",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 05A",
+    "no_hp": "082286599017"
+  },
+  {
+    "nama": "Wahyu Syahputra",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 05B",
+    "no_hp": "082286997299"
+  },
+  {
+    "nama": "Christiano Carly Gilbert Hutapea",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 05B",
+    "no_hp": "085270914371"
+  },
+  {
+    "nama": "Dandi Samuel Limbong",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 05C",
+    "no_hp": "082211779730"
+  },
+  {
+    "nama": "Ferdy Giranto Hasiolan Pardede",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 05C",
+    "no_hp": "089676239803"
+  },
+  {
+    "nama": "Riki Rahmadani",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 05D",
+    "no_hp": "082286561965"
+  },
+  {
+    "nama": "Ikhsanul Huda",
+    "jabatan": "FAT I 2027",
+    "kamar": "Kamar 05D",
+    "no_hp": "081363404598"
+  },
+  {
+    "nama": "Jaya Rizaldi Fajri",
+    "jabatan": "MAT I 2027",
+    "kamar": "Kamar 06A",
+    "no_hp": "08974306230"
+  },
+  {
+    "nama": "Ikhban Bayhaqi Lubis",
+    "jabatan": "MAT I 2027",
+    "kamar": "Kamar 06A",
+    "no_hp": "081262509449"
+  },
+  {
+    "nama": "Andhika Adiputra",
+    "jabatan": "MAT I 2027",
+    "kamar": "Kamar 06B",
+    "no_hp": "082172294628"
+  },
+  {
+    "nama": "Sadam Husein",
+    "jabatan": "MAT I 2027",
+    "kamar": "Kamar 06B",
+    "no_hp": "081392429713"
+  },
+  {
+    "nama": "Thoriq Sapta Kurniawan",
+    "jabatan": "MAT I 2027",
+    "kamar": "Kamar 06C",
+    "no_hp": "0895613054023"
+  },
+  {
+    "nama": "Sidiq Ardiansyah",
+    "jabatan": "MAT I 2027",
+    "kamar": "Kamar 06C",
+    "no_hp": "081373193632"
+  },
+  {
+    "nama": "Rahmat Ramadhan",
+    "jabatan": "MAT I 2027",
+    "kamar": "Kamar 06D",
+    "no_hp": "081372179428"
+  },
+  {
+    "nama": "Arka Nur Haikkal",
+    "jabatan": "MAT I 2027",
+    "kamar": "Kamar 06D",
+    "no_hp": "081220025088"
+  },
+  {
+    "nama": "Bryand Fredikson Tumanggor",
+    "jabatan": "MAT I 2027",
+    "kamar": "Kamar 09A",
+    "no_hp": "082272953115"
+  },
+  {
+    "nama": "Firmansyah Putra",
+    "jabatan": "MAT I 2027",
+    "kamar": "Kamar 09A",
+    "no_hp": "082182670432"
+  },
+  {
+    "nama": "Sandhy Rhana Rhandika",
+    "jabatan": "TAT I 2027",
+    "kamar": "Kamar 09B",
+    "no_hp": "081276986059"
+  },
+  {
+    "nama": "Piter Jones Nainggolan",
+    "jabatan": "TAT I 2027",
+    "kamar": "Kamar 09B",
+    "no_hp": "081275047467"
+  },
+  {
+    "nama": "Aldi Zulkarnain Hasibuan",
+    "jabatan": "TAT I 2027",
+    "kamar": "Kamar 09C",
+    "no_hp": "083809710079"
+  },
+  {
+    "nama": "Muhammad Fikli",
+    "jabatan": "TAT I 2027",
+    "kamar": "Kamar 09C",
+    "no_hp": "085834219075"
+  },
+  {
+    "nama": "Riung Pandia",
+    "jabatan": "TAT I 2027",
+    "kamar": "Kamar 09D",
+    "no_hp": "085664942300"
+  },
+  {
+    "nama": "Willy Fernando Pakpahan",
+    "jabatan": "DMT I 2027",
+    "kamar": "Kamar 09D",
+    "no_hp": "085124346562"
+  },
+  {
+    "nama": "Fairuz Hawary K",
+    "jabatan": "DMT I 2027",
+    "kamar": "Kamar 10A",
+    "no_hp": "087763093453"
+  },
+  {
+    "nama": "Sukses Ardiansyah",
+    "jabatan": "DMT I 2027",
+    "kamar": "Kamar 10A",
+    "no_hp": "082283319481"
+  },
+  {
+    "nama": "Josua Hasudungan Purba",
+    "jabatan": "DMT I 2027",
+    "kamar": "Kamar 10B",
+    "no_hp": "082267019680"
+  },
+  {
+    "nama": "Aditya Anandika",
+    "jabatan": "DMT I 2027",
+    "kamar": "Kamar 10B",
+    "no_hp": "082289737264"
+  },
+  {
+    "nama": "Daniel Rohki Saragih",
+    "jabatan": "DMT I 2027",
+    "kamar": "Kamar 10C",
+    "no_hp": "085157552467"
+  },
+  {
+    "nama": "Evan Filbert Hesekiel Sitinjak",
+    "jabatan": "DMT I 2027",
+    "kamar": "Kamar 10C",
+    "no_hp": "082282046318"
+  },
+  {
+    "nama": "Draivo Prasetya Saragih",
+    "jabatan": "DMT I 2027",
+    "kamar": "Kamar 10D",
+    "no_hp": "082180202913"
+  },
+  {
+    "nama": "Vrengky Roberto Silaban",
+    "jabatan": "DMT I 2027",
+    "kamar": "Kamar 10D",
+    "no_hp": "081378750693"
+  },
+  {
+    "nama": "Andhes Pranata",
+    "jabatan": "FAT II 2026",
+    "kamar": "Kamar 11A",
+    "no_hp": "085709546730"
+  },
+  {
+    "nama": "Juando Gregorius",
+    "jabatan": "FAT II 2026",
+    "kamar": "Kamar 11A",
+    "no_hp": "082381117062"
+  },
+  {
+    "nama": "Romi Ebenhaezer",
+    "jabatan": "FAT II 2026",
+    "kamar": "Kamar 11B",
+    "no_hp": "085363942617"
+  },
+  {
+    "nama": "Amin Agustiwan",
+    "jabatan": "FAT II 2026",
+    "kamar": "Kamar 11B",
+    "no_hp": "081361301558"
+  },
+  {
+    "nama": "Gremy Ivalaro",
+    "jabatan": "FAT II 2026",
+    "kamar": "Kamar 11C",
+    "no_hp": "082161761839"
+  },
+  {
+    "nama": "Rafli Syaiful",
+    "jabatan": "FAT II 2026",
+    "kamar": "Kamar 11C",
+    "no_hp": "08156167467"
+  },
+  {
+    "nama": "Fuad Abdul Jabbar",
+    "jabatan": "FAT II 2026",
+    "kamar": "Kamar 11D",
+    "no_hp": "082383737498"
+  },
+  {
+    "nama": "Abrar Fawwaza",
+    "jabatan": "FAT II 2026",
+    "kamar": "Kamar 11D",
+    "no_hp": "082165448207"
+  },
+  {
+    "nama": "Michel Febrianto",
+    "jabatan": "FAT II 2026",
+    "kamar": "Kamar 12A",
+    "no_hp": "080375482999"
+  },
+  {
+    "nama": "Calvin Yonathan",
+    "jabatan": "FAT II 2026",
+    "kamar": "Kamar 12A",
+    "no_hp": "082289337398"
+  },
+  {
+    "nama": "Febri Wijaya",
+    "jabatan": "MAT II 2026",
+    "kamar": "Kamar 12B",
+    "no_hp": "088287641815"
+  },
+  {
+    "nama": "Bayu Rizky",
+    "jabatan": "MAT II 2026",
+    "kamar": "Kamar 12B",
+    "no_hp": "085763982177"
+  },
+  {
+    "nama": "Luthfi Nurilmi",
+    "jabatan": "MAT II 2026",
+    "kamar": "Kamar 12C",
+    "no_hp": "085607076488"
+  },
+  {
+    "nama": "M Suganda Siregar",
+    "jabatan": "MAT II 2026",
+    "kamar": "Kamar 12C",
+    "no_hp": "082285086302"
+  },
+  {
+    "nama": "Aditya Maulana Herlambang",
+    "jabatan": "MAT II 2026",
+    "kamar": "Kamar 12D",
+    "no_hp": "081372247915"
+  },
+  {
+    "nama": "Hasyim Hasbi",
+    "jabatan": "MAT II 2026",
+    "kamar": "Kamar 12D",
+    "no_hp": "082214228933"
+  }
+]

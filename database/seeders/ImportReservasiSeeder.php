@@ -16,7 +16,7 @@ class ImportReservasiSeeder extends Seeder
      */
     public function run(): void
     {
-        $json = File::get(storage_path('app/reservasi_data.json'));
+        $json = File::get(database_path('seeders/reservasi_data.json'));
         $data = json_decode($json, true);
 
         if (!$data) {
