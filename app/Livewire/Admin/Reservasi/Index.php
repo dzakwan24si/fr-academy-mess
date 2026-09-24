@@ -158,11 +158,15 @@ class Index extends Component
     public function updatedFormNama($value)
     {
         if (strlen($value) >= 4) {
-            $tamu = Tamu::where('nama', $value)->first();
+            $tamu = Tamu::where('nama', 'like', '%' . $value . '%')->first();
             if ($tamu) {
                 if (empty($this->form_no_hp)) {
                     $this->form_no_hp = $tamu->no_hp;
                 }
+                // We intentionally don't overwrite the name here so it doesn't disrupt typing,
+                // or we could overwrite it if we want to force the full name. 
+                // Let's force the full name so they know who it matched.
+                $this->form_nama = $tamu->nama;
                 $this->form_perusahaan = $tamu->perusahaan;
                 $this->form_jabatan = $tamu->jabatan;
                 $this->form_kategori = $tamu->kategori;
