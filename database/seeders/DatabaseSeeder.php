@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             AsetExcelSeeder::class,
             MasterDataExcelSeeder::class,
             GuestHouseSeeder::class,
+            ImportReservasiSeeder::class,
         ]);
     }
 }
