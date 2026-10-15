@@ -2,12 +2,16 @@
 
 namespace App\Livewire\Admin\Dapur;
 
-use Livewire\Component;
-use Livewire\Attributes\Layout;
-use Livewire\Attributes\Title;
 use App\Models\BahanBaku;
 use App\Models\Menu;
+use App\Models\PemotonganStok;
 use App\Models\RencanaMenuHarian;
+use App\Models\RiwayatBelanjaDapur;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
+use Livewire\Component;
 use Livewire\WithPagination;
 
 #[Layout('layouts.admin')]
@@ -22,28 +26,67 @@ class Index extends Component
 
     // Filter & Search states
     public $searchStok = '';
+
     public $filterKategoriStok = '';
 
     public $searchMenu = '';
+
     public $filterKategoriMenu = '';
+
     public $filterWaktuMenu = '';
 
     public $searchRencana = '';
+
     public $filterStatusRencana = '';
+
     public $filterWaktuRencana = '';
+
     public $filterTanggalRencana = '';
 
-    public function updatingSearchStok() { $this->resetPage('stokPage'); }
-    public function updatingFilterKategoriStok() { $this->resetPage('stokPage'); }
+    public function updatingSearchStok()
+    {
+        $this->resetPage('stokPage');
+    }
 
-    public function updatingSearchMenu() { $this->resetPage('menuPage'); }
-    public function updatingFilterKategoriMenu() { $this->resetPage('menuPage'); }
-    public function updatingFilterWaktuMenu() { $this->resetPage('menuPage'); }
+    public function updatingFilterKategoriStok()
+    {
+        $this->resetPage('stokPage');
+    }
 
-    public function updatingSearchRencana() { $this->resetPage('rencanaPage'); }
-    public function updatingFilterStatusRencana() { $this->resetPage('rencanaPage'); }
-    public function updatingFilterWaktuRencana() { $this->resetPage('rencanaPage'); }
-    public function updatingFilterTanggalRencana() { $this->resetPage('rencanaPage'); }
+    public function updatingSearchMenu()
+    {
+        $this->resetPage('menuPage');
+    }
+
+    public function updatingFilterKategoriMenu()
+    {
+        $this->resetPage('menuPage');
+    }
+
+    public function updatingFilterWaktuMenu()
+    {
+        $this->resetPage('menuPage');
+    }
+
+    public function updatingSearchRencana()
+    {
+        $this->resetPage('rencanaPage');
+    }
+
+    public function updatingFilterStatusRencana()
+    {
+        $this->resetPage('rencanaPage');
+    }
+
+    public function updatingFilterWaktuRencana()
+    {
+        $this->resetPage('rencanaPage');
+    }
+
+    public function updatingFilterTanggalRencana()
+    {
+        $this->resetPage('rencanaPage');
+    }
 
     public function setTab($tab)
     {
@@ -53,58 +96,66 @@ class Index extends Component
     public function render()
     {
         $queryStok = BahanBaku::query();
-        if (!empty($this->searchStok)) {
-            $queryStok->where('nama_bahan', 'like', '%' . $this->searchStok . '%');
+        if (! empty($this->searchStok)) {
+            $queryStok->where('nama_bahan', 'like', '%'.$this->searchStok.'%');
         }
-        if (!empty($this->filterKategoriStok)) {
+        if (! empty($this->filterKategoriStok)) {
             $queryStok->where('kategori_bahan', $this->filterKategoriStok);
         }
         $bahanBakus = $queryStok->latest()->paginate($this->perPage, ['*'], 'stokPage');
 
         $queryMenu = Menu::withCount('bahanBakus');
-        if (!empty($this->searchMenu)) {
-            $queryMenu->where('nama_menu', 'like', '%' . $this->searchMenu . '%');
+        if (! empty($this->searchMenu)) {
+            $queryMenu->where('nama_menu', 'like', '%'.$this->searchMenu.'%');
         }
-        if (!empty($this->filterKategoriMenu)) {
+        if (! empty($this->filterKategoriMenu)) {
             $queryMenu->where('kategori', $this->filterKategoriMenu);
         }
-        if (!empty($this->filterWaktuMenu)) {
+        if (! empty($this->filterWaktuMenu)) {
             $queryMenu->where('waktu_penyajian', $this->filterWaktuMenu);
         }
         $menus = $queryMenu->latest()->paginate($this->perPage, ['*'], 'menuPage');
 
         $queryRencana = RencanaMenuHarian::with(['menu', 'feedbackMasakans']);
-        if (!empty($this->searchRencana)) {
+        if (! empty($this->searchRencana)) {
             $queryRencana->whereHas('menu', function ($q) {
-                $q->where('nama_menu', 'like', '%' . $this->searchRencana . '%');
+                $q->where('nama_menu', 'like', '%'.$this->searchRencana.'%');
             });
         }
-        if (!empty($this->filterStatusRencana)) {
+        if (! empty($this->filterStatusRencana)) {
             $queryRencana->where('status', $this->filterStatusRencana);
         }
-        if (!empty($this->filterWaktuRencana)) {
+        if (! empty($this->filterWaktuRencana)) {
             $queryRencana->where('waktu', $this->filterWaktuRencana);
         }
-        if (!empty($this->filterTanggalRencana)) {
+        if (! empty($this->filterTanggalRencana)) {
             $queryRencana->whereDate('tanggal', $this->filterTanggalRencana);
         }
         $rencanaHarians = $queryRencana->latest()->paginate($this->perPage, ['*'], 'rencanaPage');
 
         $allMenus = Menu::orderBy('nama_menu')->get();
+        $allBahanBakus = BahanBaku::orderBy('nama_bahan')->get();
 
-        return view('livewire.admin.dapur.index', compact('bahanBakus', 'menus', 'rencanaHarians', 'allMenus'));
+        return view('livewire.admin.dapur.index', compact('bahanBakus', 'menus', 'rencanaHarians', 'allMenus', 'allBahanBakus'));
     }
 
     public function formOpname() {}
 
     // --- State & Methods untuk Modal Bahan Baku ---
     public $isModalOpen = false;
+
     public $editBahanId = null;
+
     public $nama_bahan;
+
     public $stok_saat_ini;
+
     public $satuan;
+
     public $kategori_bahan = 'Kering';
+
     public $harga_satuan = 0;
+
     public $keterangan_volume;
 
     public function bukaModal()
@@ -125,7 +176,7 @@ class Index extends Component
         $this->kategori_bahan = $bahan->kategori_bahan;
         $this->harga_satuan = $bahan->harga_satuan;
         $this->keterangan_volume = $bahan->keterangan_volume;
-        
+
         $this->isModalOpen = true;
     }
 
@@ -142,7 +193,7 @@ class Index extends Component
             'satuan' => 'required|string|max:50',
             'kategori_bahan' => 'required|in:Kering,Basah',
             'harga_satuan' => 'required|numeric|min:0',
-            'keterangan_volume' => 'nullable|string|max:50'
+            'keterangan_volume' => 'nullable|string|max:50',
         ]);
 
         $data = [
@@ -171,15 +222,22 @@ class Index extends Component
         $bahan->delete();
         session()->flash('success', 'Bahan baku berhasil dihapus.');
     }
-    
+
     // --- State & Methods untuk Modal Menu ---
     public $isModalMenuOpen = false;
+
     public $editMenuId = null;
+
     public $nama_menu;
+
     public $deskripsi;
+
     public $kategori = 'Sarapan';
+
     public $waktu_penyajian = 'Universal';
+
     public $estimasi_harga_porsi = 0;
+
     public $is_active = true;
 
     public function bukaModalMenu()
@@ -245,27 +303,32 @@ class Index extends Component
     {
         $menu = Menu::findOrFail($id);
         $menu->delete();
-        
+
         session()->flash('success', 'Menu berhasil dihapus.');
     }
 
     // --- State & Methods untuk Modal Resep ---
     public $isModalResepOpen = false;
+
     public $activeMenuId = null;
+
     public $activeMenuName = '';
+
     public $selectedBahanId = '';
+
     public $jumlahPerPorsi = '';
+
     public $resepBahanList = [];
 
     public function bukaModalResep($menuId)
     {
         $this->reset(['selectedBahanId', 'jumlahPerPorsi', 'resepBahanList']);
-        
+
         $menu = Menu::with('bahanBakus')->findOrFail($menuId);
         $this->activeMenuId = $menu->id;
         $this->activeMenuName = $menu->nama_menu;
         $this->resepBahanList = $menu->bahanBakus; // Load existing
-        
+
         $this->isModalResepOpen = true;
     }
 
@@ -287,17 +350,19 @@ class Index extends Component
         // Validasi duplicate
         if ($menu->bahanBakus()->where('bahan_baku_id', $this->selectedBahanId)->exists()) {
             session()->flash('error_resep', 'Bahan baku ini sudah ada di dalam resep.');
+
             return;
         }
 
         // Attach ke pivot
         $menu->bahanBakus()->attach($this->selectedBahanId, [
-            'jumlah_dibutuhkan' => $this->jumlahPerPorsi
+            'jumlah_dibutuhkan' => $this->jumlahPerPorsi,
         ]);
 
         // Refresh state
         $this->resepBahanList = $menu->bahanBakus()->get();
         $this->reset(['selectedBahanId', 'jumlahPerPorsi']);
+        $this->dispatch('reset-select-bahan');
         session()->flash('success_resep', 'Bahan baku berhasil ditambahkan ke resep.');
     }
 
@@ -305,17 +370,21 @@ class Index extends Component
     {
         $menu = Menu::findOrFail($this->activeMenuId);
         $menu->bahanBakus()->detach($bahanId);
-        
+
         // Refresh state
         $this->resepBahanList = $menu->bahanBakus()->get();
     }
 
     // --- State & Methods untuk Modal Rencana Harian ---
     public $isModalRencanaOpen = false;
+
     public $rencana_tanggal;
+
     public $rencana_waktu = 'Pagi'; // Default
+
     public $rencana_menu_id;
-    public $rencana_target_porsi; 
+
+    public $rencana_target_porsi;
 
     public function bukaModalRencana()
     {
@@ -354,14 +423,16 @@ class Index extends Component
     public function hapusRencana($id)
     {
         $rencanaMenu = RencanaMenuHarian::find($id);
-        
-        if (!$rencanaMenu) {
+
+        if (! $rencanaMenu) {
             session()->flash('error', 'Data Rencana Menu tidak ditemukan.');
+
             return;
         }
 
         if ($rencanaMenu->status !== 'menunggu') {
             session()->flash('error', 'Hanya rencana yang belum dimulai yang dapat dihapus.');
+
             return;
         }
 
@@ -374,23 +445,25 @@ class Index extends Component
         // 1. Validasi Awal
         $rencanaMenu = RencanaMenuHarian::with('menu.bahanBakus')->find($id);
 
-        if (!$rencanaMenu) {
+        if (! $rencanaMenu) {
             session()->flash('error', 'Data Rencana Menu tidak ditemukan.');
+
             return;
         }
 
         // Cek status masak (kolom aktual: 'status')
         if ($rencanaMenu->status !== 'menunggu') {
             session()->flash('error', 'Status rencana harian ini tidak valid untuk mulai memasak (sudah sedang masak atau selesai).');
+
             return;
         }
 
         // 2. Gunakan DB::transaction
         try {
-            \Illuminate\Support\Facades\DB::transaction(function () use ($rencanaMenu) {
+            DB::transaction(function () use ($rencanaMenu) {
                 // 3. Logika Kalkulasi & Pemotongan
                 $menu = $rencanaMenu->menu;
-                
+
                 // Gunakan target_porsi dari DB jika ada, jika belum gunakan default fallback (contoh: 100)
                 // (Catatan: kolom target_porsi belum ada di schema rencana_menu_harians)
                 $targetPorsi = $rencanaMenu->target_porsi ?? 100;
@@ -411,10 +484,10 @@ class Index extends Component
                         $bahanBaku->decrement('stok', $jumlahDipotong);
 
                         // 4. Pencatatan Log
-                        \App\Models\PemotonganStok::create([
+                        PemotonganStok::create([
                             'rencana_menu_harian_id' => $rencanaMenu->id,
                             'bahan_baku_id' => $bahanBaku->id,
-                            'jumlah_dipotong' => $jumlahDipotong
+                            'jumlah_dipotong' => $jumlahDipotong,
                         ]);
                     }
                 }
@@ -436,8 +509,9 @@ class Index extends Component
     {
         $rencanaMenu = RencanaMenuHarian::find($id);
 
-        if (!$rencanaMenu || $rencanaMenu->status !== 'sedang_masak') {
+        if (! $rencanaMenu || $rencanaMenu->status !== 'sedang_masak') {
             session()->flash('error', 'Status rencana harian ini tidak valid untuk diselesaikan.');
+
             return;
         }
 
@@ -447,7 +521,9 @@ class Index extends Component
 
     // --- State & Methods untuk Modal Ulasan ---
     public $isModalUlasanOpen = false;
+
     public $ulasanList = [];
+
     public $ulasanMenuName = '';
 
     public function bukaModalUlasan($id)
@@ -467,9 +543,13 @@ class Index extends Component
 
     // --- State & Methods untuk Cetak Daftar Belanja ---
     public $isModalCetakOpen = false;
+
     public $cetak_start_date;
+
     public $cetak_end_date;
+
     public $cetak_nama_pelatihan;
+
     public $cetak_jumlah_peserta;
 
     public function bukaModalCetak()
@@ -502,27 +582,28 @@ class Index extends Component
             'end' => $this->cetak_end_date,
             'pelatihan' => $this->cetak_nama_pelatihan,
             'peserta' => $this->cetak_jumlah_peserta,
-            'tanggal_teks' => \Carbon\Carbon::parse($this->cetak_start_date)->translatedFormat('j F') . ' - ' . \Carbon\Carbon::parse($this->cetak_end_date)->translatedFormat('j F Y'),
+            'tanggal_teks' => Carbon::parse($this->cetak_start_date)->translatedFormat('j F').' - '.Carbon::parse($this->cetak_end_date)->translatedFormat('j F Y'),
         ]);
     }
 
     // --- State & Methods untuk Modal Kedatangan Belanja ---
     public $isModalBelanjaOpen = false;
-    public $belanjaItems = []; 
+
+    public $belanjaItems = [];
 
     public function bukaModalBelanja()
     {
         $this->belanjaItems = [];
-        
+
         $bahanKebutuhan = [];
         $rencanaMenunggu = RencanaMenuHarian::with('menu.bahanBakus')->where('status', 'menunggu')->get();
-        
+
         foreach ($rencanaMenunggu as $rencana) {
             $targetPorsi = $rencana->target_porsi ?? 100;
             if ($rencana->menu && $rencana->menu->bahanBakus) {
                 foreach ($rencana->menu->bahanBakus as $bahanBaku) {
                     $butuh = $bahanBaku->pivot->jumlah_dibutuhkan * $targetPorsi;
-                    if (!isset($bahanKebutuhan[$bahanBaku->id])) {
+                    if (! isset($bahanKebutuhan[$bahanBaku->id])) {
                         $bahanKebutuhan[$bahanBaku->id] = 0;
                     }
                     $bahanKebutuhan[$bahanBaku->id] += $butuh;
@@ -530,8 +611,8 @@ class Index extends Component
             }
         }
 
-        $allBahan = \App\Models\BahanBaku::whereIn('id', array_keys($bahanKebutuhan))->get();
-        
+        $allBahan = BahanBaku::whereIn('id', array_keys($bahanKebutuhan))->get();
+
         foreach ($allBahan as $bahan) {
             $kebutuhan = $bahanKebutuhan[$bahan->id];
             if ($bahan->stok < $kebutuhan) {
@@ -542,7 +623,7 @@ class Index extends Component
                     'satuan' => $bahan->satuan,
                     'kekurangan' => $kekurangan,
                     'kuantitas_dibeli' => $kekurangan,
-                    'total_harga_beli' => 0
+                    'total_harga_beli' => 0,
                 ];
             }
         }
@@ -562,25 +643,25 @@ class Index extends Component
             'belanjaItems.*.total_harga_beli' => 'required|numeric|min:0',
         ]);
 
-        \Illuminate\Support\Facades\DB::transaction(function () {
+        DB::transaction(function () {
             foreach ($this->belanjaItems as $item) {
                 if ($item['kuantitas_dibeli'] > 0) {
-                    $bahan = \App\Models\BahanBaku::find($item['bahan_baku_id']);
-                    
+                    $bahan = BahanBaku::find($item['bahan_baku_id']);
+
                     // Update stok
                     $bahan->stok += $item['kuantitas_dibeli'];
-                    
+
                     // Update harga satuan sesuai harga pasar terbaru
                     $hargaSatuanAktual = 0;
                     if ($item['total_harga_beli'] > 0) {
                         $hargaSatuanAktual = $item['total_harga_beli'] / $item['kuantitas_dibeli'];
                         $bahan->harga_satuan = $hargaSatuanAktual;
                     }
-                    
+
                     $bahan->save();
 
                     // Insert Log Belanja
-                    \App\Models\RiwayatBelanjaDapur::create([
+                    RiwayatBelanjaDapur::create([
                         'bahan_baku_id' => $bahan->id,
                         'kuantitas_dibeli' => $item['kuantitas_dibeli'],
                         'total_harga_beli' => $item['total_harga_beli'],
@@ -597,9 +678,13 @@ class Index extends Component
 
     // --- State & Methods untuk Cetak Jadwal Menu ---
     public $isModalJadwalOpen = false;
+
     public $jadwal_start_date;
+
     public $jadwal_end_date;
+
     public $jadwal_nama_pelatihan;
+
     public $jadwal_jumlah_peserta;
 
     public function bukaModalJadwal()

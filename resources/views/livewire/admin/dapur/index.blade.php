@@ -599,6 +599,7 @@
                             if(this.$refs.select) {
                                 let ts = new TomSelect(this.$refs.select, {
                                     create: false,
+                                    maxOptions: null,
                                     placeholder: 'Ketik nama menu untuk mencari...',
                                     onChange: (val) => {
                                         $wire.set('rencana_menu_id', val);
@@ -673,14 +674,38 @@
                 <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6">
                     <h4 class="text-sm font-bold text-gray-700 mb-3">Tambah Bahan Baku</h4>
                     <div class="flex flex-col sm:flex-row gap-3 items-end">
-                        <div class="flex-1">
+                        <div class="flex-1 relative z-20" x-data="{
+                            ts: null,
+                            initTomSelect() {
+                                if (this.$refs.selectBahan) {
+                                    if (this.$refs.selectBahan.tomselect) {
+                                        this.$refs.selectBahan.tomselect.destroy();
+                                    }
+                                    this.ts = new TomSelect(this.$refs.selectBahan, {
+                                        create: false,
+                                        maxOptions: null,
+                                        placeholder: 'Ketik nama bahan untuk mencari...',
+                                        onChange: (val) => {
+                                            $wire.set('selectedBahanId', val);
+                                        }
+                                    });
+                                    $wire.on('reset-select-bahan', () => {
+                                        if (this.ts) {
+                                            this.ts.clear();
+                                        }
+                                    });
+                                }
+                            }
+                        }" x-init="initTomSelect()">
                             <label class="block text-xs font-semibold text-gray-600 mb-1.5">Pilih Bahan Baku <span class="text-red-500">*</span></label>
-                            <select wire:model="selectedBahanId" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#59A338] focus:ring-1 focus:ring-[#59A338] transition-colors bg-white">
-                                <option value="">-- Pilih Bahan --</option>
-                                @foreach($bahanBakus as $b)
-                                    <option value="{{ $b->id }}">{{ $b->nama_bahan }} ({{ $b->satuan }})</option>
-                                @endforeach
-                            </select>
+                            <div wire:ignore>
+                                <select x-ref="selectBahan" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#59A338] focus:ring-1 focus:ring-[#59A338] transition-colors bg-white">
+                                    <option value="">-- Pilih Bahan --</option>
+                                    @foreach($allBahanBakus as $b)
+                                        <option value="{{ $b->id }}">{{ $b->nama_bahan }} ({{ $b->satuan }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
                             @error('selectedBahanId') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                         </div>
                         <div class="w-full sm:w-32">
