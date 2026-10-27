@@ -107,7 +107,11 @@
         <div class="barcode-desc">Scan barcode ini untuk memberikan penilaian dan masukan terkait kualitas hidangan.</div>
         
         <div class="barcode-img">
-            <img src="data:image/png;base64,{{ $makanBase64 }}" alt="QR Ruang Makan" style="width: 100%; height: 100%;">
+            @if($makanBase64)
+                <img src="data:image/svg+xml;base64,{{ $makanBase64 }}" alt="QR Ruang Makan" style="width: 100%; height: 100%;">
+            @else
+                <div style="font-size: 14px; color: #888; padding-top: 130px;">QR Code Tidak Tersedia</div>
+            @endif
         </div>
         
         <div class="barcode-footer">
@@ -137,7 +141,11 @@
                     <div style="font-size: 12px; color: #666; margin-bottom: 15px;">Scan untuk akses sistem layanan kamar dan pelaporan masalah.</div>
                     
                     <div class="small-img">
-                        <img src="data:image/png;base64,{{ $kamarBase64 }}" alt="QR Kamar" style="width: 100%; height: 100%;">
+                        @if($kamarBase64)
+                            <img src="data:image/svg+xml;base64,{{ $kamarBase64 }}" alt="QR Kamar" style="width: 100%; height: 100%;">
+                        @else
+                            <div style="font-size: 12px; color: #888; padding-top: 60px;">QR Tidak Tersedia</div>
+                        @endif
                     </div>
                     <div style="font-size: 11px; color: #444; margin-top: 8px; font-style: italic; font-weight: 500;">
                         * Login menggunakan Nomor Handphone

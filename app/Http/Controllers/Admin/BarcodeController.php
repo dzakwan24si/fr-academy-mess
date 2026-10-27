@@ -26,11 +26,11 @@ class BarcodeController extends Controller
             ],
         ]);
 
-        $makanApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data='.urlencode($ruangMakanUrl).'&margin=0';
+        $makanApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data='.urlencode($ruangMakanUrl).'&format=svg&margin=0';
         $makanRaw = @file_get_contents($makanApiUrl, false, $qrContext);
         $makanBase64 = $makanRaw ? base64_encode($makanRaw) : '';
 
-        $kamarApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data='.urlencode(route('guest.dashboard')).'&margin=0';
+        $kamarApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data='.urlencode(route('guest.dashboard')).'&format=svg&margin=0';
         $kamarRaw = @file_get_contents($kamarApiUrl, false, $qrContext);
         $kamarBase64 = $kamarRaw ? base64_encode($kamarRaw) : '';
 
