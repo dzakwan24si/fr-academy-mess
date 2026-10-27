@@ -27,7 +27,7 @@ new class extends Component
         }
 
         $response = $http->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
-            'secret' => '0x4AAAAAAEzPGKSsKiRsoVbsX1tzF-N7x8k', // Ganti dengan Secret Key
+            'secret' => config('services.turnstile.secret', '0x4AAAAAAEzPGKSsKiRsoVbsX1tzF-N7x8k'),
             'response' => $this->turnstileToken,
             'remoteip' => request()->ip(),
         ]);
@@ -127,7 +127,7 @@ new class extends Component
                     } else {
                         // Render widget baru
                         widgetId = turnstile.render('#cf-turnstile-container', {
-                            sitekey: '0x4AAAAAAEzPGJLBNyo86KAl', // Ganti dengan Site Key
+                            sitekey: '{{ config('services.turnstile.key', '0x4AAAAAAEzPGJLBNyo86KAl') }}', // Site Key dari .env / config
                             theme: 'light', // Ubah tema kotak menjadi warna putih/terang
                             callback: function(token) {
                                 // Set token ke variabel Livewire saat berhasil diceklis

@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,11 +21,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        \Illuminate\Support\Facades\Gate::before(function ($user, $ability) {
+        Gate::before(function ($user, $ability) {
             return $user->hasRole('Superadmin') ? true : null;
         });
 
         // Tingkatkan batas ukuran upload foto kamera untuk komponen Livewire (Max 20MB)
         config(['livewire.temporary_file_upload.rules' => ['required', 'file', 'max:20480']]);
+
+        if (app()->environment('production') && str_starts_with((string) config('app.url'), 'https://')) {
+            URL::forceScheme('https');
+        }
     }
 }
