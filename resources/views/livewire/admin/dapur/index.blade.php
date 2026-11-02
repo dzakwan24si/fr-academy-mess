@@ -794,16 +794,24 @@
                     </div>
                 </div>
                 
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Nomor Surat <span class="text-red-500">*</span></label>
+                        <input wire:model="cetak_nomor_surat" type="text" placeholder="Contoh: 11" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+                        <p class="text-[11px] text-gray-400 mt-1">Format: [No]/L&D/Romawi/{{ date('Y') }}</p>
+                        @error('cetak_nomor_surat') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Jumlah Peserta <span class="text-red-500">*</span></label>
+                        <input wire:model="cetak_jumlah_peserta" type="number" min="1" placeholder="Contoh: 55" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+                        @error('cetak_jumlah_peserta') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Nama Pelatihan <span class="text-red-500">*</span></label>
                     <input wire:model="cetak_nama_pelatihan" type="text" placeholder="Contoh: FAT I, MAT I, TAT I 2027" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
                     @error('cetak_nama_pelatihan') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Jumlah Peserta <span class="text-red-500">*</span></label>
-                    <input wire:model="cetak_jumlah_peserta" type="number" min="1" placeholder="Contoh: 55" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
-                    @error('cetak_jumlah_peserta') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                 </div>
             </div>
 

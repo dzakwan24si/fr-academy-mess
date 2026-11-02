@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\RencanaMenuHarian;
-use App\Models\BahanBaku;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class DapurExportController extends Controller
 {
@@ -17,8 +15,26 @@ class DapurExportController extends Controller
         $namaPelatihan = $request->query('pelatihan', 'FAT I,MAT I,TAT I 2027');
         $jumlahPeserta = $request->query('peserta', '55 Orang');
         $tanggalPelatihan = $request->query('tanggal_teks', '24 Agustus - 1 September 2026');
+        $noInput = $request->query('no_surat');
 
-        if (!$startDate || !$endDate) {
+        $bulanRomawi = [
+            1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV', 5 => 'V', 6 => 'VI',
+            7 => 'VII', 8 => 'VIII', 9 => 'IX', 10 => 'X', 11 => 'XI', 12 => 'XII',
+        ];
+        $currentMonthRoman = $bulanRomawi[(int) date('n')];
+        $currentYear = date('Y');
+
+        if (! empty($noInput)) {
+            if (is_numeric($noInput) || ! str_contains($noInput, '/')) {
+                $noSurat = "{$noInput}/L&D/{$currentMonthRoman}/{$currentYear}";
+            } else {
+                $noSurat = $noInput;
+            }
+        } else {
+            $noSurat = "11/L&D/{$currentMonthRoman}/{$currentYear}";
+        }
+
+        if (! $startDate || ! $endDate) {
             abort(400, 'Parameter rentang tanggal tidak valid.');
         }
 
@@ -35,8 +51,8 @@ class DapurExportController extends Controller
             if ($rencana->menu && $rencana->menu->bahanBakus) {
                 foreach ($rencana->menu->bahanBakus as $bahan) {
                     $qtyDibutuhkan = $bahan->pivot->jumlah_dibutuhkan * $porsi;
-                    
-                    if (!isset($kebutuhanBahan[$bahan->id])) {
+
+                    if (! isset($kebutuhanBahan[$bahan->id])) {
                         $kebutuhanBahan[$bahan->id] = [
                             'id' => $bahan->id,
                             'nama_bahan' => $bahan->nama_bahan,
@@ -50,7 +66,7 @@ class DapurExportController extends Controller
                             'total_harga' => 0,
                         ];
                     }
-                    
+
                     $kebutuhanBahan[$bahan->id]['total_qty'] += $qtyDibutuhkan;
                 }
             }
@@ -59,7 +75,7 @@ class DapurExportController extends Controller
         // Kalkulasi Total Harga dan Qty Beli (setelah dikurangi stok Gudang)
         foreach ($kebutuhanBahan as $key => $item) {
             $kekurangan = $item['total_qty'] - $item['stok'];
-            
+
             if ($kekurangan > 0) {
                 $kebutuhanBahan[$key]['qty_beli'] = $kekurangan;
                 $kebutuhanBahan[$key]['total_harga'] = $kekurangan * $item['harga_satuan'];
@@ -74,13 +90,15 @@ class DapurExportController extends Controller
         $bahanBasah = collect($kebutuhanBahan)->where('kategori', 'Basah')->values();
 
         return view('exports.print-belanja', compact(
-            'bahanKering', 
-            'bahanBasah', 
-            'namaPelatihan', 
-            'jumlahPeserta', 
-            'tanggalPelatihan'
+            'bahanKering',
+            'bahanBasah',
+            'namaPelatihan',
+            'jumlahPeserta',
+            'tanggalPelatihan',
+            'noSurat'
         ));
     }
+
     public function printJadwal(Request $request)
     {
         $startDate = $request->query('start');
@@ -88,7 +106,7 @@ class DapurExportController extends Controller
         $namaPelatihan = $request->query('pelatihan', '');
         $jumlahPeserta = $request->query('peserta', '');
 
-        if (!$startDate || !$endDate) {
+        if (! $startDate || ! $endDate) {
             abort(400, 'Parameter rentang tanggal tidak valid.');
         }
 
@@ -113,13 +131,13 @@ class DapurExportController extends Controller
                 'menus' => [
                     'pagi' => [],
                     'siang' => [],
-                    'malam' => []
+                    'malam' => [],
                 ],
                 'porsi' => [
                     'pagi' => 0,
                     'siang' => 0,
-                    'malam' => 0
-                ]
+                    'malam' => 0,
+                ],
             ];
             $currentDate->addDay();
         }
@@ -133,7 +151,7 @@ class DapurExportController extends Controller
                     if (empty($jadwal[$date]['jus_trainer'])) {
                         $jadwal[$date]['jus_trainer'] = $menuName;
                     } else {
-                        $jadwal[$date]['jus_trainer'] .= ', ' . $menuName;
+                        $jadwal[$date]['jus_trainer'] .= ', '.$menuName;
                     }
                 } elseif (in_array($waktu, ['pagi', 'siang', 'malam'])) {
                     $jadwal[$date]['menus'][$waktu][] = $rencana->menu ? $rencana->menu->nama_menu : 'Menu Terhapus';
@@ -147,7 +165,7 @@ class DapurExportController extends Controller
         // Format tanggal header
         $startFormat = Carbon::parse($startDate)->locale('id')->isoFormat('D MMMM YYYY');
         $endFormat = Carbon::parse($endDate)->locale('id')->isoFormat('D MMMM YYYY');
-        $periode = $startFormat . ' - ' . $endFormat;
+        $periode = $startFormat.' - '.$endFormat;
 
         return view('exports.print-jadwal-menu', compact(
             'jadwal',

@@ -70,7 +70,9 @@
             font-weight: bold;
         }
         .total-row td {
-            border: none;
+            background-color: #f9f9f9;
+            font-weight: bold;
+            -webkit-print-color-adjust: exact;
         }
         
         /* Signature Section */
@@ -130,7 +132,7 @@
         <div class="header-title">
             <h2>DAFTAR BELANJA {{ strtoupper($kategori) }}</h2>
             <h2>LEARNING & DEVELOPMENT</h2>
-            <h3>NO : {{ date('m') }}/L&D/VIII/{{ date('Y') }}</h3>
+            <h3>NO : {{ $noSurat ?? ('11/L&D/' . (['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'][(int)date('n')-1]) . '/' . date('Y')) }}</h3>
         </div>
 
         <div class="info-section">
@@ -204,11 +206,19 @@
                     </tr>
                 @endforeach
             </tbody>
+            <tfoot>
+                <tr class="total-row">
+                    <td colspan="6" style="text-align: right; font-weight: bold; padding-right: 12px; font-size: 10pt;">TOTAL</td>
+                    <td style="font-weight: bold;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Rp</span>
+                            <span>{{ number_format($grandTotal, 0, ',', '.') }}</span>
+                        </div>
+                    </td>
+                    <td></td>
+                </tr>
+            </tfoot>
         </table>
-
-        <div style="text-align: right; font-weight: bold; font-size: 11pt; padding-right: 25%;">
-            Rp &nbsp;&nbsp;&nbsp;&nbsp; {{ number_format($grandTotal, 0, ',', '.') }}
-        </div>
 
         <div class="signature-section">
             <table class="signature-table">

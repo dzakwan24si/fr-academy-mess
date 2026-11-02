@@ -552,11 +552,14 @@ class Index extends Component
 
     public $cetak_jumlah_peserta;
 
+    public $cetak_nomor_surat;
+
     public function bukaModalCetak()
     {
-        $this->reset(['cetak_start_date', 'cetak_end_date', 'cetak_nama_pelatihan', 'cetak_jumlah_peserta']);
+        $this->reset(['cetak_start_date', 'cetak_end_date', 'cetak_nama_pelatihan', 'cetak_jumlah_peserta', 'cetak_nomor_surat']);
         $this->cetak_start_date = date('Y-m-d');
         $this->cetak_end_date = date('Y-m-d', strtotime('+7 days'));
+        $this->cetak_nomor_surat = '11';
         $this->isModalCetakOpen = true;
     }
 
@@ -572,6 +575,7 @@ class Index extends Component
             'cetak_end_date' => 'required|date|after_or_equal:cetak_start_date',
             'cetak_nama_pelatihan' => 'required|string|max:255',
             'cetak_jumlah_peserta' => 'required|integer|min:1',
+            'cetak_nomor_surat' => 'required|string|max:50',
         ]);
 
         $this->tutupModalCetak();
@@ -582,6 +586,7 @@ class Index extends Component
             'end' => $this->cetak_end_date,
             'pelatihan' => $this->cetak_nama_pelatihan,
             'peserta' => $this->cetak_jumlah_peserta,
+            'no_surat' => $this->cetak_nomor_surat,
             'tanggal_teks' => Carbon::parse($this->cetak_start_date)->translatedFormat('j F').' - '.Carbon::parse($this->cetak_end_date)->translatedFormat('j F Y'),
         ]);
     }
