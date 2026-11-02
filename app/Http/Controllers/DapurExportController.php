@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\RencanaMenuHarian;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class DapurExportController extends Controller
 {
@@ -31,7 +32,8 @@ class DapurExportController extends Controller
                 $noSurat = $noInput;
             }
         } else {
-            $noSurat = "11/L&D/{$currentMonthRoman}/{$currentYear}";
+            $fallbackNo = Cache::get('dapur_last_nomor_surat', 11);
+            $noSurat = "{$fallbackNo}/L&D/{$currentMonthRoman}/{$currentYear}";
         }
 
         if (! $startDate || ! $endDate) {
