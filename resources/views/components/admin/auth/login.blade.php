@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Http;
 
 new class extends Component
 {
-    public $email;
+    public $loginId;
     public $password;
     public $remember = false;
     public $turnstileToken; 
@@ -14,10 +14,11 @@ new class extends Component
     public function login()
     {
         $this->validate([
-            'email' => 'required|email',
+            'loginId' => 'required|string',
             'password' => 'required',
             'turnstileToken' => 'required', 
         ], [
+            'loginId.required' => 'Email atau NIK wajib diisi.',
             'turnstileToken.required' => 'Harap selesaikan verifikasi keamanan (Cloudflare).'
         ]);
 
@@ -40,12 +41,14 @@ new class extends Component
             return;
         }
 
-        if (Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
+        $fieldType = filter_var($this->loginId, FILTER_VALIDATE_EMAIL) ? 'email' : 'nik';
+
+        if (Auth::attempt([$fieldType => $this->loginId, 'password' => $this->password], $this->remember)) {
             session()->regenerate();
             return redirect()->intended('/admin/dashboard');
         }
 
-        $this->addError('email', 'Kredensial yang diberikan tidak cocok dengan data kami.');
+        $this->addError('loginId', 'Kredensial yang diberikan tidak cocok dengan data kami.');
         // Reset widget jika login gagal
         $this->dispatch('reset-turnstile');
     }
@@ -76,11 +79,11 @@ new class extends Component
 
                     <form wire:submit="login" class="space-y-6">
                         <div>
-                            <label for="email" class="block text-sm font-bold text-[#114045] mb-2">Email</label>
+                            <label for="loginId" class="block text-sm font-bold text-[#114045] mb-2">Email atau NIK</label>
                             <div class="relative">
-                                <input wire:model="email" id="email" name="email" type="email" autocomplete="email" placeholder="Masukkan Email Anda" required class="appearance-none block w-full px-4 py-3 border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#008000] focus:border-transparent transition-shadow sm:text-sm">
+                                <input wire:model="loginId" id="loginId" name="loginId" type="text" autocomplete="username" placeholder="Masukkan Email atau NIK Anda" required class="appearance-none block w-full px-4 py-3 border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#008000] focus:border-transparent transition-shadow sm:text-sm">
                             </div>
-                            @error('email') <p class="mt-2 text-sm text-red-600 font-medium">{{ $message }}</p> @enderror
+                            @error('loginId') <p class="mt-2 text-sm text-red-600 font-medium">{{ $message }}</p> @enderror
                         </div>
 
                         <div>

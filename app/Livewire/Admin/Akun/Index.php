@@ -3,13 +3,14 @@
 namespace App\Livewire\Admin\Akun;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use Livewire\Component;
 use Livewire\WithPagination;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Auth;
 
 #[Layout('layouts.admin')]
 #[Title('MANAJEMEN AKUN')]
@@ -23,14 +24,22 @@ class Index extends Component
 
     // Modal state
     public $isModalOpen = false;
+
     public $isEdit = false;
+
     public $user_id = null;
 
     // Form fields
     public $name;
+
     public $email;
+
+    public $nik;
+
     public $password;
+
     public $role = '';
+
     public $selectedPermissions = [];
 
     public function updatingSearch()
@@ -46,6 +55,7 @@ class Index extends Component
             $this->user_id = $user->id;
             $this->name = $user->name;
             $this->email = $user->email;
+            $this->nik = $user->nik ?? '';
             $this->role = $user->roles->first()->name ?? '';
             $this->password = '';
             $this->selectedPermissions = $user->permissions->pluck('name')->toArray();
@@ -53,7 +63,7 @@ class Index extends Component
         } else {
             $this->isEdit = false;
             $this->user_id = null;
-            $this->reset(['name', 'email', 'password', 'role', 'selectedPermissions']);
+            $this->reset(['name', 'email', 'nik', 'password', 'role', 'selectedPermissions']);
         }
         $this->isModalOpen = true;
     }
@@ -67,11 +77,12 @@ class Index extends Component
     {
         $rules = [
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $this->user_id,
+            'email' => 'required|email|max:255|unique:users,email,'.$this->user_id,
+            'nik' => 'nullable|string|max:50|unique:users,nik,'.$this->user_id,
             'role' => 'required|string|exists:roles,name',
         ];
 
-        if (!$this->isEdit) {
+        if (! $this->isEdit) {
             $rules['password'] = 'required|min:8';
         } else {
             $rules['password'] = 'nullable|min:8';
@@ -82,6 +93,7 @@ class Index extends Component
         $data = [
             'name' => $this->name,
             'email' => $this->email,
+            'nik' => ! empty($this->nik) ? trim($this->nik) : null,
         ];
 
         if ($this->password) {
@@ -108,9 +120,10 @@ class Index extends Component
     {
         if (Auth::id() == $id) {
             session()->flash('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
+
             return;
         }
-        
+
         $user = User::findOrFail($id);
         $user->delete();
     }
@@ -119,11 +132,12 @@ class Index extends Component
     {
         if (Auth::id() == $id) {
             session()->flash('error', 'Anda tidak dapat menonaktifkan akun Anda sendiri.');
+
             return;
         }
 
         $user = User::findOrFail($id);
-        $user->is_active = !$user->is_active;
+        $user->is_active = ! $user->is_active;
         $user->save();
     }
 
@@ -132,7 +146,7 @@ class Index extends Component
         $user = User::findOrFail($id);
         $user->password = Hash::make('fracademy123');
         $user->save();
-        
+
         session()->flash('success', "Password untuk {$user->name} berhasil di-reset menjadi 'fracademy123'.");
     }
 
@@ -140,15 +154,16 @@ class Index extends Component
     {
         $query = User::with('roles')->orderBy('name', 'asc');
 
-        if (!empty($this->search)) {
-            $query->where('name', 'like', '%' . $this->search . '%')
-                  ->orWhere('email', 'like', '%' . $this->search . '%');
+        if (! empty($this->search)) {
+            $query->where('name', 'like', '%'.$this->search.'%')
+                ->orWhere('email', 'like', '%'.$this->search.'%')
+                ->orWhere('nik', 'like', '%'.$this->search.'%');
         }
 
         return view('livewire.admin.akun.index', [
             'users' => $query->paginate($this->perPage),
             'roles' => Role::all(),
-            'permissionsList' => \Spatie\Permission\Models\Permission::all(),
+            'permissionsList' => Permission::all(),
         ]);
     }
 }

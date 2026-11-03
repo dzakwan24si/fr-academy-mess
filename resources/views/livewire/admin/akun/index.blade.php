@@ -61,7 +61,13 @@
                                     </div>
                                     <div class="ml-4">
                                         <div class="text-sm font-bold text-gray-900">{{ $user->name }}</div>
-                                        <div class="text-sm text-gray-500">{{ $user->email }}</div>
+                                        <div class="text-xs text-gray-500 flex items-center gap-1.5 mt-0.5">
+                                            <span>{{ $user->email }}</span>
+                                            @if($user->nik)
+                                                <span class="text-gray-300">•</span>
+                                                <span class="font-medium text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded text-[11px]">NIK: {{ $user->nik }}</span>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </td>
@@ -155,10 +161,20 @@
                         @error('name') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                     </div>
 
-                    <div>
-                        <label class="block mb-1.5 text-sm font-semibold text-gray-700">Email Login</label>
-                        <input type="email" wire:model="email" class="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-xl focus:ring-[#59A338] focus:border-[#59A338]" placeholder="nama@fracademy.com">
-                        @error('email') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block mb-1.5 text-sm font-semibold text-gray-700">Email Login <span class="text-red-500">*</span></label>
+                            <input type="email" wire:model="email" class="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-xl focus:ring-[#59A338] focus:border-[#59A338]" placeholder="nama@fracademy.com">
+                            @error('email') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                        </div>
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-sm font-semibold text-gray-700">NIK (Opsional)</label>
+                                <span class="text-[10px] text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">Bisa Login</span>
+                            </div>
+                            <input type="text" wire:model="nik" class="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-xl focus:ring-[#59A338] focus:border-[#59A338]" placeholder="Contoh: 12345678">
+                            @error('nik') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                        </div>
                     </div>
 
                     <div>
