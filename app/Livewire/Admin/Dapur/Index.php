@@ -472,13 +472,14 @@ class Index extends Component
                 if ($menu && $menu->bahanBakus) {
                     foreach ($menu->bahanBakus as $bahanBaku) {
                         // Kolom di pivot table adalah jumlah_dibutuhkan
-                        $jumlahPerPorsi = $bahanBaku->pivot->jumlah_dibutuhkan;
-                        $jumlahDipotong = $jumlahPerPorsi * $targetPorsi;
+                        $jumlahPerPorsi = (float) $bahanBaku->pivot->jumlah_dibutuhkan;
+                        $jumlahDipotong = round($jumlahPerPorsi * $targetPorsi, 3);
+                        $stokTersedia = round((float) $bahanBaku->stok, 3);
 
-                        // Validasi stok (kolom aktual: 'stok')
-                        if ($bahanBaku->stok < $jumlahDipotong) {
+                        // Validasi stok (kolom aktual: 'stok') dengan pembulatan 3 desimal agar terhindar dari floating point precision bug
+                        if ($stokTersedia < $jumlahDipotong) {
                             // Lempar exception agar transaksi DB dibatalkan secara otomatis
-                            throw new \Exception("Stok {$bahanBaku->nama_bahan} tidak mencukupi. (Butuh: {$jumlahDipotong}, Tersedia: {$bahanBaku->stok})");
+                            throw new \Exception("Stok {$bahanBaku->nama_bahan} tidak mencukupi. (Butuh: {$jumlahDipotong}, Tersedia: {$stokTersedia})");
                         }
 
                         // Lakukan pengurangan
@@ -622,11 +623,11 @@ class Index extends Component
             $targetPorsi = $rencana->target_porsi ?? 100;
             if ($rencana->menu && $rencana->menu->bahanBakus) {
                 foreach ($rencana->menu->bahanBakus as $bahanBaku) {
-                    $butuh = $bahanBaku->pivot->jumlah_dibutuhkan * $targetPorsi;
+                    $butuh = round(((float) $bahanBaku->pivot->jumlah_dibutuhkan) * $targetPorsi, 3);
                     if (! isset($bahanKebutuhan[$bahanBaku->id])) {
                         $bahanKebutuhan[$bahanBaku->id] = 0;
                     }
-                    $bahanKebutuhan[$bahanBaku->id] += $butuh;
+                    $bahanKebutuhan[$bahanBaku->id] = round($bahanKebutuhan[$bahanBaku->id] + $butuh, 3);
                 }
             }
         }
@@ -634,9 +635,10 @@ class Index extends Component
         $allBahan = BahanBaku::whereIn('id', array_keys($bahanKebutuhan))->get();
 
         foreach ($allBahan as $bahan) {
-            $kebutuhan = $bahanKebutuhan[$bahan->id];
-            if ($bahan->stok < $kebutuhan) {
-                $kekurangan = $kebutuhan - $bahan->stok;
+            $kebutuhan = round($bahanKebutuhan[$bahan->id], 3);
+            $stokTersedia = round((float) $bahan->stok, 3);
+            if ($stokTersedia < $kebutuhan) {
+                $kekurangan = round($kebutuhan - $stokTersedia, 3);
                 $this->belanjaItems[] = [
                     'bahan_baku_id' => $bahan->id,
                     'nama_bahan' => $bahan->nama_bahan,
@@ -665,16 +667,17 @@ class Index extends Component
 
         DB::transaction(function () {
             foreach ($this->belanjaItems as $item) {
-                if ($item['kuantitas_dibeli'] > 0) {
+                $qty = round((float) $item['kuantitas_dibeli'], 3);
+                if ($qty > 0) {
                     $bahan = BahanBaku::find($item['bahan_baku_id']);
 
-                    // Update stok
-                    $bahan->stok += $item['kuantitas_dibeli'];
+                    // Update stok dengan pembulatan 3 desimal
+                    $bahan->stok = round((float) $bahan->stok + $qty, 3);
 
                     // Update harga satuan sesuai harga pasar terbaru
                     $hargaSatuanAktual = 0;
                     if ($item['total_harga_beli'] > 0) {
-                        $hargaSatuanAktual = $item['total_harga_beli'] / $item['kuantitas_dibeli'];
+                        $hargaSatuanAktual = round($item['total_harga_beli'] / $qty, 2);
                         $bahan->harga_satuan = $hargaSatuanAktual;
                     }
 
@@ -683,7 +686,7 @@ class Index extends Component
                     // Insert Log Belanja
                     RiwayatBelanjaDapur::create([
                         'bahan_baku_id' => $bahan->id,
-                        'kuantitas_dibeli' => $item['kuantitas_dibeli'],
+                        'kuantitas_dibeli' => $qty,
                         'total_harga_beli' => $item['total_harga_beli'],
                         'harga_satuan_aktual' => $hargaSatuanAktual,
                         'tanggal_belanja' => now(),

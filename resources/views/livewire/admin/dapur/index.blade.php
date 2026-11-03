@@ -894,7 +894,7 @@
                                         </td>
                                         <td class="px-4 py-3 w-40">
                                             <div class="flex items-center gap-2">
-                                                <input type="number" step="0.01" min="0" wire:model="belanjaItems.{{ $index }}.kuantitas_dibeli" class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-orange-500 focus:border-orange-500 text-right font-medium">
+                                                <input type="number" step="0.001" min="0" wire:model="belanjaItems.{{ $index }}.kuantitas_dibeli" class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-orange-500 focus:border-orange-500 text-right font-medium">
                                                 <span class="text-xs text-gray-500 w-8">{{ $item['satuan'] }}</span>
                                             </div>
                                             @error('belanjaItems.'.$index.'.kuantitas_dibeli') <span class="text-red-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror

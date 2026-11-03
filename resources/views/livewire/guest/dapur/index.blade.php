@@ -98,45 +98,60 @@
                                         {{ $hasRated ? 'Penilaian Anda' : 'Beri Penilaian Makanan Ini' }}
                                     </h3>
 
-                                    @if($selectedRencanaId == $rencana->id || (!$hasRated && $selectedRencanaId == null))
+                                    @if($hasRated && $selectedRencanaId != $rencana->id)
+                                        <!-- Show Existing Rating -->
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <div class="flex">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    <svg class="w-5 h-5 {{ ($feedback->rating ?? 0) >= $i ? 'text-orange-400' : 'text-gray-300' }}" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                                    </svg>
+                                                @endfor
+                                            </div>
+                                            <span class="text-xs font-bold text-gray-500">{{ $feedback->rating ?? 0 }} Bintang</span>
+                                        </div>
+                                        @if($feedback?->komentar)
+                                            <p class="text-sm text-gray-600 font-medium italic border-l-2 border-orange-200 pl-3">"{{ $feedback->komentar }}"</p>
+                                        @endif
+                                        
+                                        <button type="button" wire:click="beriRating({{ $rencana->id }}, {{ $feedback->rating ?? 5 }})" class="text-xs font-bold text-orange-500 hover:text-orange-600 mt-3 inline-block cursor-pointer">
+                                            Edit Penilaian
+                                        </button>
+                                    @elseif($selectedRencanaId == $rencana->id)
+                                        <!-- Form Beri / Edit Penilaian Aktif -->
                                         <form wire:submit.prevent="simpanFeedback" class="space-y-4">
                                             <div class="flex items-center gap-2">
                                                 @for($i = 1; $i <= 5; $i++)
-                                                    <button type="button" wire:click="beriRating({{ $rencana->id }}, {{ $i }})" class="focus:outline-none transition-transform hover:scale-110">
-                                                        <svg class="w-8 h-8 {{ $rating >= $i && $selectedRencanaId == $rencana->id ? 'text-orange-400' : 'text-gray-300' }}" fill="currentColor" viewBox="0 0 20 20">
+                                                    <button type="button" wire:click="beriRating({{ $rencana->id }}, {{ $i }})" class="focus:outline-none transition-transform hover:scale-110 cursor-pointer">
+                                                        <svg class="w-8 h-8 {{ $rating >= $i ? 'text-orange-400' : 'text-gray-300' }}" fill="currentColor" viewBox="0 0 20 20">
                                                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
                                                         </svg>
                                                     </button>
                                                 @endfor
                                             </div>
-                                            @if($selectedRencanaId == $rencana->id)
-                                                @error('rating') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                                                <textarea wire:model="komentar" rows="2" class="w-full bg-white border border-gray-200 focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 rounded-xl px-4 py-2 text-sm transition-all" placeholder="Tambahkan komentar (opsional)..."></textarea>
-                                                
-                                                <button type="submit" class="px-5 py-2.5 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 transition-all shadow-sm text-sm">
+                                            @error('rating') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                            <textarea wire:model="komentar" rows="2" class="w-full bg-white border border-gray-200 focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 rounded-xl px-4 py-2 text-sm transition-all" placeholder="Tambahkan komentar (opsional)..."></textarea>
+                                            
+                                            <div class="flex items-center gap-2">
+                                                <button type="submit" class="px-5 py-2.5 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 transition-all shadow-sm text-sm cursor-pointer">
                                                     Kirim Penilaian
                                                 </button>
-                                            @endif
+                                                <button type="button" wire:click="$set('selectedRencanaId', null)" class="px-4 py-2.5 bg-gray-100 text-gray-600 font-semibold rounded-xl hover:bg-gray-200 transition-all text-sm cursor-pointer">
+                                                    Batal
+                                                </button>
+                                            </div>
                                         </form>
                                     @else
-                                        <!-- Show Existing Rating -->
-                                        <div class="flex items-center gap-2 mb-2">
-                                            <div class="flex">
-                                                @for($i = 1; $i <= 5; $i++)
-                                                    <svg class="w-5 h-5 {{ $feedback->rating >= $i ? 'text-orange-400' : 'text-gray-300' }}" fill="currentColor" viewBox="0 0 20 20">
+                                        <!-- Belum Dinilai & Belum Dipilih (Klik bintang untuk mulai menilai) -->
+                                        <div class="flex items-center gap-2">
+                                            @for($i = 1; $i <= 5; $i++)
+                                                <button type="button" wire:click="beriRating({{ $rencana->id }}, {{ $i }})" class="focus:outline-none transition-transform hover:scale-110 cursor-pointer">
+                                                    <svg class="w-8 h-8 text-gray-300 hover:text-orange-400" fill="currentColor" viewBox="0 0 20 20">
                                                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
                                                     </svg>
-                                                @endfor
-                                            </div>
-                                            <span class="text-xs font-bold text-gray-500">{{ $feedback->rating }} Bintang</span>
+                                                </button>
+                                            @endfor
                                         </div>
-                                        @if($feedback->komentar)
-                                            <p class="text-sm text-gray-600 font-medium italic border-l-2 border-orange-200 pl-3">"{{ $feedback->komentar }}"</p>
-                                        @endif
-                                        
-                                        <button type="button" wire:click="beriRating({{ $rencana->id }}, {{ $feedback->rating }})" class="text-xs font-bold text-orange-500 hover:text-orange-600 mt-3 inline-block">
-                                            Edit Penilaian
-                                        </button>
                                     @endif
                                 </div>
                             @endif
