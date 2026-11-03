@@ -13,44 +13,62 @@ new class extends Component
 
     public function login()
     {
-        $this->validate([
+        $turnstileEnabled = (bool) config('services.turnstile.enabled', false);
+
+        $rules = [
             'loginId' => 'required|string',
             'password' => 'required',
-            'turnstileToken' => 'required', 
-        ], [
-            'loginId.required' => 'Email atau NIK wajib diisi.',
-            'turnstileToken.required' => 'Harap selesaikan verifikasi keamanan (Cloudflare).'
-        ]);
+        ];
 
-        $http = Http::asForm();
-        if (app()->environment('local')) {
-            $http = $http->withoutVerifying();
+        $messages = [
+            'loginId.required' => 'Email atau NIK wajib diisi.',
+            'password.required' => 'Kata sandi wajib diisi.',
+        ];
+
+        if ($turnstileEnabled) {
+            $rules['turnstileToken'] = 'required';
+            $messages['turnstileToken.required'] = 'Harap selesaikan verifikasi keamanan (Cloudflare).';
         }
 
-        $response = $http->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
-            'secret' => config('services.turnstile.secret', '0x4AAAAAAEzPGKSsKiRsoVbsX1tzF-N7x8k'),
-            'response' => $this->turnstileToken,
-            'remoteip' => request()->ip(),
-        ]);
+        $this->validate($rules, $messages);
 
-        if (! $response->json('success')) {
-            $this->addError('turnstileToken', 'Verifikasi keamanan gagal. Silakan coba lagi.');
-            
-            // Perintahkan frontend untuk me-reset widget jika gagal
-            $this->dispatch('reset-turnstile');
-            return;
+        if ($turnstileEnabled) {
+            $http = Http::asForm()->timeout(5);
+            if (app()->environment('local')) {
+                $http = $http->withoutVerifying();
+            }
+
+            try {
+                $response = $http->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+                    'secret' => config('services.turnstile.secret', '0x4AAAAAAEzPGKSsKiRsoVbsX1tzF-N7x8k'),
+                    'response' => $this->turnstileToken,
+                    'remoteip' => request()->ip(),
+                ]);
+
+                if (! $response->json('success')) {
+                    $this->addError('turnstileToken', 'Verifikasi keamanan gagal. Silakan coba lagi.');
+                    $this->dispatch('reset-turnstile');
+
+                    return;
+                }
+            } catch (\Exception $e) {
+                \Log::warning('Cloudflare Turnstile verification unreachable: '.$e->getMessage());
+            }
         }
 
         $fieldType = filter_var($this->loginId, FILTER_VALIDATE_EMAIL) ? 'email' : 'nik';
 
         if (Auth::attempt([$fieldType => $this->loginId, 'password' => $this->password], $this->remember)) {
             session()->regenerate();
+
             return redirect()->intended('/admin/dashboard');
         }
 
         $this->addError('loginId', 'Kredensial yang diberikan tidak cocok dengan data kami.');
-        // Reset widget jika login gagal
-        $this->dispatch('reset-turnstile');
+
+        if ($turnstileEnabled) {
+            $this->dispatch('reset-turnstile');
+        }
     }
 };
 ?>
@@ -93,11 +111,13 @@ new class extends Component
                             </div>
                         </div>
 
-                        <!-- WIDGET CLOUDFLARE TURNSTILE (Direvisi untuk Livewire) -->
-                        <div wire:ignore>
-                            <div id="cf-turnstile-container"></div>
-                        </div>
-                        @error('turnstileToken') <p class="mt-2 text-sm text-red-600 font-medium">{{ $message }}</p> @enderror
+                        @if(config('services.turnstile.enabled', false))
+                            <!-- WIDGET CLOUDFLARE TURNSTILE (Direvisi untuk Livewire) -->
+                            <div wire:ignore>
+                                <div id="cf-turnstile-container"></div>
+                            </div>
+                            @error('turnstileToken') <p class="mt-2 text-sm text-red-600 font-medium">{{ $message }}</p> @enderror
+                        @endif
 
                         <div class="flex items-center">
                             <input wire:model="remember" id="remember_me" type="checkbox" class="h-4 w-4 text-[#008000] focus:ring-[#008000] border-gray-300 rounded cursor-pointer">
@@ -118,43 +138,44 @@ new class extends Component
             </div>
         </div>
 
-        <script>
-            let widgetId;
+        @if(config('services.turnstile.enabled', false))
+            <script>
+                let widgetId;
 
-            // Fungsi global untuk me-render widget secara manual
-            window.renderTurnstile = function() {
-                if (typeof turnstile !== 'undefined') {
-                    // Jika sudah ada widget, reset dulu untuk mencegah error duplikasi/memory leak
-                    if (widgetId !== undefined) {
-                         turnstile.reset(widgetId);
-                    } else {
-                        // Render widget baru
-                        widgetId = turnstile.render('#cf-turnstile-container', {
-                            sitekey: '{{ config('services.turnstile.key', '0x4AAAAAAEzPGJLBNyo86KAl') }}', // Site Key dari .env / config
-                            theme: 'light', // Ubah tema kotak menjadi warna putih/terang
-                            callback: function(token) {
-                                // Set token ke variabel Livewire saat berhasil diceklis
-                                @this.set('turnstileToken', token);
-                            }
-                        });
+                // Fungsi global untuk me-render widget secara manual
+                window.renderTurnstile = function() {
+                    if (typeof turnstile !== 'undefined') {
+                        // Jika sudah ada widget, reset dulu untuk mencegah error duplikasi/memory leak
+                        if (widgetId !== undefined) {
+                             turnstile.reset(widgetId);
+                        } else {
+                            // Render widget baru
+                            widgetId = turnstile.render('#cf-turnstile-container', {
+                                sitekey: '{{ config('services.turnstile.key', '0x4AAAAAAEzPGJLBNyo86KAl') }}', // Site Key dari .env / config
+                                theme: 'light', // Ubah tema kotak menjadi warna putih/terang
+                                callback: function(token) {
+                                    // Set token ke variabel Livewire saat berhasil diceklis
+                                    @this.set('turnstileToken', token);
+                                }
+                            });
+                        }
                     }
-                }
-            };
+                };
 
-            // Jalankan render saat Livewire navigasi (SPA mode)
-            document.addEventListener('livewire:navigated', window.renderTurnstile);
+                // Jalankan render saat Livewire navigasi (SPA mode)
+                document.addEventListener('livewire:navigated', window.renderTurnstile);
 
-
-            // Dengarkan event dari backend jika verifikasi/login gagal agar widget di-reset
-            window.addEventListener('reset-turnstile', event => {
-                if (typeof turnstile !== 'undefined' && widgetId !== undefined) {
-                    turnstile.reset(widgetId);
-                    @this.set('turnstileToken', null); // Kosongkan token di frontend
-                }
-            });
-        </script>
-        
-        <!-- SCRIPT CLOUDFLARE (Sekarang menggunakan callback onload agar langsung muncul) -->
-        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=renderTurnstile" async defer></script>
+                // Dengarkan event dari backend jika verifikasi/login gagal agar widget di-reset
+                window.addEventListener('reset-turnstile', event => {
+                    if (typeof turnstile !== 'undefined' && widgetId !== undefined) {
+                        turnstile.reset(widgetId);
+                        @this.set('turnstileToken', null); // Kosongkan token di frontend
+                    }
+                });
+            </script>
+            
+            <!-- SCRIPT CLOUDFLARE (Sekarang menggunakan callback onload agar langsung muncul) -->
+            <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=renderTurnstile" async defer></script>
+        @endif
 
     </div> <!-- PENUTUP div root pembungkus utama -->
