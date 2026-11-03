@@ -80,9 +80,11 @@
                                     <button wire:click="bukaModalProses({{ $laundry->id }})" class="p-2 text-teal-600 hover:bg-teal-50 rounded-xl transition-colors tooltip" data-tip="Lihat & Proses">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                     </button>
-                                    <button wire:click="hapus({{ $laundry->id }})" wire:confirm="Hapus data request laundry ini?" class="p-2 text-red-600 hover:bg-red-50 rounded-xl transition-colors tooltip" data-tip="Hapus">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                    </button>
+                                    @unless(auth()->user()->isReadOnly())
+                                        <button wire:click="hapus({{ $laundry->id }})" wire:confirm="Hapus data request laundry ini?" class="p-2 text-red-600 hover:bg-red-50 rounded-xl transition-colors tooltip" data-tip="Hapus">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        </button>
+                                    @endunless
                                 </div>
                             </td>
                         </tr>
@@ -155,27 +157,33 @@
                     </div>
                 </div>
 
-                <form wire:submit.prevent="simpanProses" class="space-y-5">
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1.5">Update Status Laundry <span class="text-red-500">*</span></label>
-                        <select wire:model="status" class="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#2E7D32] focus:ring-2 focus:ring-[#2E7D32]/20 rounded-xl px-4 py-3 text-sm transition-shadow cursor-pointer" required>
-                            <option value="menunggu">Menunggu Dijemput / Diproses</option>
-                            <option value="diproses">Sedang Dicuci (Diproses)</option>
-                            <option value="selesai">Selesai (Siap Diantar)</option>
-                        </select>
-                        @error('status') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
-                    </div>
+                @unless(auth()->user()->isReadOnly())
+                    <form wire:submit.prevent="simpanProses" class="space-y-5">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1.5">Update Status Laundry <span class="text-red-500">*</span></label>
+                            <select wire:model="status" class="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#2E7D32] focus:ring-2 focus:ring-[#2E7D32]/20 rounded-xl px-4 py-3 text-sm transition-shadow cursor-pointer" required>
+                                <option value="menunggu">Menunggu Dijemput / Diproses</option>
+                                <option value="diproses">Sedang Dicuci (Diproses)</option>
+                                <option value="selesai">Selesai (Siap Diantar)</option>
+                            </select>
+                            @error('status') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                        </div>
 
-                    <div class="pt-2">
-                        <button type="submit" class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-[#2E7D32] hover:bg-[#1b5e20] focus:outline-none focus:ring-4 focus:ring-[#2E7D32]/30 transition-all">
-                            <span wire:loading.remove wire:target="simpanProses">Simpan Perubahan</span>
-                            <span wire:loading wire:target="simpanProses" class="flex items-center gap-2">
-                                <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                Menyimpan...
-                            </span>
-                        </button>
+                        <div class="pt-2">
+                            <button type="submit" class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-[#2E7D32] hover:bg-[#1b5e20] focus:outline-none focus:ring-4 focus:ring-[#2E7D32]/30 transition-all">
+                                <span wire:loading.remove wire:target="simpanProses">Simpan Perubahan</span>
+                                <span wire:loading wire:target="simpanProses" class="flex items-center gap-2">
+                                    <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    Menyimpan...
+                                </span>
+                            </button>
+                        </div>
+                    </form>
+                @else
+                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center">
+                        <p class="text-xs text-gray-500 font-medium">Akun Anda memiliki akses <strong>Read-Only</strong> (Monitoring). Anda hanya dapat melihat rincian cucian ini.</p>
                     </div>
-                </form>
+                @endunless
             </div>
         </div>
     </div>

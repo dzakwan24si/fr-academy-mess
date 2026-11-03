@@ -22,14 +22,16 @@ class Index extends Component
 
     public $search = '';
 
-    // Modal state
+    public $activeTab = 'users'; // 'users' or 'roles'
+
+    // Modal state Pengguna
     public $isModalOpen = false;
 
     public $isEdit = false;
 
     public $user_id = null;
 
-    // Form fields
+    // Form fields Pengguna
     public $name;
 
     public $email;
@@ -42,9 +44,38 @@ class Index extends Component
 
     public $selectedPermissions = [];
 
+    // Modal state Peran (Role)
+    public $isRoleModalOpen = false;
+
+    public $isRoleEdit = false;
+
+    public $role_id = null;
+
+    public $role_name = '';
+
+    public $role_is_read_only = false;
+
+    public $role_permissions = [];
+
+    public function setTab($tab)
+    {
+        $this->activeTab = $tab;
+        $this->resetPage();
+    }
+
     public function updatingSearch()
     {
         $this->resetPage();
+    }
+
+    public function updatedRole($roleName)
+    {
+        if (! empty($roleName)) {
+            $roleObj = Role::where('name', $roleName)->first();
+            if ($roleObj) {
+                $this->selectedPermissions = $roleObj->permissions->pluck('name')->toArray();
+            }
+        }
     }
 
     public function bukaModal($id = null)
@@ -166,6 +197,81 @@ class Index extends Component
         session()->flash('success', "Password untuk {$user->name} berhasil di-reset menjadi 'fracademy123'.");
     }
 
+    public function bukaRoleModal($id = null)
+    {
+        $this->resetValidation();
+        if ($id) {
+            $role = Role::with('permissions')->findOrFail($id);
+            $this->role_id = $role->id;
+            $this->role_name = $role->name;
+            $this->role_is_read_only = (bool) $role->is_read_only;
+            $this->role_permissions = $role->permissions->pluck('name')->toArray();
+            $this->isRoleEdit = true;
+        } else {
+            $this->role_id = null;
+            $this->role_name = '';
+            $this->role_is_read_only = false;
+            $this->role_permissions = [];
+            $this->isRoleEdit = false;
+        }
+        $this->isRoleModalOpen = true;
+    }
+
+    public function tutupRoleModal()
+    {
+        $this->isRoleModalOpen = false;
+    }
+
+    public function simpanRole()
+    {
+        $this->validate([
+            'role_name' => 'required|string|max:100|unique:roles,name,'.$this->role_id,
+            'role_is_read_only' => 'boolean',
+            'role_permissions' => 'nullable|array',
+        ], [
+            'role_name.required' => 'Nama peran (role) wajib diisi.',
+            'role_name.unique' => 'Nama peran ini sudah ada.',
+        ]);
+
+        if ($this->isRoleEdit && $this->role_name === 'Superadmin') {
+            $this->role_is_read_only = false;
+        }
+
+        $role = Role::updateOrCreate(
+            ['id' => $this->role_id],
+            [
+                'name' => $this->role_name,
+                'is_read_only' => (bool) $this->role_is_read_only,
+                'guard_name' => 'web',
+            ]
+        );
+
+        $role->syncPermissions($this->role_permissions ?? []);
+
+        session()->flash('success', $this->isRoleEdit ? "Peran '{$role->name}' berhasil diperbarui." : "Peran '{$role->name}' berhasil ditambahkan.");
+        $this->tutupRoleModal();
+    }
+
+    public function hapusRole($id)
+    {
+        $role = Role::withCount('users')->findOrFail($id);
+        if ($role->name === 'Superadmin') {
+            session()->flash('error', 'Role Superadmin tidak dapat dihapus.');
+
+            return;
+        }
+
+        if ($role->users_count > 0) {
+            session()->flash('error', "Role '{$role->name}' sedang digunakan oleh {$role->users_count} pengguna. Silakan pindahkan role akun tersebut terlebih dahulu.");
+
+            return;
+        }
+
+        $name = $role->name;
+        $role->delete();
+        session()->flash('success', "Role '{$name}' berhasil dihapus.");
+    }
+
     public function render()
     {
         $query = User::with('roles')->orderBy('name', 'asc');
@@ -179,6 +285,7 @@ class Index extends Component
         return view('livewire.admin.akun.index', [
             'users' => $query->paginate($this->perPage),
             'roles' => Role::all(),
+            'rolesList' => Role::with('permissions')->withCount('users')->get(),
             'permissionsList' => Permission::all(),
         ]);
     }

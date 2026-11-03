@@ -6,10 +6,12 @@
             <p class="text-gray-500 text-sm mt-1">Kelola pengajuan booking dan proses check-in/out tamu.</p>
         </div>
         <div class="flex items-center gap-3 w-full sm:w-auto">
-            <button wire:click="bukaModalBuat" class="flex-shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-[#59A338] hover:bg-[#4d8f2f] text-white rounded-xl text-sm font-semibold transition-colors shadow-sm w-full sm:w-auto">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                <span >Buat Reservasi</span>
-            </button>
+            @unless(auth()->user()->isReadOnly())
+                <button wire:click="bukaModalBuat" class="flex-shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-[#59A338] hover:bg-[#4d8f2f] text-white rounded-xl text-sm font-semibold transition-colors shadow-sm w-full sm:w-auto">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    <span>Buat Reservasi</span>
+                </button>
+            @endunless
         </div>
     </div>
 
@@ -140,40 +142,42 @@
                                             Lihat Detail
                                         </button>
                                         
-                                        @if($rsv->status == 'pending')
-                                            <button wire:click="setujuiBooking({{ $rsv->id }})" class="w-full text-left px-4 py-3 text-sm text-green-700 hover:bg-green-50 flex items-center gap-2 border-b border-gray-50">
-                                                <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                                Setujui Reservasi
-                                            </button>
-                                            <button wire:click="bukaModalTolak({{ $rsv->id }})" class="w-full text-left px-4 py-3 text-sm text-orange-700 hover:bg-orange-50 flex items-center gap-2 border-b border-gray-50">
-                                                <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                                Tolak Reservasi
-                                            </button>
-                                        @elseif($rsv->status == 'approved')
-                                            <button wire:click="prosesCheckIn({{ $rsv->id }})" class="w-full text-left px-4 py-3 text-sm text-blue-700 hover:bg-blue-50 flex items-center gap-2 border-b border-gray-50">
-                                                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
-                                                Proses Check-In
-                                            </button>
-                                        @elseif($rsv->status == 'checked_in')
-                                            <button wire:click="bukaModalOff({{ $rsv->id }})" class="w-full text-left px-4 py-3 text-sm text-yellow-700 hover:bg-yellow-50 flex items-center gap-2 border-b border-gray-50">
-                                                <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                                Off Sementara
-                                            </button>
-                                            <button wire:click="prosesCheckOut({{ $rsv->id }})" class="w-full text-left px-4 py-3 text-sm text-emerald-700 hover:bg-emerald-50 flex items-center gap-2 border-b border-gray-50">
-                                                <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                                                Proses Check-Out
-                                            </button>
-                                        @endif
+                                        @unless(auth()->user()->isReadOnly())
+                                            @if($rsv->status == 'pending')
+                                                <button wire:click="setujuiBooking({{ $rsv->id }})" class="w-full text-left px-4 py-3 text-sm text-green-700 hover:bg-green-50 flex items-center gap-2 border-b border-gray-50">
+                                                    <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                                    Setujui Reservasi
+                                                </button>
+                                                <button wire:click="bukaModalTolak({{ $rsv->id }})" class="w-full text-left px-4 py-3 text-sm text-orange-700 hover:bg-orange-50 flex items-center gap-2 border-b border-gray-50">
+                                                    <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                    Tolak Reservasi
+                                                </button>
+                                            @elseif($rsv->status == 'approved')
+                                                <button wire:click="prosesCheckIn({{ $rsv->id }})" class="w-full text-left px-4 py-3 text-sm text-blue-700 hover:bg-blue-50 flex items-center gap-2 border-b border-gray-50">
+                                                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
+                                                    Proses Check-In
+                                                </button>
+                                            @elseif($rsv->status == 'checked_in')
+                                                <button wire:click="bukaModalOff({{ $rsv->id }})" class="w-full text-left px-4 py-3 text-sm text-yellow-700 hover:bg-yellow-50 flex items-center gap-2 border-b border-gray-50">
+                                                    <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                    Off Sementara
+                                                </button>
+                                                <button wire:click="prosesCheckOut({{ $rsv->id }})" class="w-full text-left px-4 py-3 text-sm text-emerald-700 hover:bg-emerald-50 flex items-center gap-2 border-b border-gray-50">
+                                                    <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                                                    Proses Check-Out
+                                                </button>
+                                            @endif
 
-                                        <button wire:click="bukaModalEdit({{ $rsv->id }})" class="w-full text-left px-4 py-3 text-sm text-blue-600 hover:bg-blue-50 flex items-center gap-2 border-b border-gray-50">
-                                            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                            Edit Data
-                                        </button>
-                                        
-                                        <button wire:click="konfirmasiHapus({{ $rsv->id }})" class="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
-                                            <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                            Hapus Reservasi
-                                        </button>
+                                            <button wire:click="bukaModalEdit({{ $rsv->id }})" class="w-full text-left px-4 py-3 text-sm text-blue-600 hover:bg-blue-50 flex items-center gap-2 border-b border-gray-50">
+                                                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                                Edit Data
+                                            </button>
+                                            
+                                            <button wire:click="konfirmasiHapus({{ $rsv->id }})" class="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+                                                <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                Hapus Reservasi
+                                            </button>
+                                        @endunless
                                     </div>
                                 </div>
                             </td>

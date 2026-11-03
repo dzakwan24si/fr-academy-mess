@@ -31,4 +31,13 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function isReadOnly(): bool
+    {
+        if ($this->hasRole('Superadmin')) {
+            return false;
+        }
+
+        return $this->roles->contains('is_read_only', true);
+    }
 }

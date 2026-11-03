@@ -43,14 +43,16 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <h2 class="text-lg font-bold text-gray-800">Daftar Stok Saat Ini</h2>
                     <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                        <button wire:click="bukaModalBelanja" class="w-full sm:w-auto px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-sm font-semibold shadow-sm flex items-center justify-center gap-2 transition-colors">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                            Input Belanja
-                        </button>
-                        <button wire:click="bukaModal" class="flex-shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-[#59A338] hover:bg-[#4d8f2f] text-white rounded-xl text-sm font-semibold transition-colors shadow-sm w-full sm:w-auto">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                            Tambah Bahan
-                        </button>
+                        @unless(auth()->user()->isReadOnly())
+                            <button wire:click="bukaModalBelanja" class="w-full sm:w-auto px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-sm font-semibold shadow-sm flex items-center justify-center gap-2 transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                                Input Belanja
+                            </button>
+                            <button wire:click="bukaModal" class="flex-shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-[#59A338] hover:bg-[#4d8f2f] text-white rounded-xl text-sm font-semibold transition-colors shadow-sm w-full sm:w-auto">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                Tambah Bahan
+                            </button>
+                        @endunless
                     </div>
                 </div>
 
@@ -100,14 +102,18 @@
                                 <td class="px-6 py-4 text-gray-500">Rp {{ number_format($bahan->harga_satuan, 0, ',', '.') }}</td>
                                 <td class="px-6 py-4 text-gray-500">{{ $bahan->satuan }} {{ $bahan->keterangan_volume ? '('.$bahan->keterangan_volume.')' : '' }}</td>
                                 <td class="px-6 py-4">
-                                    <div class="flex justify-center items-center gap-2">
-                                        <button wire:click="editBahan({{ $bahan->id }})" class="p-1.5 rounded-full text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors" title="Edit">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                        </button>
-                                        <button wire:click="hapusBahan({{ $bahan->id }})" onclick="confirm('Yakin ingin menghapus bahan baku ini?') || event.stopImmediatePropagation()" class="p-1.5 rounded-full text-red-600 bg-red-50 hover:bg-red-100 transition-colors" title="Hapus">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                        </button>
-                                    </div>
+                                    @unless(auth()->user()->isReadOnly())
+                                        <div class="flex justify-center items-center gap-2">
+                                            <button wire:click="editBahan({{ $bahan->id }})" class="p-1.5 rounded-full text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors" title="Edit">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                            </button>
+                                            <button wire:click="hapusBahan({{ $bahan->id }})" onclick="confirm('Yakin ingin menghapus bahan baku ini?') || event.stopImmediatePropagation()" class="p-1.5 rounded-full text-red-600 bg-red-50 hover:bg-red-100 transition-colors" title="Hapus">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            </button>
+                                        </div>
+                                    @else
+                                        <div class="text-center text-xs text-gray-400">-</div>
+                                    @endunless
                                 </td>
                             </tr>
                             @empty
@@ -128,10 +134,12 @@
             <div class="flex-1 flex flex-col overflow-hidden">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <h2 class="text-lg font-bold text-gray-800">Daftar Master Menu</h2>
-                    <button wire:click="bukaModalMenu" class="flex-shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-[#59A338] hover:bg-[#4d8f2f] text-white rounded-xl text-sm font-semibold transition-colors shadow-sm w-full sm:w-auto">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        Tambah Menu
-                    </button>
+                    @unless(auth()->user()->isReadOnly())
+                        <button wire:click="bukaModalMenu" class="flex-shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-[#59A338] hover:bg-[#4d8f2f] text-white rounded-xl text-sm font-semibold transition-colors shadow-sm w-full sm:w-auto">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            Tambah Menu
+                        </button>
+                    @endunless
                 </div>
 
                 <!-- Filter Section Tab 2 -->
@@ -201,17 +209,21 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <div class="flex justify-center items-center gap-2">
-                                        <button wire:click="bukaModalResep({{ $menu->id }})" class="px-3 py-1.5 rounded-lg text-emerald-700 bg-emerald-50 hover:bg-emerald-100 font-semibold text-xs border border-emerald-200 transition-colors">
-                                            Atur Resep
-                                        </button>
-                                        <button wire:click="editMenu({{ $menu->id }})" class="p-1.5 rounded-full text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors" title="Edit">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                        </button>
-                                        <button wire:click="hapusMenu({{ $menu->id }})" wire:confirm="Yakin ingin menghapus menu ini?" class="p-1.5 rounded-full text-red-600 bg-red-50 hover:bg-red-100 transition-colors" title="Hapus">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                        </button>
-                                    </div>
+                                    @unless(auth()->user()->isReadOnly())
+                                        <div class="flex justify-center items-center gap-2">
+                                            <button wire:click="bukaModalResep({{ $menu->id }})" class="px-3 py-1.5 rounded-lg text-emerald-700 bg-emerald-50 hover:bg-emerald-100 font-semibold text-xs border border-emerald-200 transition-colors">
+                                                Atur Resep
+                                            </button>
+                                            <button wire:click="editMenu({{ $menu->id }})" class="p-1.5 rounded-full text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors" title="Edit">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                            </button>
+                                            <button wire:click="hapusMenu({{ $menu->id }})" wire:confirm="Yakin ingin menghapus menu ini?" class="p-1.5 rounded-full text-red-600 bg-red-50 hover:bg-red-100 transition-colors" title="Hapus">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            </button>
+                                        </div>
+                                    @else
+                                        <div class="text-center text-xs text-gray-400">-</div>
+                                    @endunless
                                 </td>
                             </tr>
                             @empty
@@ -243,10 +255,12 @@
                             Cetak Jadwal Menu
                         </button>
 
-                        <button wire:click="bukaModalRencana" class="flex-shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-[#2E7D32] hover:bg-green-700 text-white rounded-xl text-sm font-semibold shadow-sm w-full sm:w-auto transition-colors">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                            Buat Rencana
-                        </button>
+                        @unless(auth()->user()->isReadOnly())
+                            <button wire:click="bukaModalRencana" class="flex-shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-[#2E7D32] hover:bg-green-700 text-white rounded-xl text-sm font-semibold shadow-sm w-full sm:w-auto transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                                Buat Rencana
+                            </button>
+                        @endunless
                     </div>
                 </div>
 
@@ -339,16 +353,24 @@
                                 <td class="px-6 py-4">
                                     <div class="flex justify-center items-center gap-2">
                                         @if($rencana->status == 'sedang_masak')
-                                        <button wire:click="selesaiMasak({{ $rencana->id }})" class="px-3 py-1.5 rounded-lg text-emerald-700 bg-emerald-50 hover:bg-emerald-100 font-semibold text-xs border border-emerald-200 transition-colors">
-                                            Selesai Masak
-                                        </button>
+                                            @unless(auth()->user()->isReadOnly())
+                                                <button wire:click="selesaiMasak({{ $rencana->id }})" class="px-3 py-1.5 rounded-lg text-emerald-700 bg-emerald-50 hover:bg-emerald-100 font-semibold text-xs border border-emerald-200 transition-colors">
+                                                    Selesai Masak
+                                                </button>
+                                            @else
+                                                <span class="text-xs text-amber-600 font-medium">Sedang Berlangsung</span>
+                                            @endunless
                                         @elseif($rencana->status == 'menunggu')
-                                        <button wire:click="mulaiMasak({{ $rencana->id }})" class="px-3 py-1.5 rounded-lg text-blue-700 bg-blue-50 hover:bg-blue-100 font-semibold text-xs border border-blue-200 transition-colors">
-                                            Mulai Masak
-                                        </button>
-                                        <button wire:click="hapusRencana({{ $rencana->id }})" onclick="confirm('Yakin ingin menghapus rencana masak ini?') || event.stopImmediatePropagation()" class="p-1.5 rounded-lg text-red-600 bg-red-50 hover:bg-red-100 transition-colors border border-transparent hover:border-red-200" title="Hapus">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                        </button>
+                                            @unless(auth()->user()->isReadOnly())
+                                                <button wire:click="mulaiMasak({{ $rencana->id }})" class="px-3 py-1.5 rounded-lg text-blue-700 bg-blue-50 hover:bg-blue-100 font-semibold text-xs border border-blue-200 transition-colors">
+                                                    Mulai Masak
+                                                </button>
+                                                <button wire:click="hapusRencana({{ $rencana->id }})" onclick="confirm('Yakin ingin menghapus rencana masak ini?') || event.stopImmediatePropagation()" class="p-1.5 rounded-lg text-red-600 bg-red-50 hover:bg-red-100 transition-colors border border-transparent hover:border-red-200" title="Hapus">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                </button>
+                                            @else
+                                                <span class="text-xs text-gray-400 italic">Menunggu Masak</span>
+                                            @endunless
                                         @elseif($rencana->status == 'selesai')
                                             @php
                                                 $avgRating = $rencana->feedbackMasakans->avg('rating');
