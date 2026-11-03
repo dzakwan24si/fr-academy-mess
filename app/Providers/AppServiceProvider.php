@@ -28,7 +28,13 @@ class AppServiceProvider extends ServiceProvider
         // Tingkatkan batas ukuran upload foto kamera untuk komponen Livewire (Max 20MB)
         config(['livewire.temporary_file_upload.rules' => ['required', 'file', 'max:20480']]);
 
-        if (app()->environment('production') && str_starts_with((string) config('app.url'), 'https://')) {
+        if (
+            str_starts_with((string) config('app.url'), 'https://')
+            || request()->isSecure()
+            || request()->header('x-forwarded-proto') === 'https'
+            || request()->server('HTTP_X_FORWARDED_PROTO') === 'https'
+            || (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
+        ) {
             URL::forceScheme('https');
         }
     }
