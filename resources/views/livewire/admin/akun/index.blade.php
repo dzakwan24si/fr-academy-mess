@@ -67,7 +67,11 @@
                                 </div>
                             </td>
                             <td class="py-4 px-6">
-                                <span class="text-sm text-gray-600 font-medium">{{ $user->email }}</span>
+                                @if($user->email)
+                                    <span class="text-sm text-gray-600 font-medium">{{ $user->email }}</span>
+                                @else
+                                    <span class="text-xs text-gray-400 italic">-</span>
+                                @endif
                             </td>
                             <td class="py-4 px-6">
                                 @if($user->nik)
@@ -168,19 +172,22 @@
                         @error('name') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block mb-1.5 text-sm font-semibold text-gray-700">Email Login <span class="text-red-500">*</span></label>
-                            <input type="email" wire:model="email" class="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-xl focus:ring-[#59A338] focus:border-[#59A338]" placeholder="nama@fracademy.com">
-                            @error('email') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                    <div class="bg-gray-50/70 border border-gray-200/80 rounded-xl p-3.5 space-y-3">
+                        <div class="flex items-center justify-between text-xs text-gray-500 font-medium pb-1 border-b border-gray-200/60">
+                            <span>Kredensial Login (Isi salah satu atau keduanya)</span>
+                            <span class="text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded text-[11px]">Bisa Digunakan Login</span>
                         </div>
-                        <div>
-                            <div class="flex items-center justify-between mb-1.5">
-                                <label class="block text-sm font-semibold text-gray-700">NIK (Opsional)</label>
-                                <span class="text-[10px] text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">Bisa Login</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            <div>
+                                <label class="block mb-1.5 text-xs font-semibold text-gray-700">Email</label>
+                                <input type="email" wire:model="email" class="w-full px-3.5 py-2 text-sm bg-white border border-gray-300 rounded-xl focus:ring-[#59A338] focus:border-[#59A338]" placeholder="nama@fracademy.com">
+                                @error('email') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                             </div>
-                            <input type="text" wire:model="nik" class="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-xl focus:ring-[#59A338] focus:border-[#59A338]" placeholder="Contoh: 12345678">
-                            @error('nik') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                            <div>
+                                <label class="block mb-1.5 text-xs font-semibold text-gray-700">NIK (Nomor Induk Karyawan)</label>
+                                <input type="text" wire:model="nik" class="w-full px-3.5 py-2 text-sm bg-white border border-gray-300 rounded-xl focus:ring-[#59A338] focus:border-[#59A338]" placeholder="Contoh: 2012040260">
+                                @error('nik') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                            </div>
                         </div>
                     </div>
 

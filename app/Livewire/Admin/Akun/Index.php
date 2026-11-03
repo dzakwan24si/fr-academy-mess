@@ -75,25 +75,41 @@ class Index extends Component
 
     public function simpan()
     {
+        $this->email = ! empty($this->email) ? trim($this->email) : null;
+        $this->nik = ! empty($this->nik) ? trim($this->nik) : null;
+
         $rules = [
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,'.$this->user_id,
-            'nik' => 'nullable|string|max:50|unique:users,nik,'.$this->user_id,
+            'email' => 'required_without:nik|nullable|email|max:255|unique:users,email,'.$this->user_id,
+            'nik' => 'required_without:email|nullable|string|max:50|unique:users,nik,'.$this->user_id,
             'role' => 'required|string|exists:roles,name',
+        ];
+
+        $messages = [
+            'name.required' => 'Nama pengguna wajib diisi.',
+            'email.required_without' => 'Email atau NIK wajib diisi salah satu.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email ini sudah terdaftar.',
+            'nik.required_without' => 'Email atau NIK wajib diisi salah satu.',
+            'nik.unique' => 'NIK ini sudah terdaftar.',
+            'role.required' => 'Pilih peran akun.',
         ];
 
         if (! $this->isEdit) {
             $rules['password'] = 'required|min:8';
+            $messages['password.required'] = 'Kata sandi wajib diisi.';
+            $messages['password.min'] = 'Kata sandi minimal 8 karakter.';
         } else {
             $rules['password'] = 'nullable|min:8';
+            $messages['password.min'] = 'Kata sandi minimal 8 karakter.';
         }
 
-        $this->validate($rules);
+        $this->validate($rules, $messages);
 
         $data = [
             'name' => $this->name,
             'email' => $this->email,
-            'nik' => ! empty($this->nik) ? trim($this->nik) : null,
+            'nik' => $this->nik,
         ];
 
         if ($this->password) {
