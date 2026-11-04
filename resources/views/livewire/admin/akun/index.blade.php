@@ -68,11 +68,10 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-gray-50/50 border-b border-gray-100 text-gray-500 font-semibold text-xs uppercase tracking-wider">
-                            <th class="py-4 px-6 rounded-tl-2xl">Nama Pengguna</th>
-                            <th class="py-4 px-6">Email</th>
-                            <th class="py-4 px-6">NIK</th>
-                            <th class="py-4 px-6">Peran (Role)</th>
+                            <th class="py-4 px-6 rounded-tl-2xl">Pengguna & NIK</th>
+                            <th class="py-4 px-6">Role Akses</th>
                             <th class="py-4 px-6">Status</th>
+                            <th class="py-4 px-6">Login Terakhir</th>
                             <th class="py-4 px-6 text-right rounded-tr-2xl">Aksi</th>
                         </tr>
                     </thead>
@@ -81,52 +80,73 @@
                             <tr class="hover:bg-gray-50/50 transition-colors">
                                 <td class="py-4 px-6">
                                     <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-[#114045]/10 flex items-center justify-center text-[#114045] font-bold text-sm">
-                                            {{ strtoupper(substr($user->name, 0, 1)) }}
+                                        @php
+                                            $initial = strtoupper(substr($user->name, 0, 1));
+                                            $avatarColors = [
+                                                'bg-purple-100 text-purple-700',
+                                                'bg-amber-100 text-amber-700',
+                                                'bg-emerald-100 text-emerald-700',
+                                                'bg-blue-100 text-blue-700',
+                                                'bg-rose-100 text-rose-700',
+                                                'bg-indigo-100 text-indigo-700',
+                                                'bg-teal-100 text-teal-700',
+                                            ];
+                                            $avatarColor = $avatarColors[ord($initial) % count($avatarColors)];
+                                        @endphp
+                                        <div class="flex-shrink-0 h-10 w-10 rounded-full {{ $avatarColor }} flex items-center justify-center font-bold text-sm">
+                                            {{ $initial }}
                                         </div>
                                         <div class="ml-3.5">
-                                            <div class="text-sm font-bold text-gray-900 leading-tight">{{ $user->name }}</div>
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-sm font-bold text-gray-900 leading-tight">{{ $user->name }}</span>
+                                                @if(Auth::id() === $user->id)
+                                                    <span class="px-2 py-0.5 text-[10px] font-semibold text-emerald-800 bg-emerald-100 rounded-full">
+                                                        Anda
+                                                    </span>
+                                                @endif
+                                            </div>
+                                            <div class="text-xs text-gray-500 font-mono mt-0.5">
+                                                @if($user->nik && $user->email)
+                                                    NIK: {{ $user->nik }} <span class="text-gray-300 font-sans mx-1">•</span> <span class="font-sans text-gray-400">{{ $user->email }}</span>
+                                                @elseif($user->nik)
+                                                    NIK: {{ $user->nik }}
+                                                @else
+                                                    <span class="font-sans text-gray-500">{{ $user->email ?? '-' }}</span>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
-                                </td>
-                                <td class="py-4 px-6">
-                                    @if($user->email)
-                                        <span class="text-sm text-gray-600 font-medium">{{ $user->email }}</span>
-                                    @else
-                                        <span class="text-xs text-gray-400 italic">-</span>
-                                    @endif
-                                </td>
-                                <td class="py-4 px-6">
-                                    @if($user->nik)
-                                        <span class="inline-flex items-center font-mono text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 rounded-lg">
-                                            {{ $user->nik }}
-                                        </span>
-                                    @else
-                                        <span class="text-xs text-gray-400 italic">-</span>
-                                    @endif
                                 </td>
                                 <td class="py-4 px-6">
                                     @php
                                         $userRole = $user->roles->first();
                                         $roleName = $userRole->name ?? '-';
                                         $isReadOnlyRole = $userRole?->is_read_only ?? false;
-                                        $badgeColor = match($roleName) {
-                                            'Superadmin' => 'bg-purple-100 text-purple-700 border-purple-200',
-                                            'Koordinator Mess' => 'bg-emerald-100 text-emerald-700 border-emerald-200',
-                                            'Direktur', 'Manager' => 'bg-indigo-100 text-indigo-700 border-indigo-200',
-                                            'Kepala TU' => 'bg-blue-100 text-blue-700 border-blue-200',
-                                            'Staf Dapur' => 'bg-orange-100 text-orange-700 border-orange-200',
-                                            'Staf Kebersihan', 'Staf Laundry', 'Teknisi' => 'bg-teal-100 text-teal-700 border-teal-200',
-                                            default => 'bg-gray-100 text-gray-700 border-gray-200'
+                                        
+                                        $isSuperadmin = $roleName === 'Superadmin';
+                                        $isManajemen = in_array($roleName, ['Direktur', 'Manager']);
+                                        
+                                        $roleBadgeClasses = match($roleName) {
+                                            'Superadmin' => 'bg-purple-50 text-purple-700 border-purple-200',
+                                            'Direktur', 'Manager' => 'bg-amber-50 text-amber-700 border-amber-200',
+                                            'Koordinator Mess' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                                            'Kepala TU' => 'bg-blue-50 text-blue-700 border-blue-200',
+                                            'Staf Dapur' => 'bg-orange-50 text-orange-700 border-orange-200',
+                                            default => 'bg-gray-50 text-gray-700 border-gray-200'
                                         };
                                     @endphp
                                     <div class="flex flex-col gap-1 items-start">
-                                        <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full border {{ $badgeColor }}">
-                                            {{ $roleName }}
+                                        <span class="px-3 py-1 inline-flex items-center gap-1.5 text-xs font-semibold rounded-full border {{ $roleBadgeClasses }}">
+                                            @if($isSuperadmin)
+                                                <svg class="w-3.5 h-3.5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                                            @else
+                                                <svg class="w-3.5 h-3.5 text-current opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                            @endif
+                                            <span>{{ $roleName }}</span>
                                         </span>
                                         @if($isReadOnlyRole)
                                             <span class="inline-flex items-center gap-1 text-[10px] font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
-                                                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                                <svg class="w-2.5 h-2.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                                 Read-Only
                                             </span>
                                         @endif
@@ -134,13 +154,22 @@
                                 </td>
                                 <td class="py-4 px-6">
                                     @if($user->is_active)
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Aktif
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Aktif
                                         </span>
                                     @else
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-200">
                                             <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Nonaktif
                                         </span>
+                                    @endif
+                                </td>
+                                <td class="py-4 px-6 text-sm">
+                                    @if($user->last_login_at)
+                                        <span class="text-xs font-medium text-gray-700">
+                                            {{ $user->last_login_at->translatedFormat('d M Y, H.i') }}
+                                        </span>
+                                    @else
+                                        <span class="text-xs text-gray-400">Belum pernah</span>
                                     @endif
                                 </td>
                                 <td class="py-4 px-6 text-right whitespace-nowrap space-x-2">

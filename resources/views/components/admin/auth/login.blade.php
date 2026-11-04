@@ -61,6 +61,11 @@ new class extends Component
         if (Auth::attempt([$fieldType => $this->loginId, 'password' => $this->password], $this->remember)) {
             session()->regenerate();
 
+            $user = Auth::user();
+            if ($user) {
+                $user->update(['last_login_at' => now()]);
+            }
+
             return redirect()->intended('/admin/dashboard');
         }
 

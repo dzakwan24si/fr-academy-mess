@@ -277,9 +277,11 @@ class Index extends Component
         $query = User::with('roles')->orderBy('name', 'asc');
 
         if (! empty($this->search)) {
-            $query->where('name', 'like', '%'.$this->search.'%')
-                ->orWhere('email', 'like', '%'.$this->search.'%')
-                ->orWhere('nik', 'like', '%'.$this->search.'%');
+            $query->where(function ($q) {
+                $q->where('name', 'like', '%'.$this->search.'%')
+                    ->orWhere('email', 'like', '%'.$this->search.'%')
+                    ->orWhere('nik', 'like', '%'.$this->search.'%');
+            });
         }
 
         return view('livewire.admin.akun.index', [

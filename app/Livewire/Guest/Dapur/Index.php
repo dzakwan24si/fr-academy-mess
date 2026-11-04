@@ -83,6 +83,8 @@ class Index extends Component
 
         $menus = RencanaMenuHarian::with('menu')
             ->where('tanggal', $today)
+            ->where('peruntukan', 'reguler')
+            ->where('waktu', '!=', 'jus_trainer')
             ->orderByRaw("FIELD(waktu, 'pagi', 'siang', 'malam')")
             ->get();
 

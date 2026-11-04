@@ -319,9 +319,24 @@
                                 </td>
                                 <td class="px-6 py-4 font-bold text-gray-800">{{ $rencana->menu->nama_menu ?? 'Menu Terhapus' }}</td>
                                 <td class="px-6 py-4 text-gray-600 font-medium">
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">
-                                        {{ $rencana->waktu === 'jus_trainer' ? 'Jus Trainer' : ucfirst($rencana->waktu) }}
-                                    </span>
+                                    <div class="flex flex-col gap-1 items-start">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">
+                                            {{ $rencana->waktu === 'jus_trainer' ? 'Jus Trainer' : ucfirst($rencana->waktu) }}
+                                        </span>
+                                        @if(($rencana->peruntukan ?? 'reguler') === 'trainer' || $rencana->waktu === 'jus_trainer')
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200">
+                                                Trainer
+                                            </span>
+                                        @elseif(($rencana->peruntukan ?? 'reguler') === 'tamu_luar')
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                                                Tamu Luar
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                Tamu Mess
+                                            </span>
+                                        @endif
+                                    </div>
                                 </td>
                                 <td class="px-6 py-4 text-gray-600">
                                     {{ $rencana->target_porsi }} Porsi
@@ -372,20 +387,30 @@
                                                 <span class="text-xs text-gray-400 italic">Menunggu Masak</span>
                                             @endunless
                                         @elseif($rencana->status == 'selesai')
-                                            @php
-                                                $avgRating = $rencana->feedbackMasakans->avg('rating');
-                                                $countRating = $rencana->feedbackMasakans->count();
-                                            @endphp
-                                            @if($countRating > 0)
-                                                <button wire:click="bukaModalUlasan({{ $rencana->id }})" class="flex flex-col items-center hover:bg-gray-100 p-1.5 rounded-lg transition-colors" title="Lihat Detail Ulasan">
-                                                    <div class="flex items-center text-orange-400">
-                                                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                                                        <span class="font-bold text-gray-700">{{ number_format($avgRating, 1) }}</span>
-                                                    </div>
-                                                    <span class="text-[10px] text-gray-500 underline decoration-gray-300">({{ $countRating }} ulasan)</span>
-                                                </button>
+                                            @if(($rencana->peruntukan ?? 'reguler') === 'trainer' || $rencana->waktu === 'jus_trainer')
+                                                <span class="text-xs text-purple-700 font-medium italic px-2 py-1 bg-purple-50 rounded-lg border border-purple-100" title="Menu khusus Trainer (tidak masuk ulasan tamu)">
+                                                    Trainer (Non-Rating)
+                                                </span>
+                                            @elseif(($rencana->peruntukan ?? 'reguler') === 'tamu_luar')
+                                                <span class="text-xs text-amber-700 font-medium italic px-2 py-1 bg-amber-50 rounded-lg border border-amber-100" title="Menu khusus Tamu Luar (tidak masuk ulasan tamu)">
+                                                    Tamu Luar (Non-Rating)
+                                                </span>
                                             @else
-                                                <span class="text-xs text-gray-400 italic p-1.5">Belum ada ulasan</span>
+                                                @php
+                                                    $avgRating = $rencana->feedbackMasakans->avg('rating');
+                                                    $countRating = $rencana->feedbackMasakans->count();
+                                                @endphp
+                                                @if($countRating > 0)
+                                                    <button wire:click="bukaModalUlasan({{ $rencana->id }})" class="flex flex-col items-center hover:bg-gray-100 p-1.5 rounded-lg transition-colors" title="Lihat Detail Ulasan">
+                                                        <div class="flex items-center text-orange-400">
+                                                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                                            <span class="font-bold text-gray-700">{{ number_format($avgRating, 1) }}</span>
+                                                        </div>
+                                                        <span class="text-[10px] text-gray-500 underline decoration-gray-300">({{ $countRating }} ulasan)</span>
+                                                    </button>
+                                                @else
+                                                    <span class="text-xs text-gray-400 italic p-1.5">Belum ada ulasan</span>
+                                                @endif
                                             @endif
                                         @endif
                                     </div>
@@ -647,6 +672,31 @@
                         <input wire:model="rencana_target_porsi" type="number" min="1" placeholder="Contoh: 100" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#59A338] focus:ring-1 focus:ring-[#59A338] transition-colors">
                         @error('rencana_target_porsi') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                     </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Sasaran Menu / Peruntukan <span class="text-red-500">*</span></label>
+                    <select wire:model.live="rencana_peruntukan" @disabled($rencana_waktu === 'jus_trainer') class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#59A338] focus:ring-1 focus:ring-[#59A338] transition-colors bg-white font-medium disabled:bg-gray-100 disabled:text-gray-500">
+                        <option value="reguler">Tamu Mess (Tampil di Ruang Makan &amp; Ulasan Tamu)</option>
+                        <option value="tamu_luar">Tamu Luar / Acara (Konsumsi Rapat / Pelatihan Non-Inap)</option>
+                        <option value="trainer">Trainer (Khusus Instruktur / Jus Trainer)</option>
+                    </select>
+                    <div class="mt-1.5 text-xs leading-relaxed">
+                        @if($rencana_waktu === 'jus_trainer' || $rencana_peruntukan === 'trainer')
+                            <p class="text-purple-700 bg-purple-50 p-2.5 rounded-lg border border-purple-100">
+                                <strong>Khusus Trainer:</strong> Hidangan khusus instruktur/trainer. Stok bahan baku di dapur tetap dipotong, tidak masuk ke halaman ulasan peserta.
+                            </p>
+                        @elseif($rencana_peruntukan === 'tamu_luar')
+                            <p class="text-amber-700 bg-amber-50 p-2.5 rounded-lg border border-amber-100">
+                                <strong>Tamu Luar / Acara:</strong> Makanan disiapkan untuk tamu luar / kegiatan khusus. Stok di dapur terpotong, tidak masuk ke ulasan tamu mess reguler.
+                            </p>
+                        @else
+                            <p class="text-emerald-700 bg-emerald-50 p-2.5 rounded-lg border border-emerald-100">
+                                <strong>Tamu Mess:</strong> Disajikan di ruang makan mess dan dapat dinilai oleh tamu penghuni mess.
+                            </p>
+                        @endif
+                    </div>
+                    @error('rencana_peruntukan') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                 </div>
             </div>
 

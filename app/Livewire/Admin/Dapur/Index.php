@@ -387,11 +387,21 @@ class Index extends Component
 
     public $rencana_target_porsi;
 
+    public $rencana_peruntukan = 'reguler'; // 'reguler' (Tamu Mess), 'tamu_luar' (Tamu Luar / Acara), 'trainer' (Trainer)
+
+    public function updatedRencanaWaktu($value)
+    {
+        if (strtolower($value) === 'jus_trainer') {
+            $this->rencana_peruntukan = 'trainer';
+        }
+    }
+
     public function bukaModalRencana()
     {
-        $this->reset(['rencana_tanggal', 'rencana_waktu', 'rencana_menu_id', 'rencana_target_porsi']);
+        $this->reset(['rencana_tanggal', 'rencana_waktu', 'rencana_menu_id', 'rencana_target_porsi', 'rencana_peruntukan']);
         $this->rencana_tanggal = date('Y-m-d');
         $this->rencana_waktu = 'Pagi';
+        $this->rencana_peruntukan = 'reguler';
         $this->isModalRencanaOpen = true;
     }
 
@@ -407,7 +417,13 @@ class Index extends Component
             'rencana_waktu' => 'required|string',
             'rencana_menu_id' => 'required|exists:menus,id',
             'rencana_target_porsi' => 'required|numeric|min:1',
+            'rencana_peruntukan' => 'required|in:reguler,tamu_luar,trainer',
         ]);
+
+        $peruntukan = $this->rencana_peruntukan;
+        if (strtolower($this->rencana_waktu) === 'jus_trainer') {
+            $peruntukan = 'trainer';
+        }
 
         RencanaMenuHarian::create([
             'tanggal' => $this->rencana_tanggal,
@@ -415,6 +431,7 @@ class Index extends Component
             'menu_id' => $this->rencana_menu_id,
             'status' => 'menunggu',
             'target_porsi' => $this->rencana_target_porsi,
+            'peruntukan' => $peruntukan,
         ]);
 
         $this->tutupModalRencana();

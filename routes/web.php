@@ -39,6 +39,11 @@ Route::post('/login', function (Request $request) {
     if (Auth::attempt([$fieldType => $request->loginId, 'password' => $request->password], $remember)) {
         $request->session()->regenerate();
 
+        $user = Auth::user();
+        if ($user) {
+            $user->update(['last_login_at' => now()]);
+        }
+
         return redirect()->intended('/admin/dashboard');
     }
 
@@ -79,6 +84,11 @@ Route::middleware('auth')->group(function () {
     // Reservasi
     Route::middleware('permission:akses_reservasi')->group(function () {
         Route::get('/admin/reservasi', App\Livewire\Admin\Reservasi\Index::class)->name('admin.reservasi');
+    });
+
+    // Data Tamu (dapat diakses oleh tim reservasi maupun admin sistem)
+    Route::middleware('permission:akses_reservasi|manajemen_akun')->group(function () {
+        Route::get('/admin/tamu', App\Livewire\Admin\Tamu\Index::class)->name('admin.tamu');
     });
 
     // Laundry
