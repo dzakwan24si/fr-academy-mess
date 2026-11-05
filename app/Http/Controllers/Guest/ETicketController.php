@@ -64,7 +64,11 @@ class ETicketController extends Controller
         } catch (\Throwable $e) {
             \Log::error('E-Ticket Generation Error: '.$e->getMessage()."\nFile: ".$e->getFile().':'.$e->getLine());
 
-            return response("Terjadi kendala saat memproses E-Ticket PDF di server:\n\n".$e->getMessage()."\n\nLokasi: ".$e->getFile().':'.$e->getLine()."\n\nPastikan ekstensi PHP di server (seperti php-gd, php-xml, php-mbstring) sudah aktif dan jalankan 'composer dump-autoload'.", 500)
+            $errorMessage = config('app.debug')
+                ? "Terjadi kendala saat memproses E-Ticket PDF:\n\n".$e->getMessage()."\n\nLokasi: ".$e->getFile().':'.$e->getLine()
+                : 'Terjadi kendala saat memproses E-Ticket PDF. Silakan hubungi Front Office / Koordinator Mess atau coba beberapa saat lagi.';
+
+            return response($errorMessage, 500)
                 ->header('Content-Type', 'text/plain');
         }
     }
