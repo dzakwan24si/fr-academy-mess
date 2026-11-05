@@ -130,8 +130,14 @@
         <div class="header">
             @if(isset($logoBase64) && $logoBase64)
                 <img src="{{ $logoBase64 }}" alt="FR Academy Logo">
-            @elseif(file_exists(public_path('logofr.png')))
+            @elseif(file_exists(public_path('logofr.jpg')))
+                <img src="{{ public_path('logofr.jpg') }}" alt="FR Academy Logo">
+            @elseif(extension_loaded('gd') && file_exists(public_path('logofr.png')))
                 <img src="{{ public_path('logofr.png') }}" alt="FR Academy Logo">
+            @else
+                <div style="font-size: 16px; font-weight: bold; color: #2E7D32; letter-spacing: 0.5px; margin-bottom: 6px;">
+                    FIRST RESOURCES ACADEMY
+                </div>
             @endif
             <h1>E-Ticket Reservasi</h1>
             <p>ID: RSV-{{ str_pad($reservasi->id, 4, '0', STR_PAD_LEFT) }}</p>
@@ -181,7 +187,11 @@
                     </div>
                 </td>
                 <td class="qr-col">
-                    @if($qrCode)
+                    @if(isset($qrCodeSvg) && $qrCodeSvg)
+                        <div style="display: inline-block; border: 1px solid #ddd; padding: 5px; background: #fff; border-radius: 8px;">
+                            {!! $qrCodeSvg !!}
+                        </div>
+                    @elseif(isset($qrCode) && $qrCode)
                         <img src="{{ $qrCode }}" alt="QR Code">
                     @endif
                 </td>

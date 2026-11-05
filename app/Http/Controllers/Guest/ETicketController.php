@@ -27,19 +27,32 @@ class ETicketController extends Controller
                 @mkdir($fontDir, 0775, true);
             }
 
-            // Generate QR code locally in pure PHP (no external API calls, offline-ready)
+            // Generate QR code locally in pure PHP (SVG requires 0 extensions, completely offline)
             $qrCodeData = 'RSV-'.str_pad($reservasi->id, 4, '0', STR_PAD_LEFT);
+            $qrCodeSvg = null;
             $qrCodeBase64 = null;
+
             if (class_exists(QRCode::class)) {
-                $qrCodeBase64 = QRCode::getBase64Png($qrCodeData, 4);
+                $qrCodeSvg = QRCode::getSvg($qrCodeData, 2, 120);
+                if (! $qrCodeSvg && extension_loaded('gd')) {
+                    $qrCodeBase64 = QRCode::getBase64Png($qrCodeData, 4);
+                }
             }
 
-            // Load logo as base64 for reliable DomPDF embedding
-            $logoPath = public_path('logofr.png');
-            $logoBase64 = file_exists($logoPath) ? 'data:image/png;base64,'.base64_encode(file_get_contents($logoPath)) : null;
+            // Determine logo: prefer JPG because DomPDF renders JPEG natively without PHP-GD extension
+            $jpgLogo = public_path('logofr.jpg');
+            $pngLogo = public_path('logofr.png');
+            $logoBase64 = null;
+
+            if (file_exists($jpgLogo)) {
+                $logoBase64 = 'data:image/jpeg;base64,'.base64_encode(file_get_contents($jpgLogo));
+            } elseif (file_exists($pngLogo) && extension_loaded('gd')) {
+                $logoBase64 = 'data:image/png;base64,'.base64_encode(file_get_contents($pngLogo));
+            }
 
             $pdf = Pdf::loadView('pdf.e-ticket', [
                 'reservasi' => $reservasi,
+                'qrCodeSvg' => $qrCodeSvg,
                 'qrCode' => $qrCodeBase64,
                 'logoBase64' => $logoBase64,
             ])->setPaper([0, 0, 380, 435], 'portrait');

@@ -31,6 +31,46 @@ DEALINGS IN THE SOFTWARE.
 
 class QRCode
 {
+    public static function getSvg(string $data, int $margin = 2, int $size = 120): ?string
+    {
+        try {
+            $generator = new self($data, [
+                's' => 'qrl',
+            ]);
+
+            $code = $generator->dispatch_encode($generator->data, $generator->options);
+            if (! isset($code['s'][0]) || ! isset($code['b'])) {
+                return null;
+            }
+
+            $matrixSize = $code['s'][0];
+            $matrix = $code['b'];
+            $totalSize = $matrixSize + ($margin * 2);
+
+            $pathData = '';
+            for ($r = 0; $r < $matrixSize; $r++) {
+                for ($c = 0; $c < $matrixSize; $c++) {
+                    if (($matrix[$r][$c] & 1) === 1) {
+                        $x = $c + $margin;
+                        $y = $r + $margin;
+                        $pathData .= "M{$x},{$y}h1v1h-1z ";
+                    }
+                }
+            }
+
+            $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '.$totalSize.' '.$totalSize.'" width="'.$size.'" height="'.$size.'" shape-rendering="crispEdges">';
+            $svg .= '<rect width="100%" height="100%" fill="#ffffff"/>';
+            $svg .= '<path fill="#000000" d="'.trim($pathData).'"/>';
+            $svg .= '</svg>';
+
+            return $svg;
+        } catch (\Throwable $e) {
+            \Log::warning('Failed generating SVG QR Code: '.$e->getMessage());
+
+            return null;
+        }
+    }
+
     public static function getBase64Png(string $data, int $scale = 4): ?string
     {
         try {
