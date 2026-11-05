@@ -62,17 +62,21 @@
 
                 <form wire:submit.prevent="simpanPenyelesaian">
                     <div class="mb-4">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Catatan Pembersihan (Opsional)</label>
-                        <textarea wire:model="catatanKebersihan" rows="2" class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm resize-none" placeholder="Misal: Keset sudah diganti baru, atau ada kerusakan kran air..."></textarea>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Catatan Pembersihan <span class="text-red-500">*</span>
+                        </label>
+                        <textarea wire:model="catatanKebersihan" rows="2" class="w-full border @error('catatanKebersihan') border-red-400 @else border-gray-300 @enderror rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#59A338] focus:border-transparent text-sm resize-none" placeholder="Tuliskan catatan kondisi kamar (misal: kamar sudah disapu, dipel, dan sprei diganti baru)..."></textarea>
                         @error('catatanKebersihan')
                             <p class="text-red-500 text-xs mt-1 font-medium">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Upload Foto Bukti (Opsional)</label>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Upload Foto Bukti <span class="text-red-500">*</span>
+                        </label>
                         
-                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-[#59A338] hover:bg-green-50/50 transition-colors relative cursor-pointer overflow-hidden" onclick="document.getElementById('fotoUpload').click()">
+                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 @error('fotoBukti') border-red-400 bg-red-50/20 @else border-gray-300 @enderror border-dashed rounded-xl hover:border-[#59A338] hover:bg-green-50/50 transition-colors relative cursor-pointer overflow-hidden" onclick="document.getElementById('fotoUpload').click()">
                             <div class="space-y-2 text-center {{ $fotoBukti ? 'hidden' : 'block' }}">
                                 <svg class="mx-auto h-10 w-10 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                                     <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>

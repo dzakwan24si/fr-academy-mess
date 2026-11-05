@@ -53,9 +53,10 @@
         }
         .barcode-img {
             width: 280px;
+            height: 280px;
             margin: 0 auto;
             border: 2px solid #eee;
-            padding: 8px;
+            padding: 10px;
             background: #fff;
             border-radius: 15px;
             text-align: center;
@@ -89,6 +90,7 @@
         }
         .small-img {
             width: 140px;
+            height: 140px;
             margin: 0 auto 10px auto;
             text-align: center;
         }
@@ -107,12 +109,10 @@
         <div class="barcode-desc">Scan barcode ini untuk memberikan penilaian dan masukan terkait kualitas hidangan.</div>
         
         <div class="barcode-img">
-            @if(isset($makanSvg) && $makanSvg)
-                {!! $makanSvg !!}
-            @elseif($makanBase64)
-                <img src="data:image/svg+xml;base64,{{ $makanBase64 }}" alt="QR Ruang Makan" style="width: 100%; height: 100%;">
+            @if($makanBase64)
+                <img src="{{ $makanBase64 }}" alt="QR Ruang Makan" width="280" height="280" style="display: block; margin: 0 auto;">
             @else
-                <div style="font-size: 14px; color: #888; padding: 100px 0;">QR Code Tidak Tersedia</div>
+                <div style="font-size: 14px; color: #888; padding-top: 130px;">QR Code Tidak Tersedia</div>
             @endif
         </div>
         
@@ -143,12 +143,10 @@
                     <div style="font-size: 12px; color: #666; margin-bottom: 15px;">Scan untuk akses sistem layanan kamar dan pelaporan masalah.</div>
                     
                     <div class="small-img">
-                        @if(isset($kamarSvg) && $kamarSvg)
-                            {!! $kamarSvg !!}
-                        @elseif($kamarBase64)
-                            <img src="data:image/svg+xml;base64,{{ $kamarBase64 }}" alt="QR Kamar" style="width: 100%; height: 100%;">
+                        @if($kamarBase64)
+                            <img src="{{ $kamarBase64 }}" alt="QR Kamar" width="140" height="140" style="display: block; margin: 0 auto;">
                         @else
-                            <div style="font-size: 12px; color: #888; padding: 50px 0;">QR Tidak Tersedia</div>
+                            <div style="font-size: 12px; color: #888; padding-top: 60px;">QR Tidak Tersedia</div>
                         @endif
                     </div>
                     <div style="font-size: 11px; color: #444; margin-top: 8px; font-style: italic; font-weight: 500;">

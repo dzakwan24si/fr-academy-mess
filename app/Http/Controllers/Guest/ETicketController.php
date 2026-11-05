@@ -27,14 +27,13 @@ class ETicketController extends Controller
                 @mkdir($fontDir, 0775, true);
             }
 
-            // Generate QR code locally in pure PHP (SVG requires 0 extensions, completely offline)
+            // Generate QR code locally in pure PHP (SVG base64 requires 0 extensions, completely offline)
             $qrCodeData = 'RSV-'.str_pad($reservasi->id, 4, '0', STR_PAD_LEFT);
-            $qrCodeSvg = null;
             $qrCodeBase64 = null;
 
             if (class_exists(QRCode::class)) {
-                $qrCodeSvg = QRCode::getSvg($qrCodeData, 2, 120);
-                if (! $qrCodeSvg && extension_loaded('gd')) {
+                $qrCodeBase64 = QRCode::getBase64Svg($qrCodeData, 2, 120);
+                if (! $qrCodeBase64 && extension_loaded('gd')) {
                     $qrCodeBase64 = QRCode::getBase64Png($qrCodeData, 4);
                 }
             }
@@ -52,7 +51,6 @@ class ETicketController extends Controller
 
             $pdf = Pdf::loadView('pdf.e-ticket', [
                 'reservasi' => $reservasi,
-                'qrCodeSvg' => $qrCodeSvg,
                 'qrCode' => $qrCodeBase64,
                 'logoBase64' => $logoBase64,
             ])->setPaper([0, 0, 380, 435], 'portrait');

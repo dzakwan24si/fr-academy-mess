@@ -187,11 +187,7 @@
                     </div>
                 </td>
                 <td class="qr-col">
-                    @if(isset($qrCodeSvg) && $qrCodeSvg)
-                        <div style="display: inline-block; border: 1px solid #ddd; padding: 5px; background: #fff; border-radius: 8px;">
-                            {!! $qrCodeSvg !!}
-                        </div>
-                    @elseif(isset($qrCode) && $qrCode)
+                    @if(isset($qrCode) && $qrCode)
                         <img src="{{ $qrCode }}" alt="QR Code">
                     @endif
                 </td>

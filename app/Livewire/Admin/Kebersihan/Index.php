@@ -4,14 +4,14 @@ namespace App\Livewire\Admin\Kebersihan;
 
 use App\Models\Kamar;
 use App\Models\RiwayatAktivitas;
-use Livewire\Component;
-use Livewire\Attributes\Layout;
-use Livewire\Attributes\Title;
-use Livewire\WithFileUploads;
-use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Notifications\KebersihanKamarNotification;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
+use Livewire\Component;
+use Livewire\WithFileUploads;
 
 #[Layout('layouts.admin')]
 #[Title('Tugas Kebersihan')]
@@ -20,9 +20,13 @@ class Index extends Component
     use WithFileUploads;
 
     public $kamarIdAktif = null;
+
     public $kamarNomorAktif = '';
+
     public $isModalSelesaiOpen = false;
+
     public $fotoBukti;
+
     public $catatanKebersihan = '';
 
     public function bukaModalSelesai($id, $nomor)
@@ -47,12 +51,19 @@ class Index extends Component
     public function simpanPenyelesaian()
     {
         $this->validate([
-            'fotoBukti' => 'nullable|image|max:2048',
-            'catatanKebersihan' => 'nullable|string|max:500',
+            'fotoBukti' => 'required|image|max:2048',
+            'catatanKebersihan' => 'required|string|max:500',
+        ], [
+            'fotoBukti.required' => 'Foto bukti pembersihan wajib diunggah.',
+            'fotoBukti.image' => 'Berkas bukti harus berupa gambar.',
+            'fotoBukti.max' => 'Ukuran foto bukti maksimal 2MB.',
+            'catatanKebersihan.required' => 'Catatan pembersihan wajib diisi.',
+            'catatanKebersihan.string' => 'Catatan pembersihan harus berupa teks.',
+            'catatanKebersihan.max' => 'Catatan pembersihan maksimal 500 karakter.',
         ]);
 
         $kamar = Kamar::findOrFail($this->kamarIdAktif);
-        
+
         $pathFoto = null;
         if ($this->fotoBukti) {
             $pathFoto = $this->fotoBukti->store('bukti_kebersihan', 'public');
@@ -61,8 +72,8 @@ class Index extends Component
         $kamar->update(['status' => 'kosong_bersih']);
 
         $keterangan = 'Status kamar diubah menjadi Kosong Bersih oleh Staf Kebersihan.';
-        if (!empty($this->catatanKebersihan)) {
-            $keterangan .= ' Catatan: ' . $this->catatanKebersihan;
+        if (! empty($this->catatanKebersihan)) {
+            $keterangan .= ' Catatan: '.$this->catatanKebersihan;
         }
 
         RiwayatAktivitas::create([
@@ -71,7 +82,7 @@ class Index extends Component
             'user_id' => Auth::id(),
             'aksi' => 'Kamar Dibersihkan',
             'keterangan' => $keterangan,
-            'foto_bukti' => $pathFoto
+            'foto_bukti' => $pathFoto,
         ]);
 
         $admins = User::role(['Superadmin', 'Koordinator Mess'])->get();
@@ -88,7 +99,7 @@ class Index extends Component
             ->get();
 
         return view('livewire.admin.kebersihan.index', [
-            'kamars' => $kamars
+            'kamars' => $kamars,
         ]);
     }
 }

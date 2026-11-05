@@ -15,19 +15,17 @@ class BarcodeController extends Controller
 
         $ruangMakanUrl = route('guest.dashboard');
 
-        // Generate offline vector SVG QR code (pure PHP, no external API, exact print size)
-        $makanSvg = QRCode::getSvg($ruangMakanUrl, 2, 280);
+        // Generate offline vector SVG QR code embedded via base64 for DomPDF
+        $makanBase64 = QRCode::getBase64Svg($ruangMakanUrl, 2, 280);
 
         // QR Code untuk kamar diarahkan ke portal tamu
         $kamarUrl = route('guest.dashboard');
-        $kamarSvg = QRCode::getSvg($kamarUrl, 2, 140);
+        $kamarBase64 = QRCode::getBase64Svg($kamarUrl, 2, 140);
 
         $pdf = Pdf::loadView('admin.barcode.cetak', [
             'kamars' => $kamars,
-            'makanSvg' => $makanSvg,
-            'kamarSvg' => $kamarSvg,
-            'makanBase64' => null,
-            'kamarBase64' => null,
+            'makanBase64' => $makanBase64,
+            'kamarBase64' => $kamarBase64,
         ])->setPaper('a4', 'portrait');
 
         return $pdf->stream('Barcode-Ruangan-FR-Academy.pdf');

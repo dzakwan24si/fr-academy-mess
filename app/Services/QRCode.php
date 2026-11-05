@@ -73,6 +73,13 @@ class QRCode
         }
     }
 
+    public static function getBase64Svg(string $data, int $margin = 2, int $size = 120): ?string
+    {
+        $svg = self::getSvg($data, $margin, $size);
+
+        return $svg ? 'data:image/svg+xml;base64,'.base64_encode($svg) : null;
+    }
+
     public static function getBase64Png(string $data, int $scale = 4): ?string
     {
         try {
