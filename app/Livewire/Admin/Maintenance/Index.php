@@ -93,6 +93,7 @@ class Index extends Component
                         'user_id' => Auth::id(),
                         'aksi' => 'Perbaikan Komplain Selesai',
                         'keterangan' => 'Komplain ('.$komplain->judul_komplain.') telah diselesaikan. Catatan teknisi: '.$this->catatanTeknisi,
+                        'foto_bukti' => $pathFoto,
                     ]);
                 }
 
@@ -122,7 +123,20 @@ class Index extends Component
                     'user_id' => Auth::id(),
                     'aksi' => 'Perbaikan Aset Selesai',
                     'keterangan' => 'Kondisi aset di '.($kamar ? $kamar->nomor_kamar : 'kamar').' telah diperbaiki menjadi Baik. Catatan: '.$this->catatanTeknisi,
+                    'foto_bukti' => $pathFoto,
                 ]);
+
+                if ($kamar) {
+                    $aset = AsetMess::find($this->tugasIdAktif);
+                    RiwayatAktivitas::create([
+                        'trackable_type' => Kamar::class,
+                        'trackable_id' => $kamar->id,
+                        'user_id' => Auth::id(),
+                        'aksi' => 'Perbaikan Aset Selesai',
+                        'keterangan' => 'Aset '.($aset ? $aset->nama_aset : 'aset').' telah diperbaiki menjadi Baik. Catatan: '.$this->catatanTeknisi,
+                        'foto_bukti' => $pathFoto,
+                    ]);
+                }
 
                 session()->flash('success', 'Status aset berhasil dikembalikan menjadi Baik dengan bukti perbaikan!');
             }

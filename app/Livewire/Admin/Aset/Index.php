@@ -3,9 +3,10 @@
 namespace App\Livewire\Admin\Aset;
 
 use App\Models\AsetMess;
-use Livewire\Component;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use Livewire\Component;
 use Livewire\WithPagination;
 
 #[Layout('layouts.admin')]
@@ -17,21 +18,28 @@ class Index extends Component
     public $perPage = 10;
 
     public $search = '';
-    
+
     // Form Modal
     public $isModalOpen = false;
+
     public $isDetailModalOpen = false;
+
     public $isEdit = false;
+
     public $selectedId = null;
+
     public $selectedAset = null;
-    
+
     // Riwayat Modal
     public $isModalRiwayatOpen = false;
+
     public $riwayatList = [];
+
     public $riwayatAsetTitle = '';
 
     // Fields
     public $nama_aset;
+
     public $kategori = 'Elektronik';
 
     protected $queryString = ['search'];
@@ -47,7 +55,7 @@ class Index extends Component
         if ($id) {
             $this->isEdit = true;
             $this->selectedId = $id;
-            
+
             $aset = AsetMess::findOrFail($id);
             $this->nama_aset = $aset->nama_aset;
             $this->kategori = $aset->kategori;
@@ -98,7 +106,7 @@ class Index extends Component
         $this->selectedAset = AsetMess::with(['kamars' => function ($query) {
             $query->orderBy('nomor_kamar', 'asc');
         }])->findOrFail($id);
-        
+
         $this->isDetailModalOpen = true;
     }
 
@@ -110,10 +118,26 @@ class Index extends Component
 
     public function bukaModalRiwayat($id)
     {
-        $aset = AsetMess::with(['riwayatAktivitas' => function($q) {
+        $aset = AsetMess::with(['riwayatAktivitas' => function ($q) {
             $q->latest();
         }, 'riwayatAktivitas.user'])->findOrFail($id);
-        
+
+        // Fallback pemulihan foto bukti perbaikan dari aset_kamar jika belum tersimpan di riwayat_aktivitas
+        foreach ($aset->riwayatAktivitas as $riwayat) {
+            if (empty($riwayat->foto_bukti) && str_contains($riwayat->aksi, 'Perbaikan')) {
+                $foto = DB::table('aset_kamar')
+                    ->where('aset_mess_id', $aset->id)
+                    ->whereNotNull('foto_perbaikan')
+                    ->orderByDesc('id')
+                    ->value('foto_perbaikan');
+
+                if ($foto) {
+                    $riwayat->foto_bukti = $foto;
+                    $riwayat->save();
+                }
+            }
+        }
+
         $this->riwayatList = $aset->riwayatAktivitas;
         $this->riwayatAsetTitle = $aset->nama_aset;
         $this->isModalRiwayatOpen = true;
@@ -129,9 +153,9 @@ class Index extends Component
     {
         $query = AsetMess::with('kamars')->orderBy('created_at', 'desc');
 
-        if (!empty($this->search)) {
-            $query->where('nama_aset', 'like', '%' . $this->search . '%')
-                  ->orWhere('kategori', 'like', '%' . $this->search . '%');
+        if (! empty($this->search)) {
+            $query->where('nama_aset', 'like', '%'.$this->search.'%')
+                ->orWhere('kategori', 'like', '%'.$this->search.'%');
         }
 
         $asets = $query->paginate($this->perPage);
@@ -164,7 +188,7 @@ class Index extends Component
         });
 
         return view('livewire.admin.aset.index', [
-            'asets' => $asets
+            'asets' => $asets,
         ]);
     }
 }

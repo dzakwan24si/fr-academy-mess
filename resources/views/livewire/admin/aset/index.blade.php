@@ -253,6 +253,17 @@
                                         </span>
                                     </div>
                                     <p class="text-sm text-gray-600 mb-2">{{ $riwayat->keterangan }}</p>
+                                    @if($riwayat->foto_bukti)
+                                        <div class="mb-3 mt-2">
+                                            <a href="{{ Storage::url($riwayat->foto_bukti) }}" target="_blank" class="inline-block relative rounded-lg overflow-hidden border border-gray-200 hover:ring-2 hover:ring-[#59A338] transition-all group">
+                                                <img src="{{ Storage::url($riwayat->foto_bukti) }}" alt="Foto Bukti Perbaikan" class="w-28 h-28 sm:w-36 sm:h-36 object-cover group-hover:scale-105 transition-transform duration-200">
+                                                <span class="absolute bottom-1 right-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded font-medium flex items-center gap-1 backdrop-blur-xs">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                                    Lihat Foto
+                                                </span>
+                                            </a>
+                                        </div>
+                                    @endif
                                     <div class="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                                         Oleh: {{ $riwayat->user ? $riwayat->user->name : 'Sistem' }}
