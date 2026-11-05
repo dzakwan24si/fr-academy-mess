@@ -161,15 +161,15 @@
                     <div>
                         <label class="block mb-2 text-sm font-bold text-gray-800">Catatan Tindakan / Perbaikan <span class="text-red-500">*</span></label>
                         <textarea wire:model="catatanTeknisi" rows="4" 
-                                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-[#59A338] focus:border-[#59A338] block w-full p-3 shadow-sm placeholder-gray-400" 
-                                  placeholder="Contoh: Mengganti kapasitor AC yang terbakar..." required></textarea>
-                        @error('catatanTeknisi') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                                  class="bg-gray-50 border @error('catatanTeknisi') border-red-400 @else border-gray-300 @enderror text-gray-900 text-sm rounded-xl focus:ring-[#59A338] focus:border-[#59A338] block w-full p-3 shadow-sm placeholder-gray-400" 
+                                  placeholder="Contoh: Mengganti kapasitor AC yang terbakar..."></textarea>
+                        @error('catatanTeknisi') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                     </div>
 
                     <div>
-                        <label class="block mb-2 text-sm font-bold text-gray-800">Unggah Foto Bukti <span class="text-gray-400 font-normal">(Opsional)</span></label>
+                        <label class="block mb-2 text-sm font-bold text-gray-800">Unggah Foto Bukti <span class="text-red-500">*</span></label>
                         <div class="flex items-center justify-center w-full">
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors relative overflow-hidden group">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed @error('fotoBukti') border-red-400 bg-red-50/20 @else border-gray-300 bg-gray-50 @enderror rounded-xl cursor-pointer hover:bg-gray-100 transition-colors relative overflow-hidden group">
                                 <div class="flex flex-col items-center justify-center pt-5 pb-6">
                                     @if ($fotoBukti)
                                         <img src="{{ $fotoBukti->temporaryUrl() }}" class="absolute inset-0 w-full h-full object-cover opacity-60">
