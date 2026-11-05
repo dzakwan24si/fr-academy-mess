@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Reservasi;
 use App\Services\QRCode;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ETicketController extends Controller
 {
@@ -19,23 +20,41 @@ class ETicketController extends Controller
         // Only allow download if status is approved, checked_in, or completed
         abort_if(! in_array($reservasi->status, ['approved', 'checked_in', 'completed']), 404, 'E-Ticket belum tersedia.');
 
-        // Generate QR code locally in pure PHP (no external API calls, offline-ready)
-        $qrCodeData = 'RSV-'.str_pad($reservasi->id, 4, '0', STR_PAD_LEFT);
-        $qrCodeBase64 = QRCode::getBase64Png($qrCodeData, 4);
+        try {
+            // Ensure storage/fonts directory exists for DomPDF font cache
+            $fontDir = storage_path('fonts');
+            if (! file_exists($fontDir)) {
+                @mkdir($fontDir, 0775, true);
+            }
 
-        // Load logo as base64 for reliable DomPDF embedding
-        $logoPath = public_path('logofr.png');
-        $logoBase64 = file_exists($logoPath) ? 'data:image/png;base64,'.base64_encode(file_get_contents($logoPath)) : null;
+            // Generate QR code locally in pure PHP (no external API calls, offline-ready)
+            $qrCodeData = 'RSV-'.str_pad($reservasi->id, 4, '0', STR_PAD_LEFT);
+            $qrCodeBase64 = null;
+            if (class_exists(QRCode::class)) {
+                $qrCodeBase64 = QRCode::getBase64Png($qrCodeData, 4);
+            }
 
-        $pdf = Pdf::loadView('pdf.e-ticket', [
-            'reservasi' => $reservasi,
-            'qrCode' => $qrCodeBase64,
-            'logoBase64' => $logoBase64,
-        ])->setPaper([0, 0, 380, 435], 'portrait');
+            // Load logo as base64 for reliable DomPDF embedding
+            $logoPath = public_path('logofr.png');
+            $logoBase64 = file_exists($logoPath) ? 'data:image/png;base64,'.base64_encode(file_get_contents($logoPath)) : null;
 
-        $namaTamu = $reservasi->tamu?->nama ?? 'Tamu';
-        $fileName = 'E-Ticket-'.str_pad($reservasi->id, 4, '0', STR_PAD_LEFT).'-'.str_replace(' ', '-', $namaTamu).'.pdf';
+            $pdf = Pdf::loadView('pdf.e-ticket', [
+                'reservasi' => $reservasi,
+                'qrCode' => $qrCodeBase64,
+                'logoBase64' => $logoBase64,
+            ])->setPaper([0, 0, 380, 435], 'portrait');
 
-        return $pdf->download($fileName);
+            $namaTamu = $reservasi->tamu?->nama ?? 'Tamu';
+            $fileName = 'E-Ticket-'.str_pad($reservasi->id, 4, '0', STR_PAD_LEFT).'-'.str_replace(' ', '-', $namaTamu).'.pdf';
+
+            return $pdf->download($fileName);
+        } catch (HttpException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            \Log::error('E-Ticket Generation Error: '.$e->getMessage()."\nFile: ".$e->getFile().':'.$e->getLine());
+
+            return response("Terjadi kendala saat memproses E-Ticket PDF di server:\n\n".$e->getMessage()."\n\nLokasi: ".$e->getFile().':'.$e->getLine()."\n\nPastikan ekstensi PHP di server (seperti php-gd, php-xml, php-mbstring) sudah aktif dan jalankan 'composer dump-autoload'.", 500)
+                ->header('Content-Type', 'text/plain');
+        }
     }
 }
