@@ -128,7 +128,11 @@
 
     <div class="ticket-box">
         <div class="header">
-            <img src="{{ public_path('logofr.png') }}" alt="FR Academy Logo">
+            @if(isset($logoBase64) && $logoBase64)
+                <img src="{{ $logoBase64 }}" alt="FR Academy Logo">
+            @elseif(file_exists(public_path('logofr.png')))
+                <img src="{{ public_path('logofr.png') }}" alt="FR Academy Logo">
+            @endif
             <h1>E-Ticket Reservasi</h1>
             <p>ID: RSV-{{ str_pad($reservasi->id, 4, '0', STR_PAD_LEFT) }}</p>
         </div>
@@ -138,8 +142,8 @@
                 <td class="info-col">
                     <div class="detail-row">
                         <div class="detail-label">Tamu</div>
-                        <div class="detail-value guest-name">{{ $reservasi->tamu->nama }}</div>
-                        <div class="detail-sub">{{ $reservasi->tamu->perusahaan ?? '-' }} ({{ $reservasi->tamu->jabatan ?? '-' }})</div>
+                        <div class="detail-value guest-name">{{ $reservasi->tamu?->nama ?? 'Tamu' }}</div>
+                        <div class="detail-sub">{{ $reservasi->tamu?->perusahaan ?? '-' }} ({{ $reservasi->tamu?->jabatan ?? '-' }})</div>
                     </div>
 
                     <div class="detail-row">
@@ -156,7 +160,7 @@
                     <div class="detail-row">
                         <div class="detail-label">Jadwal Menginap</div>
                         <div class="detail-value">
-                            {{ \Carbon\Carbon::parse($reservasi->tanggal_checkin)->translatedFormat('d M Y') }} 
+                            {{ $reservasi->tanggal_checkin ? \Carbon\Carbon::parse($reservasi->tanggal_checkin)->translatedFormat('d M Y') : '-' }} 
                             &ndash; 
                             {{ $reservasi->tanggal_checkout ? \Carbon\Carbon::parse($reservasi->tanggal_checkout)->translatedFormat('d M Y') : 'Selesai' }}
                         </div>
