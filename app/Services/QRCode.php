@@ -45,20 +45,22 @@ class QRCode
 
             $matrixSize = $code['s'][0];
             $matrix = $code['b'];
-            $totalSize = $matrixSize + ($margin * 2);
+            $totalModules = $matrixSize + ($margin * 2);
+            $moduleScale = max(1, (int) floor($size / $totalModules));
+            $finalSize = $totalModules * $moduleScale;
 
             $pathData = '';
             for ($r = 0; $r < $matrixSize; $r++) {
                 for ($c = 0; $c < $matrixSize; $c++) {
                     if (($matrix[$r][$c] & 1) === 1) {
-                        $x = $c + $margin;
-                        $y = $r + $margin;
-                        $pathData .= "M{$x},{$y}h1v1h-1z ";
+                        $x = ($c + $margin) * $moduleScale;
+                        $y = ($r + $margin) * $moduleScale;
+                        $pathData .= "M{$x},{$y}h{$moduleScale}v{$moduleScale}h-{$moduleScale}z ";
                     }
                 }
             }
 
-            $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '.$totalSize.' '.$totalSize.'" width="'.$size.'" height="'.$size.'" shape-rendering="crispEdges">';
+            $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '.$finalSize.' '.$finalSize.'" width="'.$finalSize.'" height="'.$finalSize.'" shape-rendering="crispEdges">';
             $svg .= '<rect width="100%" height="100%" fill="#ffffff"/>';
             $svg .= '<path fill="#000000" d="'.trim($pathData).'"/>';
             $svg .= '</svg>';

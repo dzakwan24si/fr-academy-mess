@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Kamar;
+use App\Services\QRCode;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class BarcodeController extends Controller
@@ -12,32 +13,21 @@ class BarcodeController extends Controller
     {
         $kamars = Kamar::where('tipe_kamar', '!=', 'Fasilitas Umum')->orderBy('nomor_kamar', 'asc')->get();
 
-        $ruangMakanUrl = route('guest.dashboard'); // Nanti tamu bisa pilih menu survei dari dashboard
-        // Untuk survei kepuasan makanan, kita bisa mengarahkannya langsung kalau ada routenya,
-        // tapi sementara arahkan ke dashboard tamu.
+        $ruangMakanUrl = route('guest.dashboard');
 
-        $qrContext = stream_context_create([
-            'ssl' => [
-                'verify_peer' => false,
-                'verify_peer_name' => false,
-            ],
-            'http' => [
-                'timeout' => 5,
-            ],
-        ]);
+        // Generate offline vector SVG QR code (pure PHP, no external API, exact print size)
+        $makanSvg = QRCode::getSvg($ruangMakanUrl, 2, 280);
 
-        $makanApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data='.urlencode($ruangMakanUrl).'&format=svg&margin=0';
-        $makanRaw = @file_get_contents($makanApiUrl, false, $qrContext);
-        $makanBase64 = $makanRaw ? base64_encode($makanRaw) : '';
-
-        $kamarApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data='.urlencode(route('guest.dashboard')).'&format=svg&margin=0';
-        $kamarRaw = @file_get_contents($kamarApiUrl, false, $qrContext);
-        $kamarBase64 = $kamarRaw ? base64_encode($kamarRaw) : '';
+        // QR Code untuk kamar diarahkan ke portal tamu
+        $kamarUrl = route('guest.dashboard');
+        $kamarSvg = QRCode::getSvg($kamarUrl, 2, 140);
 
         $pdf = Pdf::loadView('admin.barcode.cetak', [
             'kamars' => $kamars,
-            'makanBase64' => $makanBase64,
-            'kamarBase64' => $kamarBase64,
+            'makanSvg' => $makanSvg,
+            'kamarSvg' => $kamarSvg,
+            'makanBase64' => null,
+            'kamarBase64' => null,
         ])->setPaper('a4', 'portrait');
 
         return $pdf->stream('Barcode-Ruangan-FR-Academy.pdf');
