@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Livewire\Admin\Dapur\Index;
 use App\Models\RencanaMenuHarian;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 
 class DapurExportController extends Controller
 {
@@ -32,7 +32,7 @@ class DapurExportController extends Controller
                 $noSurat = $noInput;
             }
         } else {
-            $fallbackNo = Cache::get('dapur_last_nomor_surat', 11);
+            $fallbackNo = Index::getNomorSuratBerikutnya();
             $noSurat = "{$fallbackNo}/L&D/{$currentMonthRoman}/{$currentYear}";
         }
 

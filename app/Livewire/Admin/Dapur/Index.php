@@ -571,15 +571,41 @@ class Index extends Component
 
     public $cetak_jumlah_peserta;
 
-    public $cetak_nomor_surat;
+    public $cetak_nomor_surat = '';
+
+    public static function getNomorSuratBerikutnya(): string
+    {
+        $filePath = storage_path('app/dapur_nomor_surat.txt');
+        if (file_exists($filePath)) {
+            $val = trim((string) file_get_contents($filePath));
+            if ($val !== '' && is_numeric($val)) {
+                return (string) $val;
+            }
+        }
+
+        $cached = Cache::get('dapur_last_nomor_surat');
+        if ($cached !== null && is_numeric($cached)) {
+            return (string) $cached;
+        }
+
+        return '11';
+    }
+
+    public static function simpanNomorSuratBerikutnya(int $nextNumber): void
+    {
+        Cache::forever('dapur_last_nomor_surat', (string) $nextNumber);
+        $filePath = storage_path('app/dapur_nomor_surat.txt');
+        @file_put_contents($filePath, (string) $nextNumber);
+    }
 
     public function bukaModalCetak()
     {
         $this->reset(['cetak_start_date', 'cetak_end_date', 'cetak_nama_pelatihan', 'cetak_jumlah_peserta']);
+        $this->resetValidation();
         $this->cetak_start_date = date('Y-m-d');
         $this->cetak_end_date = date('Y-m-d', strtotime('+7 days'));
-        // Ambil nomor urut surat dari Cache (default mulai dari 11)
-        $this->cetak_nomor_surat = Cache::get('dapur_last_nomor_surat', 11);
+        // Ambil nomor urut surat tersimpan (selalu dipastikan string agar validasi tidak error)
+        $this->cetak_nomor_surat = (string) self::getNomorSuratBerikutnya();
         $this->isModalCetakOpen = true;
     }
 
@@ -590,23 +616,30 @@ class Index extends Component
 
     public function prosesCetakBelanja()
     {
+        $this->cetak_nomor_surat = (string) ($this->cetak_nomor_surat ?? '');
+
         $this->validate([
             'cetak_start_date' => 'required|date',
             'cetak_end_date' => 'required|date|after_or_equal:cetak_start_date',
             'cetak_nama_pelatihan' => 'required|string|max:255',
             'cetak_jumlah_peserta' => 'required|integer|min:1',
-            'cetak_nomor_surat' => 'nullable|string|max:50',
+            'cetak_nomor_surat' => 'nullable|max:50',
+        ], [
+            'cetak_start_date.required' => 'Dari tanggal wajib diisi.',
+            'cetak_end_date.required' => 'Sampai tanggal wajib diisi.',
+            'cetak_nama_pelatihan.required' => 'Nama pelatihan wajib diisi.',
+            'cetak_jumlah_peserta.required' => 'Jumlah peserta wajib diisi.',
         ]);
 
-        $noInput = trim($this->cetak_nomor_surat ?? '');
-        $currentSeq = Cache::get('dapur_last_nomor_surat', 11);
+        $noInput = trim($this->cetak_nomor_surat);
+        $currentSeq = (int) self::getNomorSuratBerikutnya();
 
         if ($noInput === '') {
             $noSuratFinal = (string) $currentSeq;
-            Cache::forever('dapur_last_nomor_surat', ((int) $currentSeq) + 1);
+            self::simpanNomorSuratBerikutnya($currentSeq + 1);
         } elseif (is_numeric($noInput)) {
             $noSuratFinal = $noInput;
-            Cache::forever('dapur_last_nomor_surat', ((int) $noInput) + 1);
+            self::simpanNomorSuratBerikutnya(((int) $noInput) + 1);
         } else {
             $noSuratFinal = $noInput;
         }
