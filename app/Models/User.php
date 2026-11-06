@@ -42,4 +42,37 @@ class User extends Authenticatable
 
         return $this->roles->contains('is_read_only', true);
     }
+
+    public function getHomeRoute(): string
+    {
+        // Staf operasional dialihkan langsung ke menu kerja hariannya
+        if ($this->hasRole('Teknisi')) {
+            return route('admin.maintenance');
+        }
+
+        if ($this->hasRole('Staf Kebersihan')) {
+            return route('admin.kebersihan');
+        }
+
+        if ($this->hasRole('Staf Dapur')) {
+            return route('admin.dapur');
+        }
+
+        if ($this->hasRole('Staf Laundry')) {
+            return route('admin.laundry');
+        }
+
+        // Superadmin, Koordinator Mess, Kepala TU, Direktur, dan tim manajemen lainnya
+        return route('admin.dashboard');
+    }
+
+    public function canAccessDashboard(): bool
+    {
+        // Staf operasional murni tidak membutuhkan tampilan dashboard manajerial
+        if ($this->hasAnyRole(['Teknisi', 'Staf Kebersihan', 'Staf Dapur', 'Staf Laundry'])) {
+            return $this->hasAnyRole(['Superadmin', 'Koordinator Mess', 'Kepala TU', 'Direktur']);
+        }
+
+        return true;
+    }
 }

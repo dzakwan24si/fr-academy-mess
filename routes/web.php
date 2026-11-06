@@ -44,7 +44,7 @@ Route::post('/login', function (Request $request) {
             $user->update(['last_login_at' => now()]);
         }
 
-        return redirect()->intended('/admin/dashboard');
+        return redirect()->intended($user?->getHomeRoute() ?? '/admin/dashboard');
     }
 
     return back()->withErrors([

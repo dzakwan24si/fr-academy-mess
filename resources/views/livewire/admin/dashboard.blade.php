@@ -21,7 +21,7 @@
 
     <!-- Summary Cards (Top) -->
     <div class="flex flex-wrap gap-4">
-        @can('akses_reservasi')
+        @if(auth()->user()?->canAccessDashboard() || auth()->user()?->can('akses_reservasi'))
         <!-- 1. Kamar Terisi -->
         <div wire:click="showDetail('okupansi')" class="cursor-pointer hover:scale-[1.02] transition-transform flex-1 min-w-[200px] bg-white rounded-2xl p-5 shadow-sm hover:shadow-md border border-gray-100 flex flex-col gap-3">
             <div class="flex items-center justify-between">
@@ -91,10 +91,10 @@
                 <p class="text-xs text-rose-600 mt-1">Kamar status kotor</p>
             </div>
         </div>
-        @endcan
+        @endif
 
         <!-- 6. Komplain Baru -->
-        @can('akses_komplain')
+        @if(auth()->user()?->canAccessDashboard() || auth()->user()?->can('akses_komplain'))
         <div wire:click="showDetail('komplain_baru')" class="cursor-pointer hover:scale-[1.02] transition-transform flex-1 min-w-[200px] bg-white rounded-2xl p-5 shadow-sm hover:shadow-md border border-amber-100 flex flex-col gap-3">
             <div class="flex items-center justify-between">
                 <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
@@ -107,14 +107,14 @@
                 <p class="text-xs text-amber-600 mt-1">Laporan belum diproses</p>
             </div>
         </div>
-        @endcan
+        @endif
     </div>
 
-    @php $hasChart = auth()->user()->can('akses_reservasi'); @endphp
+    @php $hasChart = auth()->user()?->canAccessDashboard() || auth()->user()?->can('akses_reservasi'); @endphp
     <!-- Main Content Area -->
     <div class="grid grid-cols-1 {{ $hasChart ? 'lg:grid-cols-3' : 'lg:grid-cols-1' }} gap-6 flex-1">
         
-        @can('akses_reservasi')
+        @if(auth()->user()?->canAccessDashboard() || auth()->user()?->can('akses_reservasi'))
         <!-- Left Side: Occupancy Chart (Col Span 2) -->
         <div class="lg:col-span-2 flex flex-col gap-6">
             
@@ -190,14 +190,14 @@
                 </div>
             </div>
         </div>
-        @endcan
+        @endif
 
         <!-- Right Side: Operational Widget -->
         <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col gap-6 {{ $hasChart ? '' : 'col-span-full' }}">
             <h2 class="text-lg font-bold text-gray-800 border-b border-gray-100 pb-4">Ringkasan Operasional Hari Ini</h2>
             
             <!-- Dapur -->
-            @can('akses_dapur')
+            @if(auth()->user()?->canAccessDashboard() || auth()->user()?->can('akses_dapur'))
             <div>
                 <div class="flex items-center gap-3 mb-4">
                     <div class="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center text-orange-500">
@@ -223,12 +223,12 @@
             </div>
 
             <hr class="border-gray-50">
-            @endcan
+            @endif
 
             <!-- Komplain & Laundry -->
-            @canany(['akses_komplain', 'akses_laundry'])
+            @if(auth()->user()?->canAccessDashboard() || auth()->user()?->canany(['akses_komplain', 'akses_laundry']))
             <div class="flex flex-col gap-4">
-                @can('akses_komplain')
+                @if(auth()->user()?->canAccessDashboard() || auth()->user()?->can('akses_komplain'))
                 <div class="flex items-center justify-between bg-amber-50/50 rounded-xl p-4 border border-amber-100/50 hover:bg-amber-50 transition-colors">
                     <div class="flex items-center gap-3">
                         <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center">
@@ -241,9 +241,9 @@
                     </div>
                     <div class="font-bold text-lg {{ $komplainBaru > 0 ? 'text-amber-600' : 'text-gray-400' }}">{{ $komplainBaru }}</div>
                 </div>
-                @endcan
+                @endif
 
-                @can('akses_laundry')
+                @if(auth()->user()?->canAccessDashboard() || auth()->user()?->can('akses_laundry'))
                 <div class="flex items-center justify-between bg-cyan-50/50 rounded-xl p-4 border border-cyan-100/50 hover:bg-cyan-50 transition-colors">
                     <div class="flex items-center gap-3">
                         <div class="w-8 h-8 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center">
@@ -256,9 +256,9 @@
                     </div>
                     <div class="font-bold text-lg {{ $laundryBaru > 0 ? 'text-cyan-600' : 'text-gray-400' }}">{{ $laundryBaru }}</div>
                 </div>
-                @endcan
+                @endif
             </div>
-            @endcanany
+            @endif
             
             <div class="mt-auto pt-4 text-center">
                 <p class="text-xs text-gray-400">Data operasional diperbarui secara real-time</p>

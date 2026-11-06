@@ -2,23 +2,36 @@
 
 namespace App\Livewire\Admin;
 
-use Livewire\Component;
-use Livewire\Attributes\Layout;
-use App\Models\Reservasi;
 use App\Models\Kamar;
 use App\Models\KomplainKerusakan;
-use App\Models\RequestLaundry;
 use App\Models\RencanaMenuHarian;
+use App\Models\RequestLaundry;
+use App\Models\Reservasi;
 use Carbon\Carbon;
+use Livewire\Attributes\Layout;
+use Livewire\Component;
 
 #[Layout('layouts.admin')]
 class Dashboard extends Component
 {
     public $chartRange = 7;
+
     public $showDetailModal = false;
+
     public $detailType = '';
+
     public $detailTitle = '';
+
     public $detailData = [];
+
+    public function mount()
+    {
+        $user = auth()->user();
+        if ($user && ! $user->canAccessDashboard()) {
+            return redirect()->to($user->getHomeRoute());
+        }
+    }
+
     public function updatedChartRange()
     {
         $data = $this->getChartData();
@@ -32,13 +45,14 @@ class Dashboard extends Component
         for ($i = $this->chartRange - 1; $i >= 0; $i--) {
             $date = Carbon::today()->subDays($i);
             $chartDates[] = $date->format('d M');
-            
+
             $occupancy = Reservasi::whereDate('tanggal_checkin', '<=', $date)
                 ->whereDate('tanggal_checkout', '>=', $date)
                 ->whereIn('status', ['checked_in', 'completed'])
                 ->count();
             $chartData[] = $occupancy;
         }
+
         return ['dates' => $chartDates, 'data' => $chartData];
     }
 

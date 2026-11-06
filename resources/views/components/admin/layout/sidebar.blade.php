@@ -13,12 +13,14 @@ new class extends Component
     <div class="flex-1 overflow-y-auto py-6 px-4 space-y-4">
         
         <!-- DASHBOARD -->
+        @if(auth()->user()?->canAccessDashboard())
         <div>
             <a href="{{ route('admin.dashboard') }}" wire:navigate class="{{ request()->routeIs('admin.dashboard') ? 'bg-[#2E7D32] text-white shadow-md' : 'text-gray-600 hover:bg-gray-50' }} flex items-center gap-3 px-4 py-2.5 rounded-xl font-semibold transition-colors text-sm">
                 <svg class="w-5 h-5 {{ request()->routeIs('admin.dashboard') ? 'text-white' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                 Dashboard
             </a>
         </div>
+        @endif
         
         <!-- KAMAR & RESERVASI -->
         @canany(['akses_reservasi', 'akses_kamar', 'akses_kebersihan'])

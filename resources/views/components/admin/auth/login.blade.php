@@ -66,7 +66,7 @@ new class extends Component
                 $user->update(['last_login_at' => now()]);
             }
 
-            return redirect()->intended('/admin/dashboard');
+            return redirect()->intended($user?->getHomeRoute() ?? '/admin/dashboard');
         }
 
         $this->addError('loginId', 'Kredensial yang diberikan tidak cocok dengan data kami.');
