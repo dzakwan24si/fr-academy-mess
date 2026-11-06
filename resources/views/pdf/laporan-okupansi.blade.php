@@ -118,7 +118,7 @@
                             -
                         @endif
                     </td>
-                    <td>{{ \Carbon\Carbon::parse($row->tanggal_checkin)->translatedFormat('d M Y') }}</td>
+                    <td>{{ $row->tanggal_checkin ? \Carbon\Carbon::parse($row->tanggal_checkin)->translatedFormat('d M Y') : '-' }}</td>
                     <td>{{ $row->tanggal_checkout ? \Carbon\Carbon::parse($row->tanggal_checkout)->translatedFormat('d M Y') : '-' }}</td>
                     <td class="text-center">
                         @if($row->status == 'checked_in')

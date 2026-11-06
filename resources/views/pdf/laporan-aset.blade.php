@@ -101,22 +101,22 @@
                 <tr>
                     <td class="text-center">{{ $index + 1 }}</td>
                     <td>
-                        <strong>{{ $row['kamar_nama'] }}</strong><br>
-                        <span style="font-size: 10px; color: #666;">{{ $row['kamar_lokasi'] }}</span>
+                        <strong>{{ $row['kamar_nama'] ?? '-' }}</strong><br>
+                        <span style="font-size: 10px; color: #666;">{{ $row['kamar_lokasi'] ?? '-' }}</span>
                     </td>
-                    <td>{{ $row['aset_nama'] }}</td>
-                    <td>{{ $row['aset_kategori'] }}</td>
-                    <td class="text-center">{{ $row['jumlah'] }}</td>
+                    <td>{{ $row['aset_nama'] ?? '-' }}</td>
+                    <td>{{ $row['aset_kategori'] ?? '-' }}</td>
+                    <td class="text-center">{{ $row['jumlah'] ?? 0 }}</td>
                     <td class="text-center">
-                        @if($row['kondisi'] === 'Baik')
+                        @if(($row['kondisi'] ?? '') === 'Baik')
                             <span class="badge badge-baik">Baik</span>
-                        @elseif($row['kondisi'] === 'Rusak')
-                            <span class="badge badge-rusak">Rusak</span>
+                        @elseif(str_contains($row['kondisi'] ?? '', 'Rusak'))
+                            <span class="badge badge-rusak">{{ $row['kondisi'] }}</span>
                         @else
-                            <span class="badge badge-hilang">{{ $row['kondisi'] }}</span>
+                            <span class="badge badge-hilang">{{ $row['kondisi'] ?? '-' }}</span>
                         @endif
                     </td>
-                    <td>{{ $row['keterangan'] ?: '-' }}</td>
+                    <td>{{ ($row['keterangan'] ?? '') ?: '-' }}</td>
                 </tr>
             @empty
                 <tr>
