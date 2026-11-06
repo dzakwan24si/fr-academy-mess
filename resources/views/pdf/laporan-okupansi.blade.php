@@ -77,7 +77,11 @@
 <body>
 
     <div class="header">
-        <img src="{{ public_path('logofr.png') }}" alt="FR Academy Logo">
+        @if(!empty($logoBase64))
+            <img src="{{ $logoBase64 }}" alt="FR Academy Logo">
+        @elseif(file_exists(public_path('logofr.png')))
+            <img src="{{ public_path('logofr.png') }}" alt="FR Academy Logo">
+        @endif
         <h1>FR Academy Mess</h1>
         <p>Laporan Tingkat Hunian (Okupansi) - Periode: {{ $bulan }} {{ $tahun }}</p>
         <p style="font-size: 12px;">Tanggal Dicetak: {{ \Carbon\Carbon::now()->translatedFormat('d F Y, H:i') }}</p>
@@ -104,8 +108,8 @@
             @forelse($data as $index => $row)
                 <tr>
                     <td class="text-center">{{ $index + 1 }}</td>
-                    <td><strong>{{ $row->tamu->nama ?? 'Tamu' }}</strong></td>
-                    <td>{{ $row->tamu->perusahaan ?? '-' }} ({{ $row->tamu->jabatan ?? '-' }})</td>
+                    <td><strong>{{ $row->tamu?->nama ?? 'Tamu' }}</strong></td>
+                    <td>{{ $row->tamu?->perusahaan ?? '-' }} ({{ $row->tamu?->jabatan ?? '-' }})</td>
                     <td>
                         @if($row->kamar)
                             {{ $row->kamar->nomor_kamar }}<br>

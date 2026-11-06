@@ -74,7 +74,11 @@
 <body>
 
     <div class="header">
-        <img src="{{ public_path('logofr.png') }}" alt="FR Academy Logo">
+        @if(!empty($logoBase64))
+            <img src="{{ $logoBase64 }}" alt="FR Academy Logo">
+        @elseif(file_exists(public_path('logofr.png')))
+            <img src="{{ public_path('logofr.png') }}" alt="FR Academy Logo">
+        @endif
         <h1>FR Academy Mess</h1>
         <p>Laporan Distribusi Aset</p>
         <p style="font-size: 12px;">Tanggal Dicetak: {{ \Carbon\Carbon::now()->translatedFormat('d F Y, H:i') }}</p>

@@ -13,6 +13,6 @@ class SurveiKepuasanKamar extends Model
 
     public function reservasi()
     {
-        return $this->belongsTo(Reservasi::class);
+        return $this->belongsTo(Reservasi::class)->withTrashed();
     }
 }

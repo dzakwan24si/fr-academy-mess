@@ -80,7 +80,11 @@
 <body>
 
     <div class="header">
-        <img src="{{ public_path('logofr.png') }}" alt="FR Academy Logo">
+        @if(!empty($logoBase64))
+            <img src="{{ $logoBase64 }}" alt="FR Academy Logo">
+        @elseif(file_exists(public_path('logofr.png')))
+            <img src="{{ public_path('logofr.png') }}" alt="FR Academy Logo">
+        @endif
         <h1>FR Academy Mess</h1>
         <p>Laporan Kepuasan Pelayanan Mess</p>
         <p style="font-size: 13px; font-weight: bold; margin-top: 5px;">Periode: {{ $bulan }} {{ $tahun }}</p>
@@ -103,20 +107,25 @@
         </thead>
         <tbody>
             @forelse($data as $row)
+                @php
+                    $rowRating = $row->kebersihan_kamar !== null
+                        ? ($row->kebersihan_kamar + $row->kebersihan_toilet + $row->kualitas_makanan + $row->kenyamanan_fasilitas + $row->pelayanan_staf) / 5
+                        : ($row->rating ?? 0);
+                @endphp
                 <tr>
                     <td>{{ \Carbon\Carbon::parse($row->created_at)->translatedFormat('d M Y') }}</td>
                     <td>
-                        <strong>{{ $row->reservasi->tamu->nama ?? 'Tamu' }}</strong><br>
+                        <strong>{{ $row->reservasi?->tamu?->nama ?? 'Tamu (Umum)' }}</strong><br>
                         <span style="font-size: 10px; color: #666;">
-                            {{ $row->reservasi->tamu->perusahaan ?? '-' }} ({{ $row->reservasi->tamu->jabatan ?? '-' }})<br>
-                            @if($row->reservasi->kamar)
+                            {{ $row->reservasi?->tamu?->perusahaan ?? '-' }} ({{ $row->reservasi?->tamu?->jabatan ?? '-' }})<br>
+                            @if($row->reservasi?->kamar)
                                 {{ $row->reservasi->kamar->nomor_kamar }}
                             @else
                                 Tanpa Kamar
                             @endif
                         </span>
                     </td>
-                    <td class="text-center"><strong>{{ $row->rating }}</strong> / 5</td>
+                    <td class="text-center"><strong>{{ number_format($rowRating, 1) }}</strong> / 5</td>
                     <td>
                         <div>"{{ $row->komentar ?: 'Tidak ada komentar.' }}"</div>
                         @if($row->saran_masukan)

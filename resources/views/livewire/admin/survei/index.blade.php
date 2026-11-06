@@ -92,8 +92,8 @@
                             {{ \Carbon\Carbon::parse($survei->created_at)->format('d M Y, H:i') }}
                         </td>
                         <td class="px-6 py-4">
-                            <div class="font-bold text-gray-800">{{ $survei->reservasi->tamu->nama ?? 'Anonim' }}</div>
-                            <div class="text-[11px] text-gray-500 mt-0.5">{{ $survei->reservasi->kamar->nomor_kamar ?? '-' }}</div>
+                            <div class="font-bold text-gray-800">{{ $survei->reservasi?->tamu?->nama ?? 'Anonim' }}</div>
+                            <div class="text-[11px] text-gray-500 mt-0.5">{{ $survei->reservasi?->kamar?->nomor_kamar ?? '-' }}</div>
                         </td>
                         <td class="px-6 py-4">
                             @php

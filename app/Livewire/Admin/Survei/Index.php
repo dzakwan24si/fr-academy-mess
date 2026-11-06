@@ -2,12 +2,13 @@
 
 namespace App\Livewire\Admin\Survei;
 
-use Livewire\Component;
+use App\Models\SurveiKepuasanKamar;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
-use App\Models\SurveiKepuasanKamar;
+use Livewire\Component;
 use Livewire\WithPagination;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 #[Layout('layouts.admin')]
 #[Title('Evaluasi & Survei')]
@@ -16,9 +17,11 @@ class Index extends Component
     use WithPagination;
 
     public $perPage = 10;
-    
+
     public $search = '';
+
     public $bulan;
+
     public $tahun;
 
     public function mount()
@@ -34,8 +37,14 @@ class Index extends Component
 
     public function render()
     {
-        $query = SurveiKepuasanKamar::with(['reservasi.tamu', 'reservasi.kamar'])
-            ->latest();
+        $query = SurveiKepuasanKamar::with([
+            'reservasi' => function ($q) {
+                $q->withTrashed()->with([
+                    'tamu' => fn ($t) => $t->withTrashed(),
+                    'kamar' => fn ($k) => $k->withTrashed(),
+                ]);
+            },
+        ])->latest();
 
         if ($this->bulan !== 'all') {
             $query->whereMonth('created_at', $this->bulan);
@@ -47,9 +56,9 @@ class Index extends Component
 
         if ($this->search) {
             $query->whereHas('reservasi.tamu', function ($q) {
-                $q->where('nama', 'like', '%' . $this->search . '%');
+                $q->where('nama', 'like', '%'.$this->search.'%');
             })->orWhereHas('reservasi.kamar', function ($q) {
-                $q->where('nomor_kamar', 'like', '%' . $this->search . '%');
+                $q->where('nomor_kamar', 'like', '%'.$this->search.'%');
             });
         }
 
@@ -65,7 +74,7 @@ class Index extends Component
         if ($this->tahun !== 'all') {
             $statsQuery->whereYear('created_at', $this->tahun);
         }
-        
+
         $stats = [
             'total' => (clone $statsQuery)->count(),
             'avg_kamar' => (clone $statsQuery)->avg('kebersihan_kamar') ?? 0,
@@ -80,8 +89,20 @@ class Index extends Component
 
     public function exportPdf()
     {
-        $query = SurveiKepuasanKamar::with(['reservasi.tamu', 'reservasi.kamar'])
-            ->latest();
+        // Pastikan direktori fonts tersedia untuk cache DomPDF
+        $fontDir = storage_path('fonts');
+        if (! file_exists($fontDir)) {
+            @mkdir($fontDir, 0775, true);
+        }
+
+        $query = SurveiKepuasanKamar::with([
+            'reservasi' => function ($q) {
+                $q->withTrashed()->with([
+                    'tamu' => fn ($t) => $t->withTrashed(),
+                    'kamar' => fn ($k) => $k->withTrashed(),
+                ]);
+            },
+        ])->latest();
 
         if ($this->bulan !== 'all') {
             $query->whereMonth('created_at', $this->bulan);
@@ -93,39 +114,49 @@ class Index extends Component
 
         if ($this->search) {
             $query->whereHas('reservasi.tamu', function ($q) {
-                $q->where('nama', 'like', '%' . $this->search . '%');
+                $q->where('nama', 'like', '%'.$this->search.'%');
             })->orWhereHas('reservasi.kamar', function ($q) {
-                $q->where('nomor_kamar', 'like', '%' . $this->search . '%');
+                $q->where('nomor_kamar', 'like', '%'.$this->search.'%');
             });
         }
 
         $data = $query->get();
-        
+
         $totalResponden = $data->count();
-        // Since we want the overall average for the PDF
         if ($totalResponden > 0) {
-            // We use the same manual calculation logic as the old view
-            // The table has rating, and maybe the 5 new categories
             $rataRataRating = $data->map(function ($s) {
                 if ($s->kebersihan_kamar !== null) {
                     return ($s->kebersihan_kamar + $s->kebersihan_toilet + $s->kualitas_makanan + $s->kenyamanan_fasilitas + $s->pelayanan_staf) / 5;
                 }
+
                 return $s->rating;
             })->avg();
         } else {
             $rataRataRating = 0;
         }
 
+        // Siapkan logo dalam format base64 agar aman dirender oleh DomPDF di server linux/production
+        $logoPath = public_path('logofr.jpg');
+        if (! file_exists($logoPath)) {
+            $logoPath = public_path('logofr.png');
+        }
+        $logoBase64 = file_exists($logoPath) ? 'data:image/'.pathinfo($logoPath, PATHINFO_EXTENSION).';base64,'.base64_encode(file_get_contents($logoPath)) : null;
+
+        $namaBulan = $this->bulan === 'all'
+            ? 'Semua Bulan'
+            : Carbon::createFromDate(null, (int) $this->bulan, 1)->translatedFormat('F');
+
         $pdf = Pdf::loadView('pdf.laporan-evaluasi', [
             'data' => $data,
             'totalResponden' => $totalResponden,
             'rataRataRating' => round((float) $rataRataRating, 1),
-            'bulan' => $this->bulan === 'all' ? 'Semua Bulan' : \Carbon\Carbon::create()->month((int) $this->bulan)->translatedFormat('F'),
-            'tahun' => $this->tahun === 'all' ? 'Semua Tahun' : $this->tahun
+            'bulan' => $namaBulan,
+            'tahun' => $this->tahun === 'all' ? 'Semua Tahun' : $this->tahun,
+            'logoBase64' => $logoBase64,
         ]);
 
         return response()->streamDownload(function () use ($pdf) {
-            echo $pdf->stream();
-        }, "Laporan-Kepuasan-Tamu.pdf");
+            echo $pdf->output();
+        }, "Laporan-Kepuasan-Tamu-{$namaBulan}-{$this->tahun}.pdf");
     }
 }

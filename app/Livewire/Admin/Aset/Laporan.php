@@ -3,12 +3,14 @@
 namespace App\Livewire\Admin\Aset;
 
 use App\Models\Kamar;
-use Livewire\Component;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 #[Layout('layouts.admin')]
 #[Title('LAPORAN DISTRIBUSI ASET')]
@@ -19,15 +21,18 @@ class Laporan extends Component
     public $perPage = 10;
 
     public $search = '';
+
     public $filterKamar = '';
+
     public $filterKondisi = '';
 
     public $isModalRiwayatOpen = false;
+
     public $detailRiwayat = [];
 
     public function bukaModalRiwayat($pivot_id)
     {
-        $pivotRow = \Illuminate\Support\Facades\DB::table('aset_kamar')
+        $pivotRow = DB::table('aset_kamar')
             ->join('aset_messes', 'aset_kamar.aset_mess_id', '=', 'aset_messes.id')
             ->join('kamars', 'aset_kamar.kamar_id', '=', 'kamars.id')
             ->select('aset_messes.nama_aset', 'kamars.nomor_kamar', 'aset_kamar.catatan_perbaikan', 'aset_kamar.foto_perbaikan', 'aset_kamar.tanggal_maintenance')
@@ -58,16 +63,16 @@ class Laporan extends Component
         // Ambil data kamar beserta relasi asetnya
         $query = Kamar::whereHas('asets');
 
-        if (!empty($this->filterKamar)) {
+        if (! empty($this->filterKamar)) {
             $query->where('id', $this->filterKamar);
         }
 
         // Ambil data (Eager Load) dengan filter kondisi pada Pivot jika ada
         $kamars = $query->with(['asets' => function ($q) {
-            if (!empty($this->search)) {
-                $q->where('nama_aset', 'like', '%' . $this->search . '%');
+            if (! empty($this->search)) {
+                $q->where('nama_aset', 'like', '%'.$this->search.'%');
             }
-            if (!empty($this->filterKondisi)) {
+            if (! empty($this->filterKondisi)) {
                 $q->wherePivot('kondisi', $this->filterKondisi);
             }
         }])->get();
@@ -100,20 +105,20 @@ class Laporan extends Component
 
         $page = $this->getPage();
         $offset = ($page - 1) * $this->perPage;
-        
+
         $paginator = new LengthAwarePaginator(
             $laporanData->slice($offset, $this->perPage)->values(),
             $laporanData->count(),
             $this->perPage,
             $page,
-            ['path' => \Illuminate\Pagination\Paginator::resolveCurrentPath(), 'pageName' => 'page']
+            ['path' => Paginator::resolveCurrentPath(), 'pageName' => 'page']
         );
 
         $semuaKamar = Kamar::orderBy('nomor_kamar')->get();
 
         return view('livewire.admin.aset.laporan', [
             'laporanData' => $paginator,
-            'semuaKamar' => $semuaKamar
+            'semuaKamar' => $semuaKamar,
         ]);
     }
 
@@ -122,15 +127,15 @@ class Laporan extends Component
         // Ambil SEMUA data (tanpa pagination)
         $query = Kamar::whereHas('asets');
 
-        if (!empty($this->filterKamar)) {
+        if (! empty($this->filterKamar)) {
             $query->where('id', $this->filterKamar);
         }
 
         $kamars = $query->with(['asets' => function ($q) {
-            if (!empty($this->search)) {
-                $q->where('nama_aset', 'like', '%' . $this->search . '%');
+            if (! empty($this->search)) {
+                $q->where('nama_aset', 'like', '%'.$this->search.'%');
             }
-            if (!empty($this->filterKondisi)) {
+            if (! empty($this->filterKondisi)) {
                 $q->wherePivot('kondisi', $this->filterKondisi);
             }
         }])->get();
@@ -153,10 +158,24 @@ class Laporan extends Component
 
         $laporanData = $laporanData->sortBy('kamar_nama')->values();
 
-        $pdf = Pdf::loadView('pdf.laporan-aset', ['laporanData' => $laporanData]);
+        $fontDir = storage_path('fonts');
+        if (! file_exists($fontDir)) {
+            @mkdir($fontDir, 0775, true);
+        }
+
+        $logoPath = public_path('logofr.jpg');
+        if (! file_exists($logoPath)) {
+            $logoPath = public_path('logofr.png');
+        }
+        $logoBase64 = file_exists($logoPath) ? 'data:image/'.pathinfo($logoPath, PATHINFO_EXTENSION).';base64,'.base64_encode(file_get_contents($logoPath)) : null;
+
+        $pdf = Pdf::loadView('pdf.laporan-aset', [
+            'laporanData' => $laporanData,
+            'logoBase64' => $logoBase64,
+        ]);
 
         return response()->streamDownload(function () use ($pdf) {
-            echo $pdf->stream();
+            echo $pdf->output();
         }, 'Laporan-Distribusi-Aset.pdf');
     }
 }

@@ -13,11 +13,11 @@ class Reservasi extends Model
 
     public function tamu()
     {
-        return $this->belongsTo(Tamu::class);
+        return $this->belongsTo(Tamu::class)->withTrashed();
     }
 
     public function kamar()
     {
-        return $this->belongsTo(Kamar::class);
+        return $this->belongsTo(Kamar::class)->withTrashed();
     }
 }
