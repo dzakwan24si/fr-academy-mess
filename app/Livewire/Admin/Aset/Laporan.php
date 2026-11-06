@@ -124,44 +124,48 @@ class Laporan extends Component
 
     public function exportData()
     {
-        // Ambil SEMUA data (tanpa pagination)
-        $query = Kamar::whereHas('asets');
-
-        if (! empty($this->filterKamar)) {
-            $query->where('id', $this->filterKamar);
-        }
-
-        $kamars = $query->with(['asets' => function ($q) {
-            if (! empty($this->search)) {
-                $q->where('nama_aset', 'like', '%'.$this->search.'%');
-            }
-            if (! empty($this->filterKondisi)) {
-                $q->wherePivot('kondisi', $this->filterKondisi);
-            }
-        }])->get();
-
-        $laporanData = collect();
-
-        foreach ($kamars as $kamar) {
-            foreach ($kamar->asets as $aset) {
-                $laporanData->push([
-                    'kamar_nama' => $kamar->nomor_kamar,
-                    'kamar_lokasi' => $kamar->lokasi,
-                    'aset_nama' => $aset->nama_aset,
-                    'aset_kategori' => $aset->kategori,
-                    'jumlah' => $aset->pivot->jumlah,
-                    'kondisi' => $aset->pivot->kondisi,
-                    'keterangan' => $aset->pivot->keterangan,
-                ]);
-            }
-        }
-
-        $laporanData = $laporanData->sortBy('kamar_nama')->values();
+        @ini_set('memory_limit', '512M');
+        @set_time_limit(300);
 
         $fontDir = storage_path('fonts');
         if (! file_exists($fontDir)) {
             @mkdir($fontDir, 0775, true);
         }
+
+        // Ambil data langsung dengan DB join agar cepat dan hemat memori
+        $query = DB::table('aset_kamar')
+            ->join('kamars', 'aset_kamar.kamar_id', '=', 'kamars.id')
+            ->join('aset_messes', 'aset_kamar.aset_mess_id', '=', 'aset_messes.id')
+            ->whereNull('kamars.deleted_at')
+            ->select(
+                'kamars.nomor_kamar as kamar_nama',
+                'kamars.lokasi as kamar_lokasi',
+                'aset_messes.nama_aset as aset_nama',
+                'aset_messes.kategori as aset_kategori',
+                'aset_kamar.jumlah',
+                'aset_kamar.kondisi',
+                'aset_kamar.keterangan'
+            )
+            ->orderBy('kamars.nomor_kamar')
+            ->orderBy('aset_messes.nama_aset');
+
+        $filterKamarNama = null;
+        if (! empty($this->filterKamar)) {
+            $query->where('kamars.id', $this->filterKamar);
+            $kamar = Kamar::find($this->filterKamar);
+            $filterKamarNama = $kamar ? $kamar->nomor_kamar : null;
+        }
+
+        if (! empty($this->filterKondisi)) {
+            $query->where('aset_kamar.kondisi', $this->filterKondisi);
+        }
+
+        if (! empty($this->search)) {
+            $query->where('aset_messes.nama_aset', 'like', '%'.$this->search.'%');
+        }
+
+        $rawData = $query->get()->map(fn ($item) => (array) $item);
+        $groupedData = $rawData->groupBy('kamar_nama');
 
         $logoPath = public_path('logofr.jpg');
         if (! file_exists($logoPath)) {
@@ -170,9 +174,13 @@ class Laporan extends Component
         $logoBase64 = file_exists($logoPath) ? 'data:image/'.pathinfo($logoPath, PATHINFO_EXTENSION).';base64,'.base64_encode(file_get_contents($logoPath)) : null;
 
         $pdf = Pdf::loadView('pdf.laporan-aset', [
-            'laporanData' => $laporanData,
+            'groupedData' => $groupedData,
+            'totalItems' => $rawData->count(),
             'logoBase64' => $logoBase64,
-        ]);
+            'filterKamarNama' => $filterKamarNama,
+            'filterKondisi' => $this->filterKondisi ?: null,
+            'search' => $this->search ?: null,
+        ])->setPaper('a4', 'portrait');
 
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->output();
