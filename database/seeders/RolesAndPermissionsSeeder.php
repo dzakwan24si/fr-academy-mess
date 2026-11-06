@@ -2,8 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\User;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class RolesAndPermissionsSeeder extends Seeder
 {
@@ -13,16 +15,33 @@ class RolesAndPermissionsSeeder extends Seeder
     public function run(): void
     {
         // Reset cached roles and permissions
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Create roles
-        $superadmin = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Superadmin']);
-        $koordinator = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Koordinator Mess']);
-        $kebersihan = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Staf Kebersihan']);
-        $dapur = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Staf Dapur']);
-        $teknisi = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Teknisi']);
-        $kepalaTU = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Kepala TU']);
-        $laundry = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Staf Laundry']);
+        // Create roles and assign default permissions
+        $superadmin = Role::firstOrCreate(['name' => 'Superadmin']);
+        $koordinator = Role::firstOrCreate(['name' => 'Koordinator Mess']);
+        $koordinator->syncPermissions([
+            'akses_reservasi', 'akses_kamar', 'akses_aset', 'akses_laundry',
+            'akses_dapur', 'akses_komplain', 'akses_survei', 'akses_maintenance', 'akses_kebersihan',
+        ]);
+
+        $kebersihan = Role::firstOrCreate(['name' => 'Staf Kebersihan']);
+        $kebersihan->syncPermissions(['akses_kebersihan']);
+
+        $dapur = Role::firstOrCreate(['name' => 'Staf Dapur']);
+        $dapur->syncPermissions(['akses_dapur']);
+
+        $teknisi = Role::firstOrCreate(['name' => 'Teknisi']);
+        $teknisi->syncPermissions(['akses_maintenance', 'akses_aset']);
+
+        $kepalaTU = Role::firstOrCreate(['name' => 'Kepala TU']);
+        $kepalaTU->syncPermissions([
+            'akses_reservasi', 'akses_kamar', 'akses_aset', 'akses_laundry',
+            'akses_dapur', 'akses_komplain', 'akses_survei', 'akses_maintenance', 'akses_kebersihan',
+        ]);
+
+        $laundry = Role::firstOrCreate(['name' => 'Staf Laundry']);
+        $laundry->syncPermissions(['akses_laundry']);
 
         // Define users for each role
         $usersData = [
@@ -37,7 +56,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Create users and assign roles
         foreach ($usersData as $userData) {
-            $user = \App\Models\User::firstOrCreate(
+            $user = User::firstOrCreate(
                 ['email' => $userData['email']],
                 [
                     'name' => $userData['name'],
@@ -45,12 +64,12 @@ class RolesAndPermissionsSeeder extends Seeder
                 ]
             );
             // In case the password logic mutates it directly or we need to ensure it's unhashed 'password'
-            if (!\Hash::info($user->password)['algoName']) {
+            if (! \Hash::info($user->password)['algoName']) {
                 $user->password = bcrypt('password');
                 $user->save();
             }
 
-            if (!$user->hasRole($userData['role']->name)) {
+            if (! $user->hasRole($userData['role']->name)) {
                 $user->assignRole($userData['role']);
             }
         }
