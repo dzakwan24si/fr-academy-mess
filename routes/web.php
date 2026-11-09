@@ -8,12 +8,16 @@ use App\Livewire\Admin\Dapur\Index;
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\Kamar\Aset;
 use App\Livewire\Admin\Laporan\Okupansi;
+use App\Models\Kamar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    $totalKamar = Kamar::count();
+    $totalLorong = Kamar::where('lokasi', 'like', 'Lorong%')->distinct()->count('lokasi');
+
+    return view('welcome', compact('totalKamar', 'totalLorong'));
 })->name('home');
 
 Route::get('/sitemap.xml', function () {
