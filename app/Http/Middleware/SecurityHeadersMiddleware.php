@@ -32,11 +32,11 @@ class SecurityHeadersMiddleware
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://challenges.cloudflare.com",
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net https://cdn.jsdelivr.net",
             "font-src 'self' data: https://fonts.gstatic.com https://fonts.bunny.net https://cdn.jsdelivr.net",
-            "img-src 'self' data: blob: https:",
+            "img-src 'self' data: blob: https://*.first-resources.com",
             "media-src 'self' data: blob:",
             "connect-src 'self' https://challenges.cloudflare.com https://cdn.jsdelivr.net",
             "frame-src 'self' https://challenges.cloudflare.com https://maps.google.com https://www.google.com",
-            "object-src 'self'",
+            "object-src 'none'",
             "base-uri 'self'",
             "form-action 'self' https://challenges.cloudflare.com",
         ];
