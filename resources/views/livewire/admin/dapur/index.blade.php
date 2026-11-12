@@ -715,8 +715,8 @@
 
     <!-- MODAL ATUR RESEP -->
     @if($isModalResepOpen)
-    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden border border-gray-100 flex flex-col max-h-[90vh]">
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-3xl overflow-hidden border border-gray-100 flex flex-col max-h-[90vh]">
             <!-- Header Modal -->
             <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 shrink-0">
                 <div>
@@ -793,30 +793,28 @@
                 </div>
 
                 <!-- Tabel Resep Saat Ini -->
-                <div class="border border-gray-100 rounded-xl overflow-hidden">
-                    <table class="min-w-full text-left text-sm whitespace-nowrap">
-                        <thead class="bg-gray-50 border-b border-gray-100">
+                <div class="border border-gray-200 rounded-xl overflow-x-auto shadow-sm">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-50 border-b border-gray-200 text-gray-600 font-bold text-[11px] uppercase tracking-wider">
                             <tr>
-                                <th scope="col" class="px-4 py-3 font-bold text-gray-500 text-[11px] uppercase tracking-wider w-12">No</th>
-                                <th scope="col" class="px-4 py-3 font-bold text-gray-500 text-[11px] uppercase tracking-wider">Nama Bahan</th>
-                                <th scope="col" class="px-4 py-3 font-bold text-gray-500 text-[11px] uppercase tracking-wider">Takaran</th>
-                                <th scope="col" class="px-4 py-3 font-bold text-gray-500 text-[11px] uppercase tracking-wider">Satuan</th>
-                                <th scope="col" class="px-4 py-3 font-bold text-gray-500 text-[11px] uppercase tracking-wider text-center">Aksi</th>
+                                <th scope="col" class="px-4 py-3 text-center w-12">No</th>
+                                <th scope="col" class="px-4 py-3">Nama Bahan</th>
+                                <th scope="col" class="px-4 py-3 text-center w-28 whitespace-nowrap">Takaran</th>
+                                <th scope="col" class="px-4 py-3 text-center w-20 whitespace-nowrap">Satuan</th>
+                                <th scope="col" class="px-4 py-3 text-center w-20 whitespace-nowrap">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-50 bg-white">
+                        <tbody class="divide-y divide-gray-100 bg-white">
                             @forelse($resepBahanList as $index => $bahan)
-                            <tr class="hover:bg-gray-50/50 transition-colors">
-                                <td class="px-4 py-3 text-gray-500">{{ $index + 1 }}</td>
-                                <td class="px-4 py-3 font-medium text-gray-800">{{ $bahan->nama_bahan }}</td>
-                                <td class="px-4 py-3 font-bold text-[#2E7D32]">{{ $bahan->pivot?->jumlah_dibutuhkan ?? '-' }}</td>
-                                <td class="px-4 py-3 text-gray-500">{{ $bahan->satuan }}</td>
-                                <td class="px-4 py-3">
-                                    <div class="flex justify-center items-center">
-                                        <button wire:click="hapusBahanDariResep({{ $bahan->id }})" class="p-1.5 rounded-full text-red-600 bg-red-50 hover:bg-red-100 transition-colors" title="Hapus dari resep">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                        </button>
-                                    </div>
+                            <tr class="hover:bg-gray-50/70 transition-colors">
+                                <td class="px-4 py-3 text-center text-gray-500 font-medium">{{ $index + 1 }}</td>
+                                <td class="px-4 py-3 font-semibold text-gray-800 break-words">{{ $bahan->nama_bahan }}</td>
+                                <td class="px-4 py-3 text-center font-bold text-[#2E7D32]">{{ $bahan->pivot?->jumlah_dibutuhkan ?? '-' }}</td>
+                                <td class="px-4 py-3 text-center text-gray-500 font-medium">{{ $bahan->satuan }}</td>
+                                <td class="px-4 py-3 text-center">
+                                    <button wire:click="hapusBahanDariResep({{ $bahan->id }})" wire:confirm="Hapus {{ $bahan->nama_bahan }} dari resep ini?" class="p-1.5 rounded-lg text-red-600 bg-red-50 hover:bg-red-100 hover:text-red-700 transition-colors inline-flex items-center justify-center shadow-xs" title="Hapus dari resep">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
                                 </td>
                             </tr>
                             @empty
