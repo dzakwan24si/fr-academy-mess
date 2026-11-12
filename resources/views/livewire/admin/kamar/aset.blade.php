@@ -30,36 +30,36 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100/70">
-                    @forelse($kamar->asets as $aset)
+                    @forelse($kamarAsets as $aset)
                     <tr class="hover:bg-gray-50/50 transition-colors group">
                         <td class="px-6 py-4 font-medium text-gray-800">
                             {{ $aset->nama_aset }}
                             <div class="text-xs text-gray-500 font-normal mt-0.5">{{ $aset->kategori }}</div>
                         </td>
                         <td class="px-6 py-4 text-gray-600">
-                            {{ $aset->pivot->jumlah }}
+                            {{ $aset->pivot?->jumlah ?? 0 }}
                         </td>
                         <td class="px-6 py-4">
-                            @if($aset->pivot->kondisi == 'Baik')
+                            @if(($aset->pivot?->kondisi ?? '') == 'Baik')
                                 <span class="px-2.5 py-1 bg-green-100 text-green-800 rounded-lg text-xs font-semibold tracking-wide">BAIK</span>
-                            @elseif($aset->pivot->kondisi == 'Rusak Ringan')
+                            @elseif(($aset->pivot?->kondisi ?? '') == 'Rusak Ringan')
                                 <span class="px-2.5 py-1 bg-yellow-100 text-yellow-800 rounded-lg text-xs font-semibold tracking-wide">RUSAK RINGAN</span>
                             @else
                                 <span class="px-2.5 py-1 bg-red-100 text-red-800 rounded-lg text-xs font-semibold tracking-wide">RUSAK BERAT</span>
                             @endif
                         </td>
                         <td class="px-6 py-4 text-gray-600">
-                            {{ $aset->pivot->tanggal_maintenance ? \Carbon\Carbon::parse($aset->pivot->tanggal_maintenance)->format('d M Y') : '-' }}
+                            {{ $aset->pivot?->tanggal_maintenance ? \Carbon\Carbon::parse($aset->pivot->tanggal_maintenance)->format('d M Y') : '-' }}
                         </td>
-                        <td class="px-6 py-4 text-gray-600 truncate max-w-[200px]" title="{{ $aset->pivot->keterangan }}">
-                            {{ $aset->pivot->keterangan ?: '-' }}
+                        <td class="px-6 py-4 text-gray-600 truncate max-w-[200px]" title="{{ $aset->pivot?->keterangan }}">
+                            {{ $aset->pivot?->keterangan ?: '-' }}
                         </td>
                         <td class="px-6 py-4 text-right">
                             <div class="flex items-center justify-end gap-2">
-                                <button wire:click="bukaModal({{ $aset->pivot->id }})" class="p-2 text-gray-400 hover:text-[#59A338] hover:bg-green-50 rounded-lg transition-colors">
+                                <button wire:click="bukaModal({{ $aset->pivot?->id }})" class="p-2 text-gray-400 hover:text-[#59A338] hover:bg-green-50 rounded-lg transition-colors">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                 </button>
-                                <button onclick="confirm('Keluarkan barang ini dari kamar?') || event.stopImmediatePropagation()" wire:click="hapus({{ $aset->pivot->id }}, {{ $aset->id }})" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                <button onclick="confirm('Keluarkan barang ini dari kamar?') || event.stopImmediatePropagation()" wire:click="hapus({{ $aset->pivot?->id }}, {{ $aset->id }})" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                 </button>
                             </div>

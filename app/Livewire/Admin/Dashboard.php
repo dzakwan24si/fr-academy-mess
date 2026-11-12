@@ -22,8 +22,6 @@ class Dashboard extends Component
 
     public $detailTitle = '';
 
-    public $detailData = [];
-
     public function mount()
     {
         $user = auth()->user();
@@ -90,13 +88,57 @@ class Dashboard extends Component
             ->take(5)
             ->get();
 
+        $detailData = collect();
+        if ($this->showDetailModal && ! empty($this->detailType)) {
+            switch ($this->detailType) {
+                case 'okupansi':
+                    $detailData = Reservasi::with(['tamu', 'kamar'])
+                        ->whereIn('status', ['checked_in'])
+                        ->orderBy('tanggal_checkin', 'desc')
+                        ->get();
+                    break;
+
+                case 'kedatangan':
+                    $detailData = Reservasi::with(['tamu', 'kamar'])
+                        ->whereDate('tanggal_checkin', $today)
+                        ->get();
+                    break;
+
+                case 'kepulangan':
+                    $detailData = Reservasi::with(['tamu', 'kamar'])
+                        ->whereDate('tanggal_checkout', $today)
+                        ->get();
+                    break;
+
+                case 'pending':
+                    $detailData = Reservasi::with(['tamu', 'kamar'])
+                        ->where('status', 'pending')
+                        ->get();
+                    break;
+
+                case 'perlu_bersih':
+                    $detailData = Kamar::whereIn('status', ['kosong_kotor', 'kotor_sebagian'])
+                        ->where('tipe_kamar', '!=', 'Fasilitas Umum')
+                        ->get();
+                    break;
+
+                case 'komplain_baru':
+                    $detailData = KomplainKerusakan::with(['reservasi.tamu', 'reservasi.kamar'])
+                        ->where('status_perbaikan', 'dilaporkan')
+                        ->latest()
+                        ->get();
+                    break;
+            }
+        }
+
         return view('livewire.admin.dashboard', compact(
             'totalKamar', 'kamarTerisi', 'kamarKotor',
             'checkInHariIni', 'checkOutHariIni', 'reservasiPending',
             'komplainBaru', 'laundryBaru',
             'porsiPagi', 'porsiSiang', 'porsiMalam',
             'chartDates', 'chartData',
-            'recentReservations'
+            'recentReservations',
+            'detailData'
         ));
     }
 
@@ -124,52 +166,30 @@ class Dashboard extends Component
     {
         $this->detailType = $type;
         $this->showDetailModal = true;
-        $today = Carbon::today();
 
         switch ($type) {
             case 'okupansi':
                 $this->detailTitle = 'Detail Kamar Terisi';
-                // Ambil semua reservasi aktif beserta data kamar dan tamu
-                $this->detailData = Reservasi::with(['tamu', 'kamar'])
-                    ->whereIn('status', ['checked_in'])
-                    ->orderBy('tanggal_checkin', 'desc')
-                    ->get();
                 break;
 
             case 'kedatangan':
                 $this->detailTitle = 'Jadwal Kedatangan Hari Ini';
-                $this->detailData = Reservasi::with(['tamu', 'kamar'])
-                    ->whereDate('tanggal_checkin', $today)
-                    ->get();
                 break;
 
             case 'kepulangan':
                 $this->detailTitle = 'Jadwal Kepulangan Hari Ini';
-                $this->detailData = Reservasi::with(['tamu', 'kamar'])
-                    ->whereDate('tanggal_checkout', $today)
-                    ->get();
                 break;
 
             case 'pending':
                 $this->detailTitle = 'Reservasi Menunggu Persetujuan';
-                $this->detailData = Reservasi::with(['tamu', 'kamar'])
-                    ->where('status', 'pending')
-                    ->get();
                 break;
 
             case 'perlu_bersih':
                 $this->detailTitle = 'Daftar Kamar Perlu Dibersihkan';
-                $this->detailData = Kamar::whereIn('status', ['kosong_kotor', 'kotor_sebagian'])
-                    ->where('tipe_kamar', '!=', 'Fasilitas Umum')
-                    ->get();
                 break;
 
             case 'komplain_baru':
                 $this->detailTitle = 'Laporan Komplain Baru';
-                $this->detailData = KomplainKerusakan::with(['reservasi.tamu', 'reservasi.kamar'])
-                    ->where('status_perbaikan', 'dilaporkan')
-                    ->latest()
-                    ->get();
                 break;
         }
     }
@@ -178,6 +198,6 @@ class Dashboard extends Component
     {
         $this->showDetailModal = false;
         $this->detailType = '';
-        $this->detailData = [];
+        $this->detailTitle = '';
     }
 }

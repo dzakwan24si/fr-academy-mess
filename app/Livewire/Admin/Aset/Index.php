@@ -28,12 +28,12 @@ class Index extends Component
 
     public $selectedId = null;
 
-    public $selectedAset = null;
+    public $selectedAsetId = null;
 
     // Riwayat Modal
     public $isModalRiwayatOpen = false;
 
-    public $riwayatList = [];
+    public $riwayatAsetId = null;
 
     public $riwayatAsetTitle = '';
 
@@ -103,17 +103,15 @@ class Index extends Component
 
     public function showDetail($id)
     {
-        $this->selectedAset = AsetMess::with(['kamars' => function ($query) {
-            $query->orderBy('nomor_kamar', 'asc');
-        }])->findOrFail($id);
-
+        $aset = AsetMess::findOrFail($id);
+        $this->selectedAsetId = $aset->id;
         $this->isDetailModalOpen = true;
     }
 
     public function closeDetailModal()
     {
         $this->isDetailModalOpen = false;
-        $this->selectedAset = null;
+        $this->selectedAsetId = null;
     }
 
     public function bukaModalRiwayat($id)
@@ -138,7 +136,7 @@ class Index extends Component
             }
         }
 
-        $this->riwayatList = $aset->riwayatAktivitas;
+        $this->riwayatAsetId = $aset->id;
         $this->riwayatAsetTitle = $aset->nama_aset;
         $this->isModalRiwayatOpen = true;
     }
@@ -146,7 +144,7 @@ class Index extends Component
     public function tutupModalRiwayat()
     {
         $this->isModalRiwayatOpen = false;
-        $this->riwayatList = [];
+        $this->riwayatAsetId = null;
     }
 
     public function render()
@@ -154,8 +152,10 @@ class Index extends Component
         $query = AsetMess::with('kamars')->orderBy('created_at', 'desc');
 
         if (! empty($this->search)) {
-            $query->where('nama_aset', 'like', '%'.$this->search.'%')
-                ->orWhere('kategori', 'like', '%'.$this->search.'%');
+            $query->where(function ($q) {
+                $q->where('nama_aset', 'like', '%'.$this->search.'%')
+                    ->orWhere('kategori', 'like', '%'.$this->search.'%');
+            });
         }
 
         $asets = $query->paginate($this->perPage);
@@ -167,8 +167,8 @@ class Index extends Component
             $totalHilang = 0;
 
             foreach ($aset->kamars as $kamar) {
-                $jumlah = $kamar->pivot->jumlah;
-                $kondisi = $kamar->pivot->kondisi;
+                $jumlah = $kamar->pivot?->jumlah ?? 0;
+                $kondisi = $kamar->pivot?->kondisi ?? '';
 
                 if ($kondisi === 'Baik') {
                     $totalBaik += $jumlah;
@@ -187,8 +187,28 @@ class Index extends Component
             return $aset;
         });
 
+        $selectedAset = null;
+        if ($this->isDetailModalOpen && $this->selectedAsetId) {
+            $selectedAset = AsetMess::with(['kamars' => function ($query) {
+                $query->orderBy('nomor_kamar', 'asc');
+            }])->find($this->selectedAsetId);
+        }
+
+        $riwayatList = collect();
+        if ($this->isModalRiwayatOpen && $this->riwayatAsetId) {
+            $aset = AsetMess::find($this->riwayatAsetId);
+            if ($aset) {
+                $riwayatList = $aset->riwayatAktivitas()
+                    ->with('user')
+                    ->latest()
+                    ->get();
+            }
+        }
+
         return view('livewire.admin.aset.index', [
             'asets' => $asets,
+            'selectedAset' => $selectedAset,
+            'riwayatList' => $riwayatList,
         ]);
     }
 }

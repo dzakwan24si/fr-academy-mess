@@ -51,13 +51,13 @@
                     @forelse($komplains as $komplain)
                         <tr class="hover:bg-gray-50/50 transition-colors group">
                             <td class="px-6 py-4">
-                                <div class="font-bold text-gray-900">{{ $komplain->reservasi->tamu->nama }}</div>
+                                <div class="font-bold text-gray-900">{{ $komplain->reservasi?->tamu?->nama ?? 'Tamu Umum' }}</div>
                                 <div class="text-xs text-gray-500 mt-0.5">{{ $komplain->created_at->format('d M Y, H:i') }}</div>
                             </td>
                             <td class="px-6 py-4">
                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-100 text-gray-700 font-bold border border-gray-200">
                                     <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                                    {{ $komplain->reservasi->kamar->nomor_kamar ?? '-' }}
+                                    {{ $komplain->reservasi?->kamar?->nomor_kamar ?? '-' }}
                                 </span>
                             </td>
                             <td class="px-6 py-4">
@@ -140,11 +140,11 @@
                         <div class="flex items-center justify-between mb-3">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-lg">
-                                    {{ substr($komplainDetail->reservasi->tamu->nama, 0, 1) }}
+                                    {{ substr($komplainDetail->reservasi?->tamu?->nama ?? 'T', 0, 1) }}
                                 </div>
                                 <div>
-                                    <p class="font-bold text-gray-900">{{ $komplainDetail->reservasi->tamu->nama }}</p>
-                                    <p class="text-xs font-semibold text-gray-500">Kamar {{ $komplainDetail->reservasi->kamar->nomor_kamar }}</p>
+                                    <p class="font-bold text-gray-900">{{ $komplainDetail->reservasi?->tamu?->nama ?? 'Tamu Tidak Diketahui' }}</p>
+                                    <p class="text-xs font-semibold text-gray-500">Kamar {{ $komplainDetail->reservasi?->kamar?->nomor_kamar ?? '-' }}</p>
                                 </div>
                             </div>
                             <div class="text-xs text-gray-500 text-right">

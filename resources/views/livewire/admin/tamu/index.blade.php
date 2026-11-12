@@ -312,7 +312,7 @@
             <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                 <div>
                     <h3 class="text-lg font-bold text-gray-800">Riwayat Menginap</h3>
-                    <p class="text-xs text-gray-500 mt-0.5">Tamu: <strong class="text-gray-800">{{ $selectedTamu->nama }}</strong> ({{ $selectedTamu->no_hp }})</p>
+                    <p class="text-xs text-gray-500 mt-0.5">Tamu: <strong class="text-gray-800">{{ $selectedTamu?->nama }}</strong> ({{ $selectedTamu?->no_hp }})</p>
                 </div>
                 <button wire:click="tutupModalRiwayat" class="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -324,14 +324,14 @@
                     <div class="space-y-3">
                         @foreach($riwayatReservasis as $res)
                             @php
-                                $resKamar = $res->kamar->nomor_kamar ?? 'Kamar Tidak Diketahui';
+                                $resKamar = $res->kamar?->nomor_kamar ?? 'Kamar Tidak Diketahui';
                                 $displayResKamar = str_starts_with(strtolower($resKamar), 'kamar') ? $resKamar : 'Kamar ' . $resKamar;
                             @endphp
                             <div class="p-4 rounded-xl border border-gray-100 bg-gray-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                                 <div>
                                     <div class="flex items-center gap-2">
                                         <span class="font-bold text-gray-800">{{ $displayResKamar }}</span>
-                                        <span class="text-xs text-gray-500">({{ $res->kamar->tipe_kamar ?? '-' }})</span>
+                                        <span class="text-xs text-gray-500">({{ $res->kamar?->tipe_kamar ?? '-' }})</span>
                                     </div>
                                     <div class="text-xs text-gray-500 mt-1 flex items-center gap-2">
                                         <span>Check-in: <strong>{{ \Carbon\Carbon::parse($res->tanggal_checkin)->format('d M Y') }}</strong></span>
@@ -382,7 +382,7 @@
                 </div>
                 <h3 class="text-lg font-bold text-gray-800 mb-2">Hapus Akun Tamu?</h3>
                 <p class="text-sm text-gray-600 mb-4">
-                    Apakah Anda yakin ingin menghapus akun tamu <strong>{{ $tamuToDelete->nama }}</strong> ({{ $tamuToDelete->no_hp }})?
+                    Apakah Anda yakin ingin menghapus akun tamu <strong>{{ $tamuToDelete?->nama }}</strong> ({{ $tamuToDelete?->no_hp }})?
                 </p>
                 <div class="bg-amber-50 p-3 rounded-xl border border-amber-200 text-left text-xs text-amber-800 mb-4 leading-relaxed">
                     <p class="font-bold flex items-center gap-1 mb-1">

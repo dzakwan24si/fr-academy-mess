@@ -20,7 +20,7 @@ class Login extends Component
     public function cekNomor()
     {
         $this->validate([
-            'no_hp' => 'required|numeric|min:10'
+            'no_hp' => 'required|numeric|min_digits:10'
         ]);
 
         $tamu = Tamu::where('no_hp', $this->no_hp)->first();
@@ -51,7 +51,7 @@ class Login extends Component
     public function daftarTamu()
     {
         $this->validate([
-            'no_hp' => 'required|numeric|min:10|unique:tamus,no_hp',
+            'no_hp' => 'required|numeric|min_digits:10|unique:tamus,no_hp',
             'nama' => 'required|string|max:255',
             'perusahaan' => 'required|string|max:255',
             'jabatan' => 'required|string|max:255',

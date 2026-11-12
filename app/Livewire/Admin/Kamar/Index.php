@@ -24,7 +24,7 @@ class Index extends Component
 
     // Riwayat Modal
     public $isModalRiwayatOpen = false;
-    public $riwayatList = [];
+    public $riwayatKamarId = null;
     public $riwayatKamarTitle = '';
 
     // Form Modal
@@ -135,10 +135,8 @@ class Index extends Component
 
     public function bukaModalRiwayat($id)
     {
-        $kamar = Kamar::with(['riwayatAktivitas' => function($q) {
-            $q->latest();
-        }, 'riwayatAktivitas.user'])->findOrFail($id);
-        $this->riwayatList = $kamar->riwayatAktivitas;
+        $kamar = Kamar::findOrFail($id);
+        $this->riwayatKamarId = $kamar->id;
         $this->riwayatKamarTitle = $kamar->nomor_kamar;
         $this->isModalRiwayatOpen = true;
     }
@@ -146,7 +144,7 @@ class Index extends Component
     public function tutupModalRiwayat()
     {
         $this->isModalRiwayatOpen = false;
-        $this->riwayatList = [];
+        $this->riwayatKamarId = null;
     }
 
     public function render()
@@ -155,16 +153,30 @@ class Index extends Component
                       ->orderBy('nomor_kamar', 'asc');
 
         if (!empty($this->search)) {
-            $query->where('nomor_kamar', 'like', '%' . $this->search . '%')
+            $query->where(function ($q) {
+                $q->where('nomor_kamar', 'like', '%' . $this->search . '%')
                   ->orWhere('tipe_kamar', 'like', '%' . $this->search . '%');
+            });
         }
 
         if (!empty($this->filterStatus)) {
             $query->where('status', $this->filterStatus);
         }
 
+        $riwayatList = collect();
+        if ($this->isModalRiwayatOpen && $this->riwayatKamarId) {
+            $kamar = Kamar::find($this->riwayatKamarId);
+            if ($kamar) {
+                $riwayatList = $kamar->riwayatAktivitas()
+                    ->with('user')
+                    ->latest()
+                    ->get();
+            }
+        }
+
         return view('livewire.admin.kamar.index', [
-            'kamars' => $query->paginate($this->perPage)
+            'kamars' => $query->paginate($this->perPage),
+            'riwayatList' => $riwayatList,
         ]);
     }
 }

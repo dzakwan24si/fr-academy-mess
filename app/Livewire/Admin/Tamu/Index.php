@@ -43,14 +43,12 @@ class Index extends Component
     // State Modal Riwayat
     public $isRiwayatModalOpen = false;
 
-    public $selectedTamu = null;
-
-    public $riwayatReservasis = [];
+    public $selectedTamuId = null;
 
     // State Modal Konfirmasi Hapus
     public $isDeleteModalOpen = false;
 
-    public $tamuToDelete = null;
+    public $tamuToDeleteId = null;
 
     public function updatingSearch()
     {
@@ -148,54 +146,49 @@ class Index extends Component
 
     public function bukaModalRiwayat($id)
     {
-        $tamu = Tamu::with(['reservasis' => function ($q) {
-            $q->with('kamar')->orderBy('tanggal_checkin', 'desc');
-        }])->find($id);
-
+        $tamu = Tamu::find($id);
         if (! $tamu) {
             session()->flash('error', 'Data tamu tidak ditemukan.');
 
             return;
         }
 
-        $this->selectedTamu = $tamu;
-        $this->riwayatReservasis = $tamu->reservasis;
+        $this->selectedTamuId = $id;
         $this->isRiwayatModalOpen = true;
     }
 
     public function tutupModalRiwayat()
     {
         $this->isRiwayatModalOpen = false;
-        $this->selectedTamu = null;
-        $this->riwayatReservasis = [];
+        $this->selectedTamuId = null;
     }
 
     public function konfirmasiHapus($id)
     {
-        $tamu = Tamu::withCount('reservasis')->find($id);
+        $tamu = Tamu::find($id);
         if (! $tamu) {
             session()->flash('error', 'Data tamu tidak ditemukan.');
 
             return;
         }
 
-        $this->tamuToDelete = $tamu;
+        $this->tamuToDeleteId = $id;
         $this->isDeleteModalOpen = true;
     }
 
     public function tutupModalHapus()
     {
         $this->isDeleteModalOpen = false;
-        $this->tamuToDelete = null;
+        $this->tamuToDeleteId = null;
     }
 
     public function hapusTamu()
     {
-        if (! $this->tamuToDelete) {
+        if (! $this->tamuToDeleteId) {
             return;
         }
 
-        $tamu = Tamu::find($this->tamuToDelete->id);
+        $tamu = Tamu::find($this->tamuToDeleteId);
         if ($tamu) {
             // Modifikasi nomor HP agar dibebaskan jika nomor tersebut ingin didaftarkan ulang
             $oldPhone = $tamu->no_hp;
@@ -266,6 +259,22 @@ class Index extends Component
 
         $tamus = $query->orderBy('nama', 'asc')->paginate($this->perPage);
 
+        $selectedTamu = null;
+        $riwayatReservasis = collect();
+        if ($this->isRiwayatModalOpen && $this->selectedTamuId) {
+            $selectedTamu = Tamu::with(['reservasis' => function ($q) {
+                $q->with('kamar')->orderBy('tanggal_checkin', 'desc');
+            }])->find($this->selectedTamuId);
+            if ($selectedTamu) {
+                $riwayatReservasis = $selectedTamu->reservasis;
+            }
+        }
+
+        $tamuToDelete = null;
+        if ($this->isDeleteModalOpen && $this->tamuToDeleteId) {
+            $tamuToDelete = Tamu::withCount('reservasis')->find($this->tamuToDeleteId);
+        }
+
         return view('livewire.admin.tamu.index', [
             'tamus' => $tamus,
             'totalTamu' => $totalTamu,
@@ -273,6 +282,9 @@ class Index extends Component
             'totalUmum' => $totalUmum,
             'tamuAktifCount' => $tamuAktifCount,
             'tamuInaktifCount' => $tamuInaktifCount,
+            'selectedTamu' => $selectedTamu,
+            'riwayatReservasis' => $riwayatReservasis,
+            'tamuToDelete' => $tamuToDelete,
         ]);
     }
 }

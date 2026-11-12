@@ -73,15 +73,15 @@
                                 <div class="text-xs text-gray-500">{{ $rsv->created_at->format('d M Y, H:i') }}</div>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="font-bold text-gray-800">{{ $rsv->tamu->nama ?? '-' }}</div>
+                                <div class="font-bold text-gray-800">{{ $rsv->tamu?->nama ?? '-' }}</div>
                                 <div class="text-xs text-gray-500 mt-0.5">
-                                    <span class="font-medium text-gray-700">{{ $rsv->tamu->no_hp ?? '-' }}</span><br>
-                                    {{ $rsv->tamu->perusahaan ?? 'Personal' }} ({{ $rsv->tamu->jabatan ?? '-' }})<br>
+                                    <span class="font-medium text-gray-700">{{ $rsv->tamu?->no_hp ?? '-' }}</span><br>
+                                    {{ $rsv->tamu?->perusahaan ?? 'Personal' }} ({{ $rsv->tamu?->jabatan ?? '-' }})<br>
                                     <span class="italic max-w-[200px] truncate block" title="{{ $rsv->keperluan_menginap }}">"{{ $rsv->keperluan_menginap }}"</span>
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                @if(isset($rsv->tamu->kategori))
+                                @if(isset($rsv->tamu?->kategori))
                                     <span class="inline-flex items-center px-2.5 py-1 text-xs font-bold rounded-full {{ $rsv->tamu->kategori == 'trainee' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700' }}">
                                         {{ $rsv->tamu->kategori == 'trainee' ? 'Trainee' : 'Tamu Umum' }}
                                     </span>
@@ -221,23 +221,23 @@
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <p class="text-xs text-gray-500">Nama Lengkap</p>
-                                    <p class="font-semibold text-gray-800">{{ $detailReservasi->tamu->nama ?? '-' }}</p>
+                                    <p class="font-semibold text-gray-800">{{ $detailReservasi->tamu?->nama ?? '-' }}</p>
                                 </div>
                                 <div>
                                     <p class="text-xs text-gray-500">Nomor Handphone</p>
-                                    <p class="font-semibold text-gray-800">{{ $detailReservasi->tamu->no_hp ?? '-' }}</p>
+                                    <p class="font-semibold text-gray-800">{{ $detailReservasi->tamu?->no_hp ?? '-' }}</p>
                                 </div>
                                 <div>
                                     <p class="text-xs text-gray-500">Perusahaan</p>
-                                    <p class="font-semibold text-gray-800">{{ $detailReservasi->tamu->perusahaan ?? 'Personal' }}</p>
+                                    <p class="font-semibold text-gray-800">{{ $detailReservasi->tamu?->perusahaan ?? 'Personal' }}</p>
                                 </div>
                                 <div>
                                     <p class="text-xs text-gray-500">Jabatan</p>
-                                    <p class="font-semibold text-gray-800">{{ $detailReservasi->tamu->jabatan ?? '-' }}</p>
+                                    <p class="font-semibold text-gray-800">{{ $detailReservasi->tamu?->jabatan ?? '-' }}</p>
                                 </div>
                                 <div>
                                     <p class="text-xs text-gray-500">Kategori Tamu</p>
-                                    <p class="font-semibold text-gray-800">{{ isset($detailReservasi->tamu->kategori) ? ($detailReservasi->tamu->kategori == 'trainee' ? 'Trainee' : 'Tamu Umum') : '-' }}</p>
+                                    <p class="font-semibold text-gray-800">{{ isset($detailReservasi->tamu?->kategori) ? ($detailReservasi->tamu->kategori == 'trainee' ? 'Trainee' : 'Tamu Umum') : '-' }}</p>
                                 </div>
                             </div>
                         </div>

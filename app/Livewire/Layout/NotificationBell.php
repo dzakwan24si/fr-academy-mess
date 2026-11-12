@@ -8,10 +8,13 @@ class NotificationBell extends Component
 {
     public function markAsRead($notificationId, $url)
     {
-        $notification = auth()->user()->notifications()->find($notificationId);
-        
-        if ($notification) {
-            $notification->markAsRead();
+        $user = auth()->user();
+        if ($user) {
+            $notification = $user->notifications()->find($notificationId);
+            
+            if ($notification) {
+                $notification->markAsRead();
+            }
         }
 
         return redirect($url);
@@ -19,14 +22,19 @@ class NotificationBell extends Component
 
     public function markAllAsRead()
     {
-        auth()->user()->unreadNotifications->markAsRead();
+        $user = auth()->user();
+        if ($user) {
+            $user->unreadNotifications()->update(['read_at' => now()]);
+        }
     }
 
     public function render()
     {
+        $user = auth()->user();
+
         return view('livewire.layout.notification-bell', [
-            'notifications' => auth()->user()->notifications()->take(10)->get(),
-            'unreadCount' => auth()->user()->unreadNotifications->count()
+            'notifications' => $user ? $user->notifications()->take(10)->get() : collect(),
+            'unreadCount' => $user ? $user->unreadNotifications()->count() : 0
         ]);
     }
 }

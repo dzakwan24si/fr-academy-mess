@@ -28,7 +28,7 @@ class Index extends Component
 
     // Modal state
     public $isBookingModalOpen = false;
-    public $selectedKamar = null;
+    public $selectedKamarId = null;
     public $keperluan = '';
 
     public function mount()
@@ -39,7 +39,7 @@ class Index extends Component
 
     public function bukaModalBooking($kamarId)
     {
-        $this->selectedKamar = Kamar::find($kamarId);
+        $this->selectedKamarId = $kamarId;
         $this->isBookingModalOpen = true;
         $this->keperluan = '';
         $this->perkiraan_jam_checkin = '';
@@ -48,7 +48,7 @@ class Index extends Component
     public function tutupModalBooking()
     {
         $this->isBookingModalOpen = false;
-        $this->selectedKamar = null;
+        $this->selectedKamarId = null;
         $this->keperluan = '';
         $this->perkiraan_jam_checkin = '';
     }
@@ -66,7 +66,7 @@ class Index extends Component
 
         $reservasi = Reservasi::create([
             'tamu_id' => $tamu->id,
-            'kamar_id' => $this->selectedKamar->id,
+            'kamar_id' => $this->selectedKamarId,
             'tanggal_checkin' => $this->tanggal_checkin,
             'perkiraan_jam_checkin' => $this->perkiraan_jam_checkin ?: null,
             'tanggal_checkout' => $this->tanggal_checkout,
@@ -122,8 +122,11 @@ class Index extends Component
 
         $kamars = $query->paginate($this->perPage);
 
+        $selectedKamar = $this->selectedKamarId ? Kamar::find($this->selectedKamarId) : null;
+
         return view('livewire.guest.booking.index', [
-            'kamars' => $kamars
+            'kamars' => $kamars,
+            'selectedKamar' => $selectedKamar,
         ]);
     }
 }

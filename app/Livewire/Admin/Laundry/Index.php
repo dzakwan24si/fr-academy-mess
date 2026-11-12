@@ -24,7 +24,6 @@ class Index extends Component
     public $isModalOpen = false;
     public $selectedId = null;
     public $status = '';
-    public $laundryDetail = null;
 
     protected $queryString = ['search', 'filterStatus'];
 
@@ -42,9 +41,8 @@ class Index extends Component
     {
         $this->resetValidation();
         $this->selectedId = $id;
-        $laundry = RequestLaundry::with(['reservasi.kamar', 'reservasi.tamu', 'detailLaundries'])->findOrFail($id);
+        $laundry = RequestLaundry::findOrFail($id);
         
-        $this->laundryDetail = $laundry;
         $this->status = $laundry->status;
         
         $this->isModalOpen = true;
@@ -54,7 +52,6 @@ class Index extends Component
     {
         $this->isModalOpen = false;
         $this->selectedId = null;
-        $this->laundryDetail = null;
     }
 
     public function simpanProses()
@@ -92,10 +89,12 @@ class Index extends Component
             ->orderBy('created_at', 'desc');
 
         if (!empty($this->search)) {
-            $query->whereHas('reservasi.tamu', function($q) {
-                $q->where('nama', 'like', '%' . $this->search . '%');
-            })->orWhereHas('reservasi.kamar', function($q) {
-                $q->where('nomor_kamar', 'like', '%' . $this->search . '%');
+            $query->where(function ($nested) {
+                $nested->whereHas('reservasi.tamu', function($q) {
+                    $q->where('nama', 'like', '%' . $this->search . '%');
+                })->orWhereHas('reservasi.kamar', function($q) {
+                    $q->where('nomor_kamar', 'like', '%' . $this->search . '%');
+                });
             });
         }
 
@@ -103,8 +102,14 @@ class Index extends Component
             $query->where('status', $this->filterStatus);
         }
 
+        $laundryDetail = null;
+        if ($this->isModalOpen && $this->selectedId) {
+            $laundryDetail = RequestLaundry::with(['reservasi.kamar', 'reservasi.tamu', 'detailLaundries'])->find($this->selectedId);
+        }
+
         return view('livewire.admin.laundry.index', [
-            'laundries' => $query->paginate($this->perPage)
+            'laundries' => $query->paginate($this->perPage),
+            'laundryDetail' => $laundryDetail,
         ]);
     }
 }

@@ -154,9 +154,12 @@ class Aset extends Component
             }
         }
 
+        $kamarAsets = $this->kamar->asets()->get();
+
         return view('livewire.admin.kamar.aset', [
             'masterAset' => $masterAset,
-            'asetLorong' => collect($asetLorong)->values()
+            'asetLorong' => collect($asetLorong)->values(),
+            'kamarAsets' => $kamarAsets,
         ]);
     }
 }

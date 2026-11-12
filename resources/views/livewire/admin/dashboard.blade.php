@@ -305,14 +305,14 @@
                                             <div class="flex flex-col items-center justify-center px-4 py-2 bg-blue-50 text-blue-800 rounded-lg min-w-[80px]">
                                                 <span class="text-xs tracking-wider font-semibold mb-0.5">KAMAR</span>
                                                 <span class="font-bold text-lg leading-none">
-                                                    {{ str_ireplace(['kamar ', 'kmr '], '', $data->kamar->nomor_kamar ?? '-') }}
+                                                    {{ str_ireplace(['kamar ', 'kmr '], '', $data->kamar?->nomor_kamar ?? '-') }}
                                                 </span>
                                             </div>
                                         </div>
                                         <div class="flex-1">
-                                            <p class="text-sm font-bold text-slate-900">{{ $data->tamu->nama ?? 'Tamu Tidak Diketahui' }}</p>
+                                            <p class="text-sm font-bold text-slate-900">{{ $data->tamu?->nama ?? 'Tamu Tidak Diketahui' }}</p>
                                             <p class="text-xs text-slate-500 mt-0.5">
-                                                {{ $data->tamu->instansi ?: 'Tamu Umum' }} {{ $data->tamu->no_hp ? ' - ' . $data->tamu->no_hp : '' }}
+                                                {{ $data->tamu?->instansi ?: 'Tamu Umum' }} {{ $data->tamu?->no_hp ? ' - ' . $data->tamu->no_hp : '' }}
                                             </p>
                                             <div class="mt-2 flex items-center gap-4 text-sm text-gray-500">
                                                 <span class="flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg> {{ \Carbon\Carbon::parse($data->tanggal_checkin)->format('d M Y') }}</span>
@@ -345,13 +345,13 @@
                                             <div class="flex flex-col items-center justify-center px-4 py-2 bg-blue-50 text-blue-800 rounded-lg min-w-[80px]">
                                                 <span class="text-xs tracking-wider font-semibold mb-0.5">KAMAR</span>
                                                 <span class="font-bold text-lg leading-none">
-                                                    {{ str_ireplace(['kamar ', 'kmr '], '', $data->reservasi->kamar->nomor_kamar ?? '-') }}
+                                                    {{ str_ireplace(['kamar ', 'kmr '], '', $data->reservasi?->kamar?->nomor_kamar ?? '-') }}
                                                 </span>
                                             </div>
                                         </div>
                                         <div class="flex-1">
                                             <p class="text-sm font-bold text-slate-900 line-clamp-2">{{ $data->deskripsi }}</p>
-                                            <p class="text-xs text-slate-500 mt-0.5">Pelapor: {{ $data->reservasi->tamu->nama ?? 'Sistem/Admin' }}</p>
+                                            <p class="text-xs text-slate-500 mt-0.5">Pelapor: {{ $data->reservasi?->tamu?->nama ?? 'Sistem/Admin' }}</p>
                                             <div class="mt-1.5 text-[11px] font-medium text-slate-400">
                                                 {{ $data->created_at->format('d M Y, H:i') }}
                                             </div>

@@ -51,10 +51,10 @@
                     @forelse($laundries as $laundry)
                         <tr class="hover:bg-gray-50/50 transition-colors group">
                             <td class="px-6 py-4">
-                                <div class="font-bold text-gray-900">{{ $laundry->reservasi->tamu->nama }}</div>
+                                <div class="font-bold text-gray-900">{{ $laundry->reservasi?->tamu?->nama ?? 'Tamu Umum' }}</div>
                                 <div class="text-xs text-gray-500 mt-1 flex items-center gap-1 font-semibold">
                                     <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                                    Kamar {{ $laundry->reservasi->kamar->nomor_kamar ?? '-' }}
+                                    Kamar {{ $laundry->reservasi?->kamar?->nomor_kamar ?? '-' }}
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-gray-600 font-medium">
@@ -123,11 +123,11 @@
                 <div class="bg-teal-50/50 border border-teal-100 rounded-2xl p-4 mb-6">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="w-10 h-10 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center font-bold text-lg">
-                            {{ substr($laundryDetail->reservasi->tamu->nama, 0, 1) }}
+                            {{ substr($laundryDetail->reservasi?->tamu?->nama ?? 'T', 0, 1) }}
                         </div>
                         <div>
-                            <p class="font-bold text-gray-900">{{ $laundryDetail->reservasi->tamu->nama }}</p>
-                            <p class="text-xs font-semibold text-gray-500">Kamar {{ $laundryDetail->reservasi->kamar->nomor_kamar }}</p>
+                            <p class="font-bold text-gray-900">{{ $laundryDetail->reservasi?->tamu?->nama ?? 'Tamu Tidak Diketahui' }}</p>
+                            <p class="text-xs font-semibold text-gray-500">Kamar {{ $laundryDetail->reservasi?->kamar?->nomor_kamar ?? '-' }}</p>
                         </div>
                     </div>
                     

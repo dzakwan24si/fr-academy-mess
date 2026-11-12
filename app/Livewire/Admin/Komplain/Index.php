@@ -27,9 +27,6 @@ class Index extends Component
     public $selectedId = null;
     public $status_perbaikan = '';
     public $teknisi_id = null;
-    
-    // For view details
-    public $komplainDetail = null;
 
     protected $queryString = ['search', 'filterStatus'];
 
@@ -47,9 +44,8 @@ class Index extends Component
     {
         $this->resetValidation();
         $this->selectedId = $id;
-        $komplain = KomplainKerusakan::with(['reservasi.kamar', 'reservasi.tamu', 'teknisi'])->findOrFail($id);
+        $komplain = KomplainKerusakan::findOrFail($id);
         
-        $this->komplainDetail = $komplain;
         $this->status_perbaikan = $komplain->status_perbaikan;
         $this->teknisi_id = $komplain->teknisi_id;
         
@@ -60,7 +56,6 @@ class Index extends Component
     {
         $this->isModalOpen = false;
         $this->selectedId = null;
-        $this->komplainDetail = null;
     }
 
     public function simpanProses()
@@ -116,10 +111,12 @@ class Index extends Component
             ->orderBy('created_at', 'desc');
 
         if (!empty($this->search)) {
-            $query->whereHas('reservasi.tamu', function($q) {
-                $q->where('nama', 'like', '%' . $this->search . '%');
-            })->orWhereHas('reservasi.kamar', function($q) {
-                $q->where('nomor_kamar', 'like', '%' . $this->search . '%');
+            $query->where(function ($nested) {
+                $nested->whereHas('reservasi.tamu', function($q) {
+                    $q->where('nama', 'like', '%' . $this->search . '%');
+                })->orWhereHas('reservasi.kamar', function($q) {
+                    $q->where('nomor_kamar', 'like', '%' . $this->search . '%');
+                });
             });
         }
 
@@ -129,9 +126,15 @@ class Index extends Component
 
         $teknisis = User::role('Teknisi')->get();
 
+        $komplainDetail = null;
+        if ($this->isModalOpen && $this->selectedId) {
+            $komplainDetail = KomplainKerusakan::with(['reservasi.kamar', 'reservasi.tamu', 'teknisi'])->find($this->selectedId);
+        }
+
         return view('livewire.admin.komplain.index', [
             'komplains' => $query->paginate($this->perPage),
-            'teknisis' => $teknisis
+            'teknisis' => $teknisis,
+            'komplainDetail' => $komplainDetail,
         ]);
     }
 }

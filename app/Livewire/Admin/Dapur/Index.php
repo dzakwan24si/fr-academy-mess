@@ -137,7 +137,23 @@ class Index extends Component
         $allMenus = Menu::orderBy('nama_menu')->get();
         $allBahanBakus = BahanBaku::orderBy('nama_bahan')->get();
 
-        return view('livewire.admin.dapur.index', compact('bahanBakus', 'menus', 'rencanaHarians', 'allMenus', 'allBahanBakus'));
+        $resepBahanList = collect();
+        if ($this->isModalResepOpen && $this->activeMenuId) {
+            $activeMenu = Menu::with('bahanBakus')->find($this->activeMenuId);
+            if ($activeMenu) {
+                $resepBahanList = $activeMenu->bahanBakus;
+            }
+        }
+
+        $ulasanList = collect();
+        if ($this->isModalUlasanOpen && $this->activeUlasanRencanaId) {
+            $rencana = RencanaMenuHarian::with('feedbackMasakans.tamu')->find($this->activeUlasanRencanaId);
+            if ($rencana) {
+                $ulasanList = $rencana->feedbackMasakans;
+            }
+        }
+
+        return view('livewire.admin.dapur.index', compact('bahanBakus', 'menus', 'rencanaHarians', 'allMenus', 'allBahanBakus', 'resepBahanList', 'ulasanList'));
     }
 
     public function formOpname() {}
@@ -319,37 +335,46 @@ class Index extends Component
 
     public $jumlahPerPorsi = '';
 
-    public $resepBahanList = [];
-
     public function bukaModalResep($menuId)
     {
-        $this->reset(['selectedBahanId', 'jumlahPerPorsi', 'resepBahanList']);
+        $this->reset(['selectedBahanId', 'jumlahPerPorsi']);
 
-        $menu = Menu::with('bahanBakus')->findOrFail($menuId);
+        $menu = Menu::findOrFail($menuId);
         $this->activeMenuId = $menu->id;
         $this->activeMenuName = $menu->nama_menu;
-        $this->resepBahanList = $menu->bahanBakus; // Load existing
 
         $this->isModalResepOpen = true;
     }
 
     public function tutupModalResep()
     {
-        $this->reset(['activeMenuId', 'activeMenuName', 'selectedBahanId', 'jumlahPerPorsi', 'resepBahanList']);
+        $this->reset(['activeMenuId', 'activeMenuName', 'selectedBahanId', 'jumlahPerPorsi']);
         $this->isModalResepOpen = false;
     }
 
     public function tambahBahanKeResep()
     {
+        if (! $this->activeMenuId) {
+            session()->flash('error_resep', 'Menu tidak valid.');
+
+            return;
+        }
+
         $this->validate([
             'selectedBahanId' => 'required|exists:bahan_bakus,id',
-            'jumlahPerPorsi' => 'required|numeric|min:0.01',
+            'jumlahPerPorsi' => 'required|numeric|min:0.001',
+        ], [
+            'selectedBahanId.required' => 'Pilih bahan baku terlebih dahulu.',
+            'selectedBahanId.exists' => 'Bahan baku tidak valid.',
+            'jumlahPerPorsi.required' => 'Takaran per porsi wajib diisi.',
+            'jumlahPerPorsi.numeric' => 'Takaran harus berupa angka.',
+            'jumlahPerPorsi.min' => 'Takaran minimal 0.001.',
         ]);
 
         $menu = Menu::findOrFail($this->activeMenuId);
 
         // Validasi duplicate
-        if ($menu->bahanBakus()->where('bahan_baku_id', $this->selectedBahanId)->exists()) {
+        if ($menu->bahanBakus()->where('resep_bahan.bahan_baku_id', $this->selectedBahanId)->exists()) {
             session()->flash('error_resep', 'Bahan baku ini sudah ada di dalam resep.');
 
             return;
@@ -360,8 +385,6 @@ class Index extends Component
             'jumlah_dibutuhkan' => $this->jumlahPerPorsi,
         ]);
 
-        // Refresh state
-        $this->resepBahanList = $menu->bahanBakus()->get();
         $this->reset(['selectedBahanId', 'jumlahPerPorsi']);
         $this->dispatch('reset-select-bahan');
         session()->flash('success_resep', 'Bahan baku berhasil ditambahkan ke resep.');
@@ -369,11 +392,14 @@ class Index extends Component
 
     public function hapusBahanDariResep($bahanId)
     {
+        if (! $this->activeMenuId) {
+            return;
+        }
+
         $menu = Menu::findOrFail($this->activeMenuId);
         $menu->bahanBakus()->detach($bahanId);
 
-        // Refresh state
-        $this->resepBahanList = $menu->bahanBakus()->get();
+        session()->flash('success_resep', 'Bahan baku berhasil dihapus dari resep.');
     }
 
     // --- State & Methods untuk Modal Rencana Harian ---
@@ -541,16 +567,16 @@ class Index extends Component
     // --- State & Methods untuk Modal Ulasan ---
     public $isModalUlasanOpen = false;
 
-    public $ulasanList = [];
+    public $activeUlasanRencanaId = null;
 
     public $ulasanMenuName = '';
 
     public function bukaModalUlasan($id)
     {
-        $rencanaMenu = RencanaMenuHarian::with(['menu', 'feedbackMasakans.tamu'])->find($id);
+        $rencanaMenu = RencanaMenuHarian::with('menu')->find($id);
         if ($rencanaMenu) {
+            $this->activeUlasanRencanaId = $id;
             $this->ulasanMenuName = $rencanaMenu->menu->nama_menu ?? 'Menu Tidak Diketahui';
-            $this->ulasanList = $rencanaMenu->feedbackMasakans;
             $this->isModalUlasanOpen = true;
         }
     }
@@ -558,6 +584,8 @@ class Index extends Component
     public function tutupModalUlasan()
     {
         $this->isModalUlasanOpen = false;
+        $this->activeUlasanRencanaId = null;
+        $this->ulasanMenuName = '';
     }
 
     // --- State & Methods untuk Cetak Daftar Belanja ---

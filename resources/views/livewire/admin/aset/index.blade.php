@@ -193,16 +193,16 @@
                                         <td class="px-6 py-3 font-semibold text-gray-800">{{ $kamar->nomor_kamar }}</td>
                                         <td class="px-6 py-3 text-gray-600">{{ $kamar->lokasi ?: '-' }}</td>
                                         <td class="px-6 py-3">
-                                            @if($kamar->pivot->kondisi == 'Baik')
+                                            @if($kamar->pivot?->kondisi == 'Baik')
                                                 <span class="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs font-semibold">Baik</span>
-                                            @elseif(in_array($kamar->pivot->kondisi, ['Rusak Ringan', 'Rusak Berat']))
-                                                <span class="px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded text-xs font-semibold">{{ $kamar->pivot->kondisi }}</span>
-                                            @elseif($kamar->pivot->kondisi == 'Hilang')
+                                            @elseif(in_array($kamar->pivot?->kondisi, ['Rusak Ringan', 'Rusak Berat']))
+                                                <span class="px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded text-xs font-semibold">{{ $kamar->pivot?->kondisi }}</span>
+                                            @elseif($kamar->pivot?->kondisi == 'Hilang')
                                                 <span class="px-2 py-0.5 bg-red-100 text-red-700 rounded text-xs font-semibold">Hilang</span>
                                             @endif
                                         </td>
-                                        <td class="px-6 py-3 text-center font-bold text-gray-800">{{ $kamar->pivot->jumlah }}</td>
-                                        <td class="px-6 py-3 text-gray-500 text-xs truncate max-w-[150px]" title="{{ $kamar->pivot->keterangan }}">{{ $kamar->pivot->keterangan ?: '-' }}</td>
+                                        <td class="px-6 py-3 text-center font-bold text-gray-800">{{ $kamar->pivot?->jumlah ?? 0 }}</td>
+                                        <td class="px-6 py-3 text-gray-500 text-xs truncate max-w-[150px]" title="{{ $kamar->pivot?->keterangan }}">{{ $kamar->pivot?->keterangan ?: '-' }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

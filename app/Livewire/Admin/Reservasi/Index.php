@@ -33,7 +33,7 @@ class Index extends Component
 
     // Detail Modal
     public $isModalDetailOpen = false;
-    public $detailReservasi = null;
+    public $detailReservasiId = null;
 
 
     // Form Walk-in Reservation
@@ -112,14 +112,14 @@ class Index extends Component
 
     public function bukaModalDetail($id)
     {
-        $this->detailReservasi = Reservasi::with(['tamu', 'kamar'])->findOrFail($id);
+        $this->detailReservasiId = $id;
         $this->isModalDetailOpen = true;
     }
 
     public function tutupModalDetail()
     {
         $this->isModalDetailOpen = false;
-        $this->detailReservasi = null;
+        $this->detailReservasiId = null;
     }
 
 
@@ -544,9 +544,15 @@ class Index extends Component
                 return $kamar->active_guests_count < $kamar->kapasitas;
             });
 
+        $detailReservasi = null;
+        if ($this->isModalDetailOpen && $this->detailReservasiId) {
+            $detailReservasi = Reservasi::with(['tamu', 'kamar'])->find($this->detailReservasiId);
+        }
+
         return view('livewire.admin.reservasi.index', [
             'reservasis' => $query->paginate($this->perPage),
-            'availableRooms' => $availableRooms
+            'availableRooms' => $availableRooms,
+            'detailReservasi' => $detailReservasi,
         ]);
     }
 }

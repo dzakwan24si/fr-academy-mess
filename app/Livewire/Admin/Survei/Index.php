@@ -55,10 +55,12 @@ class Index extends Component
         }
 
         if ($this->search) {
-            $query->whereHas('reservasi.tamu', function ($q) {
-                $q->where('nama', 'like', '%'.$this->search.'%');
-            })->orWhereHas('reservasi.kamar', function ($q) {
-                $q->where('nomor_kamar', 'like', '%'.$this->search.'%');
+            $query->where(function ($nested) {
+                $nested->whereHas('reservasi.tamu', function ($q) {
+                    $q->where('nama', 'like', '%'.$this->search.'%');
+                })->orWhereHas('reservasi.kamar', function ($q) {
+                    $q->where('nomor_kamar', 'like', '%'.$this->search.'%');
+                });
             });
         }
 
@@ -113,10 +115,12 @@ class Index extends Component
         }
 
         if ($this->search) {
-            $query->whereHas('reservasi.tamu', function ($q) {
-                $q->where('nama', 'like', '%'.$this->search.'%');
-            })->orWhereHas('reservasi.kamar', function ($q) {
-                $q->where('nomor_kamar', 'like', '%'.$this->search.'%');
+            $query->where(function ($nested) {
+                $nested->whereHas('reservasi.tamu', function ($q) {
+                    $q->where('nama', 'like', '%'.$this->search.'%');
+                })->orWhereHas('reservasi.kamar', function ($q) {
+                    $q->where('nomor_kamar', 'like', '%'.$this->search.'%');
+                });
             });
         }
 

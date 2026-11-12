@@ -758,7 +758,7 @@
                                         maxOptions: null,
                                         placeholder: 'Ketik nama bahan untuk mencari...',
                                         onChange: (val) => {
-                                            $wire.set('selectedBahanId', val);
+                                            $wire.set('selectedBahanId', val, false);
                                         }
                                     });
                                     $wire.on('reset-select-bahan', () => {
@@ -782,7 +782,7 @@
                         </div>
                         <div class="w-full sm:w-32">
                             <label class="block text-xs font-semibold text-gray-600 mb-1.5">Takaran / Porsi <span class="text-red-500">*</span></label>
-                            <input wire:model="jumlahPerPorsi" type="number" step="0.01" min="0.01" placeholder="Misal: 0.25" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#59A338] focus:ring-1 focus:ring-[#59A338] transition-colors">
+                            <input wire:model="jumlahPerPorsi" type="number" step="0.001" min="0.001" placeholder="Misal: 0.25" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#59A338] focus:ring-1 focus:ring-[#59A338] transition-colors">
                             @error('jumlahPerPorsi') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                         </div>
                         <button wire:click="tambahBahanKeResep" class="w-full sm:w-auto px-4 py-2 text-sm font-semibold text-white bg-[#59A338] hover:bg-[#4d8c2f] rounded-lg shadow-sm flex items-center justify-center gap-2 transition-colors">
@@ -809,7 +809,7 @@
                             <tr class="hover:bg-gray-50/50 transition-colors">
                                 <td class="px-4 py-3 text-gray-500">{{ $index + 1 }}</td>
                                 <td class="px-4 py-3 font-medium text-gray-800">{{ $bahan->nama_bahan }}</td>
-                                <td class="px-4 py-3 font-bold text-[#2E7D32]">{{ $bahan->pivot->jumlah_dibutuhkan }}</td>
+                                <td class="px-4 py-3 font-bold text-[#2E7D32]">{{ $bahan->pivot?->jumlah_dibutuhkan ?? '-' }}</td>
                                 <td class="px-4 py-3 text-gray-500">{{ $bahan->satuan }}</td>
                                 <td class="px-4 py-3">
                                     <div class="flex justify-center items-center">
