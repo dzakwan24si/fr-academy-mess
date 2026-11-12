@@ -345,7 +345,7 @@
                                     @php
                                         $hargaPorsi = $rencana->menu->estimasi_harga_porsi > 0 
                                             ? $rencana->menu->estimasi_harga_porsi 
-                                            : ($rencana->menu->bahanBakus ? $rencana->menu->bahanBakus->sum(function($b) { return $b->pivot->jumlah_dibutuhkan * $b->harga_satuan; }) : 0);
+                                            : ($rencana->menu->bahanBakus ? $rencana->menu->bahanBakus->sum(function($b) { return ((float) ($b->pivot?->jumlah_dibutuhkan ?? 0)) * $b->harga_satuan; }) : 0);
                                         $totalAnggaran = $hargaPorsi * $rencana->target_porsi;
                                     @endphp
                                     Rp {{ number_format($totalAnggaran, 0, ',', '.') }}
@@ -809,7 +809,7 @@
                             <tr class="hover:bg-gray-50/70 transition-colors">
                                 <td class="px-4 py-3 text-center text-gray-500 font-medium">{{ $index + 1 }}</td>
                                 <td class="px-4 py-3 font-semibold text-gray-800 break-words">{{ $bahan->nama_bahan }}</td>
-                                <td class="px-4 py-3 text-center font-bold text-[#2E7D32]">{{ $bahan->pivot?->jumlah_dibutuhkan ?? '-' }}</td>
+                                <td class="px-4 py-3 text-center font-bold text-[#2E7D32]">{{ $bahan->pivot?->jumlah_dibutuhkan !== null ? (float) $bahan->pivot->jumlah_dibutuhkan : '-' }}</td>
                                 <td class="px-4 py-3 text-center text-gray-500 font-medium">{{ $bahan->satuan }}</td>
                                 <td class="px-4 py-3 text-center">
                                     <button wire:click="hapusBahanDariResep({{ $bahan->id }})" wire:confirm="Hapus {{ $bahan->nama_bahan }} dari resep ini?" class="p-1.5 rounded-lg text-red-600 bg-red-50 hover:bg-red-100 hover:text-red-700 transition-colors inline-flex items-center justify-center shadow-xs" title="Hapus dari resep">

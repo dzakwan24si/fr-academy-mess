@@ -117,7 +117,7 @@ class Index extends Component
         }
         $menus = $queryMenu->latest()->paginate($this->perPage, ['*'], 'menuPage');
 
-        $queryRencana = RencanaMenuHarian::with(['menu', 'feedbackMasakans']);
+        $queryRencana = RencanaMenuHarian::with(['menu.bahanBakus', 'feedbackMasakans']);
         if (! empty($this->searchRencana)) {
             $queryRencana->whereHas('menu', function ($q) {
                 $q->where('nama_menu', 'like', '%'.$this->searchRencana.'%');
@@ -701,7 +701,7 @@ class Index extends Component
             $targetPorsi = $rencana->target_porsi ?? 100;
             if ($rencana->menu && $rencana->menu->bahanBakus) {
                 foreach ($rencana->menu->bahanBakus as $bahanBaku) {
-                    $butuh = round(((float) $bahanBaku->pivot->jumlah_dibutuhkan) * $targetPorsi, 3);
+                    $butuh = round(((float) ($bahanBaku->pivot?->jumlah_dibutuhkan ?? 0)) * $targetPorsi, 3);
                     if (! isset($bahanKebutuhan[$bahanBaku->id])) {
                         $bahanKebutuhan[$bahanBaku->id] = 0;
                     }
@@ -748,6 +748,9 @@ class Index extends Component
                 $qty = round((float) $item['kuantitas_dibeli'], 3);
                 if ($qty > 0) {
                     $bahan = BahanBaku::find($item['bahan_baku_id']);
+                    if (! $bahan) {
+                        continue;
+                    }
 
                     // Update stok dengan pembulatan 3 desimal
                     $bahan->stok = round((float) $bahan->stok + $qty, 3);
